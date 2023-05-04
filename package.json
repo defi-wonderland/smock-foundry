@@ -1,19 +1,18 @@
 {
-  "name": "solidity-foundry-boilerplate",
+  "name": "mock-generator-foundry",
   "version": "1.0.0",
   "private": true,
-  "description": "Production ready Solidity boilerplate with Foundry",
-  "homepage": "https://github.com/defi-wonderland/solidity-foundry-boilerplate#readme",
+  "description": "",
+  "homepage": "https://github.com/defi-wonderland/mock-foundry-private#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/defi-wonderland/solidity-foundry-boilerplate.git"
+    "url": "git+https://github.com/defi-wonderland/mock-foundry-private.git"
   },
   "license": "MIT",
   "author": "Wonderland",
   "contributors": [
-    "0xGorilla (https://github.com/0xGorilla)",
-    "0xng (https://github.com/0xng)",
-    "gas1cent (https://github.com/gas1cent)"
+    "OneTony (https://github.com/0xOneTony)",
+    "Ashitaka (https://github.com/ashitakah)"
   ],
   "scripts": {
     "build": "forge build",
@@ -36,6 +35,12 @@
     "*.{js,css,md,ts,sol}": "forge fmt",
     "*.sol": "cross-env solhint --fix 'solidity/**/*.sol",
     "package.json": "sort-package-json"
+  },
+  "dependencies": {
+    "ethers": "6.3.0",
+    "nodemon": "2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "5.0.4"
   },
   "devDependencies": {
     "@commitlint/cli": "17.0.3",
