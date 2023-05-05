@@ -9,5 +9,5 @@
   ],
   "watch": ["src/**/*"],
   "ext": "ts",
-  "exec": "ts-node src/example"
+  "exec": "ts-node src/run"
 }
