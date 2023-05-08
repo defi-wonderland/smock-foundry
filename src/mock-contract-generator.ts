@@ -1,11 +1,13 @@
-import { parseContract, getContractsDirs } from "./index";
+import { parseContract, getContractsNames, getConstructor } from "./index";
 import Handlebars from "handlebars";
 import fs from "fs";
 
 export const generateMockContracts = async () => {
   // Compile handlebars template
-  const source = fs.readFileSync("templates/mockContractTemplate.hbs", "utf8");
-  const template = Handlebars.compile(source);
+  const templateContent = fs.readFileSync(
+    "templates/mockContractTemplate.hbs",
+    "utf8"
+  );
   // path
   const mockContractsDir = "./solidity/mockContracts";
 
@@ -15,29 +17,37 @@ export const generateMockContracts = async () => {
       fs.mkdirSync(mockContractsDir);
     }
 
-    const contractDirs = await getContractsDirs();
+    const contractDirs = await getContractsNames();
 
-    contractDirs.forEach(async (contractDir: string) => {
-      // Delete I as first element
-      const subNameDir = contractDir.substring(1);
+    contractDirs.forEach(async (contractNames: string) => {
+      // Get contractDir
+      const contractDir = `./solidity/contracts/${contractNames}`;
       // Replace .sol for .json
-      const subDir = contractDir.replace(".sol", ".json");
+      const subDir = contractNames.replace(".sol", ".json");
       // Gets the abi
-      const abiFile = `../out/${contractDir}/${subDir}`;
+      const abiFile = `../out/${contractNames}/${subDir}`;
       const abi = require(abiFile).abi;
 
+      const { viewFunctions, externalFunctions } = await parseContract(abi);
       const data = {
-        contractName: subNameDir.replace(".sol", ""),
-        functions: await parseContract(abi),
+        contractName: contractNames.replace(".sol", ""),
+        constructor: await getConstructor(contractDir),
+        viewFunctions: viewFunctions,
+        externalFunctions: externalFunctions,
       };
+
+      // Fill the template with the data
+      const template = Handlebars.compile(templateContent);
 
       // Fill the template with the data
       const code = template(data);
 
+      const cleanedCode = code.replace(/&#x3D;/g, "=");
+
       // Write the contract
       await fs.promises.writeFile(
-        `./solidity/mockContracts/Mock${subNameDir}`,
-        code
+        `./solidity/mockContracts/Mock${contractNames}`,
+        cleanedCode
       );
     });
 

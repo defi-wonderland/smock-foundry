@@ -1,12 +1,19 @@
-import { FunctionFragment, ethers } from "ethers";
+import { ConstructorFragment, FunctionFragment, ethers } from "ethers";
 
 export const parseContract = async (
   abi: any[]
-): Promise<FunctionFragment[]> => {
-  const iface = new ethers.Interface(abi); // Gets the interface
+): Promise<{
+  viewFunctions: FunctionFragment[];
+  externalFunctions: FunctionFragment[];
+}> => {
+  const iface = new ethers.Interface(abi);
+
+  // Gets the interface
 
   const viewFunctions: FunctionFragment[] = []; // Array with view functions frangments
-  const externalFunctions: FunctionFragment[] = []; // Array with external/public functions frangments
+  const externalFunctions: FunctionFragment[] = [];
+
+  // Array with external/public functions frangments
   const functions = iface.fragments.filter(
     (fragment) => fragment.type === "function"
   );
@@ -14,6 +21,7 @@ export const parseContract = async (
   // Gets view functions
   functions.forEach((func: FunctionFragment) => {
     if (func.stateMutability === "view") {
+      const inputs = iface.getFunction(func.name);
       viewFunctions.push(func);
     }
 
@@ -24,6 +32,5 @@ export const parseContract = async (
       externalFunctions.push(func);
     }
   });
-
-  return externalFunctions;
+  return { viewFunctions, externalFunctions };
 };

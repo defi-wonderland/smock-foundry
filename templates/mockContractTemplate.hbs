@@ -3,6 +3,9 @@ pragma solidity ^0.8.0;
 import { {{contractName}} } from 'contracts/{{contractName}}.sol';
 
 contract mock{{contractName}} is {{contractName}} {
+
+  {{constructor}}
+
   {{#each variables}}
   {{this.type}} public {{this.name}};
   {{/each}}
