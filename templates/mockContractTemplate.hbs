@@ -1,6 +1,9 @@
 pragma solidity ^0.8.0;
 
-import { {{contractName}} } from 'contracts/{{contractName}}.sol';
+import { {{~contractName~}} } from 'contracts/{{contractName}}.sol';
+{{#each import}}
+{{this}}; 
+{{/each}}
 
 contract mock{{contractName}} is {{contractName}} {
 

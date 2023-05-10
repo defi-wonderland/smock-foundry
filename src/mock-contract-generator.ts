@@ -1,4 +1,9 @@
-import { parseContract, getContractsNames, getConstructor } from "./index";
+import {
+  parseContract,
+  getContractsNames,
+  getConstructor,
+  getImports,
+} from "./index";
 import Handlebars from "handlebars";
 import fs from "fs";
 
@@ -31,6 +36,7 @@ export const generateMockContracts = async () => {
       const { viewFunctions, externalFunctions } = await parseContract(abi);
       const data = {
         contractName: contractNames.replace(".sol", ""),
+        import: await getImports(contractDir),
         constructor: await getConstructor(contractDir),
         viewFunctions: viewFunctions,
         externalFunctions: externalFunctions,
@@ -42,7 +48,10 @@ export const generateMockContracts = async () => {
       // Fill the template with the data
       const code = template(data);
 
-      const cleanedCode = code.replace(/&#x3D;/g, "=");
+      const cleanedCode = code
+        .replace(/&#x27;/g, "'")
+        .replace(/&#x3D;/g, "=")
+        .replace(/;;/g, ";");
 
       // Write the contract
       await fs.promises.writeFile(
