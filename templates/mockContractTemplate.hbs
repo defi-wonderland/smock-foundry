@@ -8,8 +8,8 @@ import { {{~contractName~}} } from 'contracts/{{contractName}}.sol';
 contract mock{{contractName}} is {{contractName}} {
 
   {{constructor}}
-
-  {{#each variables}}
-  {{this.type}} public {{this.name}};
+  
+  {{#each functions}}
+  {{this}} 
   {{/each}}
 }

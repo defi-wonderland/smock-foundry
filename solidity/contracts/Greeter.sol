@@ -28,11 +28,11 @@ contract Greeter is IGreeter {
   constructor(string memory _greeting, IERC20 _token) {
     OWNER = msg.sender;
     token = _token;
-    setGreeting(_greeting);
+    setGreeting(_greeting, 1);
   }
 
   /// @inheritdoc IGreeter
-  function setGreeting(string memory _greeting) public onlyOwner {
+  function setGreeting(string memory _greeting, uint256 _test) public onlyOwner {
     if (keccak256(bytes(_greeting)) == _EMPTY_STRING) {
       revert Greeter_InvalidGreeting();
     }
