@@ -32,12 +32,13 @@ export const generateMockContracts = async () => {
       // Gets the abi
       const abiFile = `../out/${contractNames}/${subDir}`;
       const abi = require(abiFile).abi;
-
+      const ast = require(abiFile).ast;
+      
       const { viewFunctions, externalFunctions } = await parseContract(abi);
       const data = {
         contractName: contractNames.replace(".sol", ""),
-        import: await getImports(contractDir),
-        constructor: await getConstructor(contractDir),
+        import: await getImports(abiFile),
+        constructor: await getConstructor(abiFile),
         viewFunctions: viewFunctions,
         externalFunctions: externalFunctions,
       };
