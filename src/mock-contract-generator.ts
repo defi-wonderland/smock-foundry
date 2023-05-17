@@ -6,6 +6,7 @@ import {
 } from "./index";
 import Handlebars from "handlebars";
 import fs from "fs";
+import fsExtra from "fs-extra";
 
 export const generateMockContracts = async () => {
   // Compile handlebars template
@@ -13,26 +14,29 @@ export const generateMockContracts = async () => {
     "templates/mockContractTemplate.hbs",
     "utf8"
   );
-  // path
+
+  // Output path
   const mockContractsDir = "./solidity/mockContracts";
 
   try {
-    // Checks if folder already exists
+    // Check if folder already exists
     if (!fs.existsSync(mockContractsDir)) {
       fs.mkdirSync(mockContractsDir);
     }
 
+    // Delete the contents of the output directory
+    await fsExtra.emptyDir(mockContractsDir);
+    // Get contracts dir
     const contractDirs = await getContractsNames();
-
+    // Loop for each contract
     contractDirs.forEach(async (contractNames: string) => {
-      // Get contractDir
-      const contractDir = `./solidity/contracts/${contractNames}`;
       // Replace .sol for .json
       const subDir = contractNames.replace(".sol", ".json");
       // Gets the abi
       const abiFile = `../out/${contractNames}/${subDir}`;
       const abi = require(abiFile).abi;
 
+      // All data which will be use for create the template
       const data = {
         contractName: contractNames.replace(".sol", ""),
         import: await getImports(abiFile),

@@ -1,3 +1,3 @@
-import { generateMockContracts } from "./index";
+import {generateMockContracts} from './index';
 
 generateMockContracts();
