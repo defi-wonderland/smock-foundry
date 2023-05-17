@@ -35,8 +35,8 @@ export const generateMockContracts = async () => {
 
       const data = {
         contractName: contractNames.replace(".sol", ""),
-        import: await getImports(contractDir),
-        constructor: await getConstructor(contractDir),
+        import: await getImports(abiFile),
+        constructor: await getConstructor(abiFile),
         functions: await parseContract(abi, contractNames.replace(".sol", "")),
       };
 
