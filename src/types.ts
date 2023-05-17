@@ -53,9 +53,9 @@ export interface OutputType {
   type: string;
   baseType: string;
   indexed?: boolean;
-  components: null | string;
-  arrayLength: null | string;
-  arrayChildren: null | string;
+  components: null | any;
+  arrayLength: null | any;
+  arrayChildren: null | any;
 }
 
 export type AstNode =
