@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
+    "target": "es6",
     "module": "commonjs",
     "declaration": true,
     "esModuleInterop": true,
     "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "target": "es6",
-    "allowJs": true,
-    "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@src/*": ["src/*"]
+    },
     "incremental": true,
     "resolveJsonModule": true
   },

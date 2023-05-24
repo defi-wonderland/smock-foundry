@@ -19,3 +19,6 @@ out/*/*
 # Keep the latest deployment only
 broadcast/*/*/*
 !broadcast/*/*/run-latest.json
+
+# Ignore generated mock contracts
+solidity/mockContracts

@@ -15,6 +15,9 @@ export const getConstructor = (sourceFilePath: string): Promise<string> => {
       (node): node is ContractDefinitionNode =>
         node.nodeType === "ContractDefinition"
     );
+    // Get the contract's name
+    const contractName: string = contractNode.name;
+
     // Filter the nodes and keep only the FunctionDefinition related ones
     const functionNodes: FunctionDefinitionNode[] = contractNode.nodes.filter(
       (node): node is FunctionDefinitionNode =>
@@ -52,7 +55,7 @@ export const getConstructor = (sourceFilePath: string): Promise<string> => {
     const parameterNamesString = parameterNames.join(", ");
 
     // Create the constructor signature and return it
-    const constructorSignature = `constructor(${mockConstructorParametersString}) Greeter(${parameterNamesString}) {}`;
+    const constructorSignature = `constructor(${mockConstructorParametersString}) ${contractName}(${parameterNamesString}) {}`;
     resolve(constructorSignature);
   });
 };

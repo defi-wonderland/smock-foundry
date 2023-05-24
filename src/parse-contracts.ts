@@ -42,22 +42,22 @@ export const parseContract = async (
         });
 
         // Craft the string for mock and setter
-        const viewFunc = `
-          function mock_set${capitalizeFirstLetter(
+        const viewFunc = 
+          `\tfunction mock_set${capitalizeFirstLetter(
             func.name
-          )}(${type} _${functionName}) public {
-            stdstore.target(address(this)).sig('${
+          )}(${type} _${functionName}) public {\n` +
+          `\t  stdstore.target(address(this)).sig('${
               func.name
-            }()').checked_write(_${functionName});
-          }
+            }()').checked_write(_${functionName});\n` +
+          `\t}\n\n` +
           
-          function mock_${func.name}(${type} _${functionName}) public {
-            vm.mockCall(
-            address(this),
-            abi.encodeWithSelector(I${interfaceName}.${func.name}.selector),
-            abi.encode(_${functionName})
-            );
-          }`;
+          `\tfunction mock_${func.name}(${type} _${functionName}) public {\n` +
+          `\t vm.mockCall(\n` +
+          `\t  address(this),\n` +
+          `\t  abi.encodeWithSelector(I${interfaceName}.${func.name}.selector),\n` +
+          `\t  abi.encode(_${functionName})\n` +
+          `\t  );\n` +
+          `\t}`;
 
         // Push to view functions array
         functions.push(viewFunc);
@@ -120,14 +120,14 @@ export const parseContract = async (
       }
 
       // Craft the string for mock
-      const externalFunc = `
-      function mock_${func.name}(${inputsString}${outputsString}) public {
-        vm.mockCall(
-          address(this),
-          abi.encodeWithSelector(I${interfaceName}.${func.name}.selector, ${inputsStringParam}),
-          abi.encode(${outputsStringParam})
-        );
-      }`;
+      const externalFunc = 
+        `\tfunction mock_${func.name}(${inputsString}${outputsString}) public {\n` +
+        `\t  vm.mockCall(\n` +
+        `\t    address(this),\n` +
+        `\t    abi.encodeWithSelector(I${interfaceName}.${func.name}.selector, ${inputsStringParam}),\n` +
+        `\t    abi.encode(${outputsStringParam})\n` +
+        `\t  );\n` +
+        `\t}`;
       functions.push(externalFunc);
     }
   });
