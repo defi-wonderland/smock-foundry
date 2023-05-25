@@ -1,6 +1,6 @@
-import { readdirSync } from 'fs';
+import { readdirSync } from "fs";
 
-export const getContractPaths = () : string[] => {
+export const getContractPaths = (): string[] => {
   // Dir of the contracts
   // TODO: Make this configurable
   const targetDir = "./solidity/contracts";

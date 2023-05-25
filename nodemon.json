@@ -7,7 +7,9 @@
     "**/*.spec.ts",
     "**/*.sol"
   ],
-  "watch": ["src/**/*"],
+  "watch": [
+    "src/**/*"
+  ],
   "ext": "ts",
   "exec": "ts-node src/run"
 }

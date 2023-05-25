@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
+import {DSTestPlus} from 'node_modules/@defi-wonderland/solidity-utils/solidity/test/DSTestPlus.sol';
 import { {{~contractName~}} } from 'contracts/{{contractName}}.sol';
 {{#each import}}
-{{this}}; 
+{{this}};
 {{/each}}
 
-contract mock{{contractName}} is {{contractName}} {
+contract mock{{contractName}} is {{contractName}}, DSTestPlus {
 
   {{constructor}}
-  
   {{functions}}
 }

@@ -20,6 +20,7 @@
     "lint:check": " yarn lint:ts-logic && forge fmt check",
     "lint:fix": "sort-package-json && forge fmt && yarn lint:ts-logic --fix",
     "lint:ts-logic": "eslint ./src/**/*.ts",
+    "mock-gen": "ts-node src/run.ts mock-gen",
     "test": "forge build && cross-env mocha 'test/**/*.spec.ts'"
   },
   "lint-staged": {
@@ -33,7 +34,8 @@
     "handlebars": "4.7.7",
     "nodemon": "2.0.22",
     "sinon": "15.1.0",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@commitlint/cli": "17.0.3",
@@ -49,7 +51,7 @@
     "chai-as-promised": "7.1.1",
     "cross-env": "7.0.3",
     "eslint": "8.40.0",
-    "husky": "8.0.2",
+    "husky": "8.0.3",
     "lint-staged": "10",
     "mocha": "10.2.0",
     "sort-package-json": "2.4.1",

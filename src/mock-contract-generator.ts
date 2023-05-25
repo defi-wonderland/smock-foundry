@@ -1,4 +1,5 @@
 import {
+  getDataFunctions,
   getFunctions,
   getContractPaths,
   getConstructor,
@@ -22,20 +23,20 @@ export const generateMockContracts = async () => {
 
   // Output path
   // TODO: Make this configurable
-  const mockContractsDir = './solidity/mockContracts';
+  const mockContractsDir = "./solidity/mockContracts";
 
   try {
     try {
-      await ensureDir(mockContractsDir)
+      await ensureDir(mockContractsDir);
     } catch (error) {
-      console.error('Error while creating the mock directory: ', error);
+      console.error("Error while creating the mock directory: ", error);
     }
 
     // Empty the directory, if it exists
     try {
       await emptyDir(mockContractsDir);
     } catch (error) {
-      console.error('Error while trying to empty the mock directory: ', error);
+      console.error("Error while trying to empty the mock directory: ", error);
     }
     // Get all contracts directories
     const contractPaths: string[] = getContractPaths();
@@ -55,14 +56,17 @@ export const generateMockContracts = async () => {
       // Get the contract's interface
       const iface: Interface = new ethers.utils.Interface(abi);
 
+      const functions = `
+      ${getFunctions(iface, contractPath.replace(".sol", ""))}
+      ${getDataFunctions(ast)}`;
+
       // All data which will be use for create the template
       const data = {
         contractName: contractName,
         import: getImports(ast),
         constructor: getConstructor(ast),
-        functions: getFunctions(iface, contractPath.replace(".sol", "")),
+        functions: functions,
       };
-
 
       // Fill the handlebars template with the data
       const code: string = template(data);

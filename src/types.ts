@@ -6,6 +6,15 @@ export interface VariableDeclarationNode {
   typeDescriptions: {
     typeString: string;
   };
+  typeName: {
+    id: number;
+    keyType: {
+      name: string;
+    };
+    valueType: {
+      name: string;
+    };
+  };
 }
 
 export interface ContractDefinitionNode {
@@ -61,15 +70,9 @@ export interface OutputType {
 export type AstNode =
   | ImportDirectiveNode
   | FunctionDefinitionNode
-  | ContractDefinitionNode;
+  | ContractDefinitionNode
+  | VariableDeclarationNode;
 
-export const memoryTypes = [
-  "string",
-  "bytes",
-  "bytes32",
-  "bytes64",
-  "bytes128",
-  "bytes256",
-  "array",
-  "mapping",
-];
+export const memoryTypes = ["string", "bytes", "[]", "mapping"];
+
+export const arrayRegex = /(\w+)\[\]/;

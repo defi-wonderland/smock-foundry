@@ -1,12 +1,16 @@
 import { FunctionFragment, Interface, Fragment } from "@ethersproject/abi";
-import { memoryTypes, OutputType } from "./index";
+import { OutputType } from "./index";
+import { capitalizeFirstLetter, typeFix } from "./utils";
 
-export const getFunctions = (iface: Interface, interfaceName: string): string => {
+export const getFunctions = (
+  iface: Interface,
+  interfaceName: string
+): string => {
   // Array with functions
   const functions: string[] = [];
   // Array with external/public functions frangments
   const fragments = iface.fragments.filter(
-    fragment => fragment.type === "function"
+    (fragment) => fragment.type === "function"
   ) as Fragment[];
 
   // Loop every function
@@ -36,72 +40,66 @@ export const getFunctions = (iface: Interface, interfaceName: string): string =>
   return allFunctions;
 };
 
-// Function to capitalize first letter
-function capitalizeFirstLetter(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
-function getViewFunction(iface: Interface, interfaceName: string, funcionName: string): string {
+function getViewFunction(
+  iface: Interface,
+  interfaceName: string,
+  functionName: string
+): string {
   // Get the current function
-  const getFunction: FunctionFragment = iface.getFunction(funcionName);
+  const getFunction = iface.getFunction(functionName);
+  // If the inputs have length, it means that it is either an array or a mapping, so skip that
+  if (getFunction.inputs.length) {
+    return;
+  }
 
   // Get the output type
   const outputs: OutputType[] = [...getFunction.outputs];
-
-  // If name === 0 means that its a variable and not a function
-  if (outputs[0].name === "") {
-    const functionName = getFunction.name.toLowerCase();
-
+  // If !name means that its a variable and not a function
+  if (!outputs[0].name) {
     // Check if type needs memory
-    const type = outputs.map((output) => {
-      let type = output.type;
-      if (memoryTypes.includes(output.type)) {
-        type = `${output.type} memory`;
-      }
-      return `${type}${output.name}`;
-    });
+
+    const type = typeFix(outputs[0].type);
 
     // Craft the string for mock and setter
-    const viewFunc = 
+    const viewFunc =
+      `\n` +
       `\tfunction mock_set${capitalizeFirstLetter(
-        funcionName
+        functionName
       )}(${type} _${functionName}) public {\n` +
-      `\t  stdstore.target(address(this)).sig('${
-        funcionName
-        }()').checked_write(_${functionName});\n` +
-      `\t}\n\n` +
-      
-      `\tfunction mock_${funcionName}(${type} _${functionName}) public {\n` +
+      `\t  ${functionName} = _${functionName};\n` +
+      `\t}` +
+      `\n\n` +
+      `\tfunction mock_${functionName}(${type} _${functionName}) public {\n` +
       `\t vm.mockCall(\n` +
       `\t  address(this),\n` +
-      `\t  abi.encodeWithSelector(I${interfaceName}.${funcionName}.selector),\n` +
+      `\t  abi.encodeWithSelector(I${interfaceName}.${functionName}.selector),\n` +
       `\t  abi.encode(_${functionName})\n` +
       `\t  );\n` +
       `\t}`;
-    
+
     // Return the view function
     return viewFunc;
   }
 }
 
-function getExternalFunction(iface: Interface, interfaceName: string, funcionName: string): string {
+function getExternalFunction(
+  iface: Interface,
+  interfaceName: string,
+  functionName: string
+): string {
   // Get the current function
-  const getFunction = iface.getFunction(funcionName);
+  const getFunction = iface.getFunction(functionName);
 
   // Get inputs
-  const inputsMap = getFunction.inputs.map(({ name, type }) => ({
-    name,
-    type,
+  const inputsMap = getFunction.inputs.map((input) => ({
+    name: input.name,
+    type: input.type,
   }));
 
   // Create the inputs string checking type
-  const inputsString = inputsMap
-    .map((output) => {
-      let type = output.type;
-      if (memoryTypes.includes(output.type)) {
-        type = `${output.type} memory`;
-      }
-      return `${type} ${output.name}`;
+  let inputsString = inputsMap
+    .map((input) => {
+      return `${typeFix(input.type)} ${input.name}`;
     })
     .join(", ");
 
@@ -117,18 +115,17 @@ function getExternalFunction(iface: Interface, interfaceName: string, funcionNam
   // Create the outputs string checking type
   const outputsString = outputsMap
     .map((output) => {
-      let type = output.type;
-      if (memoryTypes.includes(output.type)) {
-        type = `${output.type} memory`;
-      }
-      return `${type} ${output.name}`;
+      return `${typeFix(output.type)} ${output.name}`;
     })
     .join(", ");
 
+  // If there is an output, we will have to add a , to the end of the input string
+  if (outputsString !== "") {
+    inputsString = inputsString + ", ";
+  }
+
   // Create outputs params
-  let outputsStringParam = outputsMap
-    .map((output) => output.name)
-    .join(", ");
+  let outputsStringParam = outputsMap.map((output) => output.name).join(", ");
 
   // Checks abi encode
   if (outputsStringParam === "") {
@@ -136,11 +133,12 @@ function getExternalFunction(iface: Interface, interfaceName: string, funcionNam
   }
 
   // Craft the string for mock
-  const externalFunc = 
-    `\tfunction mock_${funcionName}(${inputsString}${outputsString}) public {\n` +
+  const externalFunc =
+    `\n` +
+    `\tfunction mock_${functionName}(${inputsString}${outputsString}) public {\n` +
     `\t  vm.mockCall(\n` +
     `\t    address(this),\n` +
-    `\t    abi.encodeWithSelector(I${interfaceName}.${funcionName}.selector, ${inputsStringParam}),\n` +
+    `\t    abi.encodeWithSelector(I${interfaceName}.${functionName}.selector, ${inputsStringParam}),\n` +
     `\t    abi.encode(${outputsStringParam})\n` +
     `\t  );\n` +
     `\t}`;
