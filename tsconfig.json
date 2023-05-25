@@ -1,18 +1,20 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    "moduleResolution": "node16",
+    "sourceMap": true,
     "declaration": true,
     "esModuleInterop": true,
     "removeComments": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "incremental": true,
+    "resolveJsonModule": true,
+    "typeRoots": ["node_modules/@types"],
     "paths": {
       "@src/*": ["src/*"]
     },
-    "incremental": true,
-    "resolveJsonModule": true
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

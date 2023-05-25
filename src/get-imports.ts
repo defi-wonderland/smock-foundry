@@ -1,34 +1,25 @@
 import { Ast, ImportDirectiveNode } from "./types";
 
-export const getImports = (sourceFilePath: string): Promise<string[]> => {
-  return new Promise<string[]>((resolve) => {
-    let ast: Ast;
-    // Get the ast from the compiled output
-    try {
-      ast = require(sourceFilePath).ast;
-    } catch (error) {
-      new Error(`Failed to load AST from source file: ${sourceFilePath}`);
-      return;
-    }
-    // Grab all the nodes related to imports
-    const importNodes: ImportDirectiveNode[] = ast.nodes.filter(
-      (node): node is ImportDirectiveNode => node.nodeType === "ImportDirective"
-    );
+export const getImports = (ast: Ast): string[] => {
+    // Filter the nodes and keep only the ImportDirective related ones
+    const importNodes = ast.nodes.filter(
+      node => node.nodeType === "ImportDirective"
+    ) as ImportDirectiveNode[];
 
     // Create the import code for every node and save it in the importStatements array
     const importStatements: string[] = importNodes.map((importDirective) => {
+      // Get the absolute path and the symbol aliases, the symbol aliases are the named imports
       const { symbolAliases, absolutePath } = importDirective;
-      // If symbolAliases length is above 0 then that means the contract has named imports
-      if (symbolAliases.length > 0) {
-        const imports = symbolAliases.map(
-          (symbolAlias) => symbolAlias.foreign.name
-        );
-        return `import {${imports.join(", ")}} from '${absolutePath}';`;
-      } else {
+      // If there are no named imports then we import the whole file
+      if (!symbolAliases.length) {
         return `import '${absolutePath}';`;
       }
+      // Get the names of the named imports
+      const imports = symbolAliases.map(
+        symbolAlias => symbolAlias.foreign.name
+      );
+      return `import {${imports.join(", ")}} from '${absolutePath}';`;
     });
 
-    resolve(importStatements);
-  });
+    return importStatements;
 };

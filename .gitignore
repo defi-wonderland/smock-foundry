@@ -1,7 +1,9 @@
 # General
 yarn-error.log
 node_modules
-.DS_STORE
+
+# Build dist files
+dist
 
 # Foundry files
 cache
@@ -15,10 +17,6 @@ out-via-ir
 
 # Ignore foundry artifacts
 out/*/*
-
-# Keep the latest deployment only
-broadcast/*/*/*
-!broadcast/*/*/run-latest.json
 
 # Ignore generated mock contracts
 solidity/mockContracts

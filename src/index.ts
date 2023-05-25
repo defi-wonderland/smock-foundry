@@ -1,5 +1,5 @@
-export * from "./parse-contracts";
-export * from "./get-contracts-names";
+export * from "./get-functions";
+export * from "./get-contracts-paths";
 export * from "./mock-contract-generator";
 export * from "./get-constructor";
 export * from "./get-imports";
