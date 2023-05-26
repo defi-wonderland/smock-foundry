@@ -1,52 +1,79 @@
 import { FunctionFragment, Interface, Fragment } from "@ethersproject/abi";
 import { OutputType } from "./index";
 import { capitalizeFirstLetter, typeFix } from "./utils";
+import { BasicStateVariableOptions, BasicStateVariableSetOptions, BasicStateVariableMockOptions, ExternalFunctionOptions } from "./types";
 
-export const getFunctions = (
+/**
+ * Returns an array BasicStateVariableOptions that contains the information to pass to the handlebars template
+ * @param iface The interface of the contract
+ * @param contractName The name of the contract
+ * @returns An array of BasicStateVariableOptions
+ */
+export const getBasicStateVariablesMockFunctions = (
   iface: Interface,
-  interfaceName: string
-): string => {
-  // Array with functions
-  const functions: string[] = [];
-  // Array with external/public functions frangments
+  contractName: string
+): BasicStateVariableOptions[] => {
+  const functions: BasicStateVariableOptions[] = [];
   const fragments = iface.fragments.filter(
     (fragment) => fragment.type === "function"
   ) as Fragment[];
 
-  // Loop every function
   fragments.forEach((func: FunctionFragment) => {
-    // Get the view functions
     if (func.stateMutability === "view") {
-      // Get the current function
-      const viewFunc = getViewFunction(iface, interfaceName, func.name);
-
-      // Push to view functions array
-      functions.push(viewFunc);
+      const viewFunc = getBasicStateVariableFunctions(iface, contractName, func.name);
+      if (viewFunc) 
+        functions.push({ setFunction: viewFunc.setFunction, mockFunction: viewFunc.mockFunction});
     }
+  });
 
+  return functions;
+};
+
+/**
+ * Returns an array ExternalFunctionOptions that contains the information to pass to the handlebars template
+ * @param iface The interface of the contract
+ * @param contractName The name of the contract
+ * @returns An array of ExternalFunctionOptions
+ */
+export const getExternalMockFunctions = (
+  iface: Interface,
+  contractName: string
+): ExternalFunctionOptions[] => {
+  const functions: ExternalFunctionOptions[] = [];
+  // Get all the functions
+  const fragments = iface.fragments.filter(
+    (fragment) => fragment.type === "function"
+  ) as Fragment[];
+
+  fragments.forEach((func: FunctionFragment) => {
     // Get the external and payable functions
     if (
       func.stateMutability === "nonpayable" ||
       func.stateMutability === "payable"
     ) {
       // Get the current function
-      const externalFunc = getExternalFunction(iface, interfaceName, func.name);
+      const externalFunc = getExternalFunction(iface, contractName, func.name);
       functions.push(externalFunc);
     }
   });
 
-  // Concat all the functions
-  const allFunctions = functions.join("\n");
-  return allFunctions;
+  return functions;
 };
 
-function getViewFunction(
+/**
+ * From view functions we only want to get the state variables to mock, since other view functions are not needed
+ * @param iface The interface of the contract
+ * @param contractName The name of the contract
+ * @param functionName The name of the function
+ * @returns A BasicStateVariableOptions object that has the information to pass to the handlebars template
+ */
+function getBasicStateVariableFunctions(
   iface: Interface,
-  interfaceName: string,
+  contractName: string,
   functionName: string
-): string {
+): BasicStateVariableOptions {
   // Get the current function
-  const getFunction = iface.getFunction(functionName);
+  const getFunction: FunctionFragment = iface.getFunction(functionName);
   // If the inputs have length, it means that it is either an array or a mapping, so skip that
   if (getFunction.inputs.length) {
     return;
@@ -57,91 +84,106 @@ function getViewFunction(
   // If !name means that its a variable and not a function
   if (!outputs[0].name) {
     // Check if type needs memory
-
     const type = typeFix(outputs[0].type);
 
-    // Craft the string for mock and setter
-    const viewFunc =
-      `\n` +
-      `\tfunction mock_set${capitalizeFirstLetter(
-        functionName
-      )}(${type} _${functionName}) public {\n` +
-      `\t  ${functionName} = _${functionName};\n` +
-      `\t}` +
-      `\n\n` +
-      `\tfunction mock_${functionName}(${type} _${functionName}) public {\n` +
-      `\t vm.mockCall(\n` +
-      `\t  address(this),\n` +
-      `\t  abi.encodeWithSelector(I${interfaceName}.${functionName}.selector),\n` +
-      `\t  abi.encode(_${functionName})\n` +
-      `\t  );\n` +
-      `\t}`;
+    // Save the set function information
+    const setFunction: BasicStateVariableSetOptions = {
+      functionName: capitalizeFirstLetter(functionName),
+      paramType: type,
+      paramName: functionName,
+    };
+    // Save the mock function information
+    const mockFunction: BasicStateVariableMockOptions = {
+      functionName: functionName,
+      paramType: type,
+      contractName: contractName
+    };
+    // Save the state variable information
+    const stateVariable: BasicStateVariableOptions = {
+      setFunction: setFunction,
+      mockFunction: mockFunction
+    };
 
-    // Return the view function
-    return viewFunc;
+    return stateVariable;
   }
 }
 
+/**
+ * Returns an ExternalFunctionOptions object that has the information to pass to the handlebars template
+ * @param iface The interface of the contract
+ * @param contractName The name of the contract
+ * @param functionName The name of the function
+ * @returns An ExternalFunctionOptions object
+ */
 function getExternalFunction(
   iface: Interface,
-  interfaceName: string,
+  contractName: string,
   functionName: string
-): string {
+): ExternalFunctionOptions {
   // Get the current function
   const getFunction = iface.getFunction(functionName);
 
-  // Get inputs
-  const inputsMap = getFunction.inputs.map((input) => ({
-    name: input.name,
-    type: input.type,
-  }));
+  // inputsString contains the input params with their types
+  let inputsString: string;
+  // inputsStringNames contains the input params names
+  let inputsStringNames: string;
+  // Check if there are inputs
+  if(getFunction.inputs.length) {
+    // Gets inputs name and type
+    const inputsMap = getFunction.inputs.map((input) => ({
+      name: input.name,
+      type: input.type,
+    }));
 
-  // Create the inputs string checking type
-  let inputsString = inputsMap
-    .map((input) => {
-      return `${typeFix(input.type)} ${input.name}`;
-    })
-    .join(", ");
+    // Create the inputs string checking type
+    inputsString = inputsMap
+      .map((input) => {
+        return `${typeFix(input.type)} ${input.name}`;
+      })
+      .join(", ");
 
-  // Create inputs params
-  const inputsStringParam = inputsMap.map((input) => input.name).join(", ");
+    // Create inputs params, basically just the names
+    inputsStringNames = inputsMap.map((input) => input.name).join(", ");
+  }else{
+    inputsStringNames = '';
+  }
 
-  // Gets outputs
-  const outputsMap = getFunction.outputs.map((output) => ({
-    name: output.name,
-    type: output.type,
-  }));
-
-  // Create the outputs string checking type
-  const outputsString = outputsMap
-    .map((output) => {
-      return `${typeFix(output.type)} ${output.name}`;
-    })
-    .join(", ");
-
-  // If there is an output, we will have to add a , to the end of the input string
-  if (outputsString !== "") {
+  // outputsString contains the output params with their types
+  let outputsString: string;
+  // outputsStringNames contains the output params names
+  let outputsStringNames: string;
+  // checks if there are outputs
+  if(getFunction.outputs.length) {
+    // If there is an output, we will have to add a , to the end of the input string
     inputsString = inputsString + ", ";
+
+    // Gets outputs name and type
+    const outputsMap = getFunction.outputs.map((output) => ({
+      name: output.name,
+      type: output.type,
+    }));
+
+    // Create the outputs string checking type
+    outputsString = outputsMap
+      .map((output) => {
+        return `${typeFix(output.type)} ${output.name}`;
+      })
+      .join(", ");
+
+    // Create outputs params, basically just the names
+    outputsStringNames = outputsMap.map((output) => output.name).join(", ");
+  }else {
+    outputsStringNames = '';
   }
+  // Save the external function information
+  const getExternalMockFunction: ExternalFunctionOptions = {
+    functionName: functionName,
+    inputsString: inputsString,
+    outputsString: outputsString,
+    contractName: contractName,
+    inputsStringNames: inputsStringNames,
+    outputsStringNames: outputsStringNames
+  };
 
-  // Create outputs params
-  let outputsStringParam = outputsMap.map((output) => output.name).join(", ");
-
-  // Checks abi encode
-  if (outputsStringParam === "") {
-    outputsStringParam = "''";
-  }
-
-  // Craft the string for mock
-  const externalFunc =
-    `\n` +
-    `\tfunction mock_${functionName}(${inputsString}${outputsString}) public {\n` +
-    `\t  vm.mockCall(\n` +
-    `\t    address(this),\n` +
-    `\t    abi.encodeWithSelector(I${interfaceName}.${functionName}.selector, ${inputsStringParam}),\n` +
-    `\t    abi.encode(${outputsStringParam})\n` +
-    `\t  );\n` +
-    `\t}`;
-
-  return externalFunc;
+  return getExternalMockFunction;
 }

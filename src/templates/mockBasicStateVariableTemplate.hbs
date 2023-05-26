@@ -1,0 +1,12 @@
+function mock_set{{setFunction.functionName}}({{setFunction.paramType}} _{{setFunction.paramName}}) public {
+  {{setFunction.paramName}} = _{{setFunction.paramName}};
+}
+
+function mock_{{mockFunction.functionName}}({{mockFunction.paramType}} _{{mockFunction.functionName}}) public {
+  vm.mockCall(
+    address(this),
+    abi.encodeWithSelector(I{{mockFunction.contractName}}.{{mockFunction.functionName}}.selector),
+    abi.encode(_{{mockFunction.functionName}})
+  );
+}
+{{nl}}

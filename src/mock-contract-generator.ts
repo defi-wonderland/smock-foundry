@@ -1,51 +1,49 @@
 import {
   getDataFunctions,
   getFunctions,
-  getContractPaths,
+  getContractNames,
   getConstructor,
   getImports,
   Ast,
 } from "./index";
 import { ethers } from "ethers";
 import { Interface } from "@ethersproject/abi";
-import { getSubDirNameFromPath } from "./utils";
+import { getSubDirNameFromPath, registerHandlebarsTemplates } from "./utils";
 import Handlebars from "handlebars";
-import { readFileSync, writeFileSync } from "fs";
+import { writeFileSync } from "fs";
 import { ensureDir, emptyDir } from "fs-extra";
+import { resolve } from 'path';
 
-export const generateMockContracts = async () => {
-  // Compile handlebars template
-  const templateContent = readFileSync(
-    'templates/mockContractTemplate.hbs',
-    'utf8'
-  );
+export const generateMockContracts = async (contractsDir: string, compiledArtifactsDir: string, generatedContractsDir: string) => {
+  // Template path
+  const templatePath = resolve(__dirname, 'templates', 'mockContractTemplate.hbs');
+  // Read the template and compile it
+  const templateContent = readFileSync(templatePath, 'utf8');
   const template = Handlebars.compile(templateContent);
 
-  // Output path
-  // TODO: Make this configurable
-  const mockContractsDir = "./solidity/mockContracts";
-
   try {
+    // Create the directory if it doesn't exist
     try {
-      await ensureDir(mockContractsDir);
+      await ensureDir(generatedContractsDir)
     } catch (error) {
       console.error("Error while creating the mock directory: ", error);
     }
 
     // Empty the directory, if it exists
     try {
-      await emptyDir(mockContractsDir);
+      await emptyDir(generatedContractsDir);
     } catch (error) {
       console.error("Error while trying to empty the mock directory: ", error);
     }
+    console.log('Parsing contracts...');
     // Get all contracts directories
-    const contractPaths: string[] = getContractPaths();
+    const contractPaths: string[] = getContractNames(contractsDir);
     // Loop for each contract path
     contractPaths.forEach(async (contractPath: string) => {
       // Get the sub dir name
+      // TODO: this assumes that the contract has the same name as the directory
       const subDirName: string = getSubDirNameFromPath(contractPath);
-      const compiledArtifactsPath = `../out/${contractPath}/${subDirName}`;
-      // Get the contract name
+      const compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirName);
       const contractName: string = subDirName.replace(".json", "");
       // Get the abi
       // TODO: add check that it exists
@@ -56,18 +54,22 @@ export const generateMockContracts = async () => {
       // Get the contract's interface
       const iface: Interface = new ethers.utils.Interface(abi);
 
-      const functions = `
-      ${getFunctions(iface, contractPath.replace(".sol", ""))}
-      ${getDataFunctions(ast)}`;
-
+      const mockStateVariables: BasicStateVariableOptions[] = getBasicStateVariablesMockFunctions(iface, contractName);
+      const mockExternalFunctions: ExternalFunctionOptions[] = getExternalMockFunctions(iface, contractName);
+      const mockArrayFunctions: BasicStateVariableOptions[] = getArrayFunctions(ast);
+      const mockMappingFunctions: MappingStateVariableOptions[] = getMappingFunctions(ast);
       // All data which will be use for create the template
       const data = {
         contractName: contractName,
         import: getImports(ast),
         constructor: getConstructor(ast),
-        functions: functions,
+        mockStateVariables: mockStateVariables,
+        mockExternalFunctions: mockExternalFunctions,
+        mockArrayStateVariables: mockArrayFunctions,
+        mockMappingStateVariables: mockMappingFunctions,
       };
 
+      console.log(`Generating mock contract for ${contractName}...`);
       // Fill the handlebars template with the data
       const code: string = template(data);
 
@@ -80,7 +82,7 @@ export const generateMockContracts = async () => {
 
       // Write the contract
       writeFileSync(
-        `./solidity/mockContracts/Mock${contractName}.sol`,
+        `${generatedContractsDir}/Mock${contractName}.sol`,
         cleanedCode
       );
     });

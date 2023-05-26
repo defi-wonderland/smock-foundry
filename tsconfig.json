@@ -1,20 +1,14 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "moduleResolution": "node16",
+    "module": "commonjs",
     "sourceMap": true,
     "declaration": true,
     "esModuleInterop": true,
     "removeComments": true,
     "outDir": "dist",
-    "baseUrl": ".",
-    "incremental": true,
     "resolveJsonModule": true,
-    "typeRoots": ["node_modules/@types"],
-    "paths": {
-      "@src/*": ["src/*"]
-    },
   },
-  "include": ["src/*.ts"],
+  "include": ["src/*.ts", "src/**/*.hbs"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,0 +1,12 @@
+function mock_set{{setFunction.functionName}}({{setFunction.keyType}} _key, {{setFunction.valueType}} _value) public {
+  {{setFunction.mappingName}}[_key] = _value;
+}
+
+function mock_{{mockFunction.functionName}}({{mockFunction.keyType}} _key, {{mockFunction.valueType}} _value) public {
+  vm.mockCall(
+    address(this),
+    abi.encodeWithSelector(I{{mockFunction.contractName}}.{{mockFunction.functionName}}.selector, _key),
+    abi.encode(_value)
+  );
+}
+{{nl}}

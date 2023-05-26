@@ -1,114 +1,120 @@
-import { Ast, ContractDefinitionNode, VariableDeclarationNode } from "./types";
+import { 
+  Ast,
+  ContractDefinitionNode,
+  VariableDeclarationNode,
+  BasicStateVariableOptions,
+  BasicStateVariableSetOptions,
+  BasicStateVariableMockOptions,
+  MappingStateVariableOptions
+} from "./types";
 import { capitalizeFirstLetter, typeFix } from "./utils";
 
-export const getDataFunctions = (ast: Ast): string => {
+export const getArrayFunctions = (ast: Ast): BasicStateVariableOptions[] => {
   // Grab the ContractDefinition node that has all the nodes for the contract
-  const contractNode: ContractDefinitionNode = ast.nodes.find(
-    (node): node is ContractDefinitionNode =>
-      node.nodeType === "ContractDefinition"
-  );
+  const contractNode = ast.nodes.find(
+    node => node.nodeType === "ContractDefinition"
+  ) as ContractDefinitionNode;
 
   // Checks if contract node exist
   if (!contractNode) {
     throw new Error(`Invalid target ast: ${ast.absolutePath}`);
   }
 
+  // Filter the nodes and keep only the VariableDeclaration related ones
+  const stateVariableNodes = contractNode.nodes.filter(
+    node => node.nodeType === "VariableDeclaration"
+  ) as VariableDeclarationNode[];
+
+  // Find the nodes from the stateVariableNodes that are arrays
+  const arrayVariableNodes = stateVariableNodes.filter(
+    node => node.typeDescriptions.typeString.includes("[]")
+  ) as VariableDeclarationNode[];
+
   // Get the contract's name
   const contractName: string = contractNode.name;
 
   // Array with functions
   const functions: string[] = [];
-
-  // Filter the nodes and keep only the VariableDeclaration related ones
-  const variableNodes: VariableDeclarationNode[] = contractNode.nodes.filter(
-    (node): node is VariableDeclarationNode =>
-      node.nodeType === "VariableDeclaration"
-  );
-
-  // Find the node from the functionNodes that is the array
-  const arrayNodes: VariableDeclarationNode[] = variableNodes.filter((node) =>
-    node.typeDescriptions.typeString.includes("[]")
-  );
-
   // Create the string with all mock for arrays
-  arrayNodes.forEach((arrayNode: VariableDeclarationNode) => {
+  arrayVariableNodes.forEach((arrayNode: VariableDeclarationNode) => {
     // Get the current function
     const arrayFunc = getArrayFunction(arrayNode, contractName);
     functions.push(arrayFunc);
   });
 
-  // Find the node from the functionNodes that is the mapping
-  const mappingNodes: VariableDeclarationNode[] = variableNodes.filter((node) =>
-    node.typeDescriptions.typeString.includes("mapping")
-  );
+  // Find the nodes from the stateVariableNodes that are mappings
+  const mappingVariableNodes = stateVariableNodes.filter(
+    node => node.typeDescriptions.typeString.includes("mapping")
+  ) as VariableDeclarationNode[];
 
   // Create the string with all mock for mappings
-  mappingNodes.forEach((mappingNode: VariableDeclarationNode) => {
+  mappingVariableNodes.forEach((mappingNode: VariableDeclarationNode) => {
     // Get the current function
     const arrayFunc = getMappingFunction(mappingNode, contractName);
     functions.push(arrayFunc);
   });
 
-  // Concat all the functions
-  const allFunctions = functions.join("\n");
-  return allFunctions;
+  return functions;
 };
 
 function getArrayFunction(
   arrayNode: VariableDeclarationNode,
   contractName: string
-): string {
+): BasicStateVariableOptions {
   // Name of the array
   const arrayName: string = arrayNode.name;
-  // Type string
-  const typeString: string = arrayNode.typeDescriptions.typeString;
+  // Type string of the array, we remove the "contract " string if it exists
+  const arrayType: string = arrayNode.typeDescriptions.typeString.replace(
+    /contract /g,
+    ""
+  );
 
-  // Craft the string for mock and setter
-  const arrayFunc =
-    `\n` +
-    `\tfunction mock_set${capitalizeFirstLetter(
-      arrayName
-    )}(${typeString} memory _${arrayName}) public {\n` +
-    `\t  ${arrayName} = _${arrayName};\n` +
-    `\t}\n\n` +
-    `\tfunction mock_${arrayName}(${typeString} memory _${arrayName}) public {\n` +
-    `\t vm.mockCall(\n` +
-    `\t  address(this),\n` +
-    `\t  abi.encodeWithSelector(I${contractName}.${arrayName}.selector),\n` +
-    `\t  abi.encode(_${arrayName})\n` +
-    `\t  );\n` +
-    `\t}`;
+  const setFunction: BasicStateVariableSetOptions = {
+    functionName: capitalizeFirstLetter(arrayName),
+    paramType: arrayType,
+    paramName: arrayName,
+  };
+  // Save the mock function information
+  const mockFunction: BasicStateVariableMockOptions = {
+    functionName: arrayName,
+    paramType: arrayType,
+    contractName: contractName
+  };
+  // Save the state variable information
+  const arrayStateVariableFunctions: BasicStateVariableOptions = {
+    setFunction: setFunction,
+    mockFunction: mockFunction
+  };
+
   // Return the array function
-  return arrayFunc;
+  return arrayStateVariableFunctions;
 }
 
 function getMappingFunction(
   mappingNode: VariableDeclarationNode,
   contractName: string
-): string {
-  // Name of the array
+): MappingStateVariableOptions {
+  // Name of the mapping
   const mappingName: string = mappingNode.name;
   // Type name
-  const keyName: string = typeFix(mappingNode.typeName.keyType.name);
+  const keyType: string = typeFix(mappingNode.typeName.keyType.name);
   // Value type
   const valueType: string = typeFix(mappingNode.typeName.valueType.name);
-  // Construct the params string
-  const params = `${keyName} _key, ${valueType} _value`;
 
-  // Craft the string for mock and setter
-  const mappingFunc =
-    `\n` +
-    `\tfunction mock_set${capitalizeFirstLetter(
-      mappingName
-    )}(${params}) public {\n` +
-    `\t  ${mappingName}[_key] = _value;\n` +
-    `\t}\n\n` +
-    `\tfunction mock_${mappingName}(${params}) public {\n` +
-    `\t vm.mockCall(\n` +
-    `\t  address(this),\n` +
-    `\t  abi.encodeWithSelector(I${contractName}.${mappingName}.selector, _key),\n` +
-    `\t  abi.encode(_value)\n` +
-    `\t  );\n` +
-    `\t}`;
-  return mappingFunc;
+  const mappingStateVariableFunction: MappingStateVariableOptions = {
+    setFunction: {
+      functionName: `set${capitalizeFirstLetter(mappingName)}`,
+      keyType: keyType,
+      valueType: valueType,
+      mappingName: mappingName
+    },
+    mockFunction: {
+      functionName: mappingName,
+      keyType: keyType,
+      valueType: valueType,
+      contractName: contractName
+    }
+  };
+
+  return mappingStateVariableFunction;
 }

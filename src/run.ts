@@ -1,6 +1,7 @@
-import { generateMockContracts } from "./index";
+import yargs from 'yargs';
+import {generateMockContracts} from './index';
 
-const defaultOutDir = './solidity/mockContracts';
+const defaultOutDir = './solidity/test/mock-contracts';
 
 yargs.command({
     command: 'mock-gen',

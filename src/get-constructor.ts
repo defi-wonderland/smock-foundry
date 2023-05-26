@@ -5,6 +5,11 @@ import {
   VariableDeclarationNode,
 } from "./types";
 
+/**
+ * Return the constructor of the contract
+ * @param ast The ast of the contract from foundry's compiled artifacts
+ * @returns The constructor of the contract
+ */
 export const getConstructor = (ast: Ast): string => {
   // Grab the ContractDefinition node that has all the nodes for the contract
   // TODO: check what happens if there are more than 1 contracts in a single file
@@ -14,21 +19,23 @@ export const getConstructor = (ast: Ast): string => {
 
   // Get the contract's name
   const contractName: string = contractNode.name;
-
+  
   // Filter the nodes and keep only the FunctionDefinition related ones
   const functionNodes = contractNode.nodes.filter(
     (node) => node.nodeType === "FunctionDefinition"
   ) as FunctionDefinitionNode[];
 
   // Find the node from the functionNodes that is the constructor
-  const constructorNode: FunctionDefinitionNode = functionNodes.find(
-    (node) => node.kind === "constructor"
-  );
-
-  // Get the parameters of the constructor
+  const constructorNode = functionNodes.find(
+    node => node.kind === "constructor"
+  ) as FunctionDefinitionNode;
+  
+  // If there is no constructor then return an empty string
+  if(!constructorNode) return "";
+  // Get the parameters of the constructor, if there are no parameters then we use an empty array
   const parameters: VariableDeclarationNode[] =
-    constructorNode.parameters.parameters;
-
+    constructorNode.parameters.parameters ? constructorNode.parameters.parameters : [];
+  
   // We save the parameters in an array with their types and storage location
   const mockConstructorParameters: string[] = [];
   // We save the parameters names in an other array

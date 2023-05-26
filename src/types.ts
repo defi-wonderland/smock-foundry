@@ -73,6 +73,59 @@ export type AstNode =
   | ContractDefinitionNode
   | VariableDeclarationNode;
 
+/**
+ * The options of the BasicStateVariable template for the setFunction section
+ * @param functionName The name of the function, this is gonna be the state variable name with the first letter capitalized
+ * @param paramType The type of the state variable we mock
+ * @param paramName The name of the state variable we mock, this is the name of the state variable
+ */
+export interface BasicStateVariableSetOptions {
+  functionName: string;
+  paramType: string;
+  paramName: string;
+}
+
+/**
+ * The options of the BasicStateVariable template for the mockFunction section
+ * @param functionName The name of the function, this is gonna be the state variable name
+ * @param paramType The type of the state variable we mock
+ * @param contractName The name of the contract we mock, we add an "I" infront in the template
+ */
+export interface BasicStateVariableMockOptions {
+  functionName: string;
+  paramType: string;
+  contractName: string;
+}
+
+export interface BasicStateVariableOptions {
+  setFunction: BasicStateVariableSetOptions;
+  mockFunction: BasicStateVariableMockOptions;
+}
+
+export interface ExternalFunctionOptions {
+  functionName: string;
+  inputsString: string;
+  outputsString: string;
+  contractName: string;
+  inputsStringNames: string;
+  outputsStringNames: string;
+}
+
+export interface MappingStateVariableOptions {
+  setFunction: {
+    functionName: string;
+    keyType: string;
+    valueType: string;
+    mappingName: string;
+  },
+  mockFunction: {
+    functionName: string;
+    keyType: string;
+    valueType: string;
+    contractName: string;
+  }
+}
+
 export const memoryTypes = ["string", "bytes", "[]", "mapping"];
 
 export const arrayRegex = /(\w+)\[\]/;
