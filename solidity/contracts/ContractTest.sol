@@ -62,4 +62,9 @@ contract ContractTest is IContractTest {
     bytes32Array = _bytes32Array;
     _result = true;
   }
+
+  function setVariables(uint256 _newValue) public returns (bool _result) {
+    uintVariable = _newValue;
+    _result = true;
+  }
 }

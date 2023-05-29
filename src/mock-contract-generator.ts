@@ -1,14 +1,15 @@
 import {
-  getDataFunctions,
-  getFunctions,
-  getContractNames,
+  getMappingFunctions,
+  getArrayFunctions,
+  getBasicStateVariablesMockFunctions,
+  getExternalMockFunctions,
   getConstructor,
   getImports,
   Ast,
 } from "./index";
 import { ethers } from "ethers";
 import { Interface } from "@ethersproject/abi";
-import { getSubDirNameFromPath, registerHandlebarsTemplates } from "./utils";
+import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNames } from "./utils";
 import Handlebars from "handlebars";
 import { writeFileSync } from "fs";
 import { ensureDir, emptyDir } from "fs-extra";
@@ -51,6 +52,8 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       // Get the ast
       // TODO: add check that it exists
       const ast: Ast = require(compiledArtifactsPath).ast;
+      // Check if the abi and ast exist
+      if(!abi || !ast) return;
       // Get the contract's interface
       const iface: Interface = new ethers.utils.Interface(abi);
 

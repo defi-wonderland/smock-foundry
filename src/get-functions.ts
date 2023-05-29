@@ -52,7 +52,7 @@ export const getExternalMockFunctions = (
       func.stateMutability === "payable"
     ) {
       // Get the current function
-      const externalFunc = getExternalFunction(iface, contractName, func.name);
+      const externalFunc = getExternalFunction(iface, contractName, func);
       functions.push(externalFunc);
     }
   });
@@ -112,16 +112,21 @@ function getBasicStateVariableFunctions(
  * Returns an ExternalFunctionOptions object that has the information to pass to the handlebars template
  * @param iface The interface of the contract
  * @param contractName The name of the contract
- * @param functionName The name of the function
+ * @param functionFragment The function fragment returned by ethers
  * @returns An ExternalFunctionOptions object
  */
 function getExternalFunction(
   iface: Interface,
   contractName: string,
-  functionName: string
+  functionFragment: FunctionFragment
 ): ExternalFunctionOptions {
+  let functionSignature: string = functionFragment.name;
+  if(functionFragment.inputs.length) {
+    const functionParamTypes = functionFragment.inputs.map((input) => input.type).join(', ');
+    functionSignature = `${functionSignature}(${functionParamTypes})`;
+  }
   // Get the current function
-  const getFunction = iface.getFunction(functionName);
+  const getFunction = iface.getFunction(functionSignature);
 
   // inputsString contains the input params with their types
   let inputsString: string;
@@ -177,7 +182,7 @@ function getExternalFunction(
   }
   // Save the external function information
   const getExternalMockFunction: ExternalFunctionOptions = {
-    functionName: functionName,
+    functionName: functionFragment.name,
     inputsString: inputsString,
     outputsString: outputsString,
     contractName: contractName,

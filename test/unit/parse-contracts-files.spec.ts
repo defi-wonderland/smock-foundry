@@ -1,4 +1,4 @@
-import { getContractNames } from '../../src/get-contracts-names';
+import { getContractNames } from '../../src/utils';
 import { promises as fsPromises } from 'fs';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
