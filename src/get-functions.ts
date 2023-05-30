@@ -20,7 +20,7 @@ export const getBasicStateVariablesMockFunctions = (
 
   fragments.forEach((func: FunctionFragment) => {
     if (func.stateMutability === "view") {
-      const viewFunc = getBasicStateVariableFunctions(iface, contractName, func.name);
+      const viewFunc = getBasicStateVariableFunctions(iface, contractName, func);
       if (viewFunc) 
         functions.push({ setFunction: viewFunc.setFunction, mockFunction: viewFunc.mockFunction});
     }
@@ -70,10 +70,15 @@ export const getExternalMockFunctions = (
 function getBasicStateVariableFunctions(
   iface: Interface,
   contractName: string,
-  functionName: string
+  functionFragment: FunctionFragment
 ): BasicStateVariableOptions {
+  let functionSignature: string = functionFragment.name;
+  if(functionFragment.inputs.length) {
+    const functionParamTypes: string = functionFragment.inputs.map((input) => input.type).join(', ');
+    functionSignature = `${functionSignature}(${functionParamTypes})`;
+  }
   // Get the current function
-  const getFunction: FunctionFragment = iface.getFunction(functionName);
+  const getFunction: FunctionFragment = iface.getFunction(functionSignature);
   // If the inputs have length, it means that it is either an array or a mapping, so skip that
   if (getFunction.inputs.length) {
     return;
@@ -88,13 +93,13 @@ function getBasicStateVariableFunctions(
 
     // Save the set function information
     const setFunction: BasicStateVariableSetOptions = {
-      functionName: capitalizeFirstLetter(functionName),
+      functionName: capitalizeFirstLetter(functionFragment.name),
       paramType: type,
-      paramName: functionName,
+      paramName: functionFragment.name,
     };
     // Save the mock function information
     const mockFunction: BasicStateVariableMockOptions = {
-      functionName: functionName,
+      functionName: functionFragment.name,
       paramType: type,
       contractName: contractName
     };
@@ -122,7 +127,7 @@ function getExternalFunction(
 ): ExternalFunctionOptions {
   let functionSignature: string = functionFragment.name;
   if(functionFragment.inputs.length) {
-    const functionParamTypes = functionFragment.inputs.map((input) => input.type).join(', ');
+    const functionParamTypes: string = functionFragment.inputs.map((input) => input.type).join(', ');
     functionSignature = `${functionSignature}(${functionParamTypes})`;
   }
   // Get the current function

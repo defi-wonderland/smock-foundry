@@ -44,11 +44,11 @@ export const getConstructor = (ast: Ast): string => {
   parameters.forEach((parameter) => {
     // If the storage location is memory or calldata then we keep it
     const storageLocation =
-      parameter.storageLocation === "memory " ||
-      parameter.storageLocation === "calldata "
-        ? parameter.storageLocation
-        : "";
-
+      parameter.storageLocation === 'memory' ||
+      parameter.storageLocation === 'calldata'
+        ? `${parameter.storageLocation} `
+        : '';
+    
     // We remove the "contract " string from the type name if it exists
     const typeName: string = parameter.typeDescriptions.typeString.replace(
       /contract /g,

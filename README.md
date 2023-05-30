@@ -1,7 +1,6 @@
-**Foundrock** is the solidity **mock**ing library. It's a plugin for
+**Foundry Mock Generator** is the solidity **mock**ing library. It's a plugin for
 [foundry](https://github.com/foundry-rs/foundry) that can be used to create mock Solidity
-contracts able to mock variables and external calls. With Smock, it's
-easier than ever to test your smart contracts with foundry.
+contracts able to mock variables and external calls.
 
 # Features
 
@@ -10,46 +9,38 @@ easier than ever to test your smart contracts with foundry.
 - Keep your tests **simple** with a easy mock functions.
 - Mock up external calls and variables in a beautiful and orderly fashion.
 
-# Documentation
-
-# Quick Start
-
 ## Installation
 
-You can install Foundrock via npm or yarn:
+You can install the tool via yarn:
 
-```console
-
+```bash
+yarn add foundry-mock-generator@<latest-canary>
 ```
 
 ## Basic Usage
 
-Foundrock is dead simple to use. Here's a basic example of how you might use
-it to streamline your tests.
+To generate the mock contracts all you have to do is run:
 
-```typescript
-
-abstract contract Base is DSTestPlus, TestConstants {
-  MockContract public mock_myContract = MockContract(mockContract(newAddress(), 'mockContract'));
-}
-  contract UnitFunctioName is Base {
-
-    function test(uint256 _x, string _y, bool _z) public {
-    /// Mock-call in tests
-    mock_myContract.mock_myFunc(_x, _y, _z);
-
-    /// Mock-var in tests
-    mock_myContract.mock_myVar(method_x, y);
-  }
-}
+```bash
+yarn foundry-mock-generation --contractsDir <path/to/contracts> --outDir <path/to/foundry/out> --genDir <path/to/generate/contracts>
 ```
 
-# License
+Note: --genDir default path is `solidity/test/mock-contracts`
 
-Foundrock is released under the MIT license. Feel free to use, modify,
-and/or redistribute this software as you see fit. See the
-[LICENSE](https://github.com/defi-wonderland/smock/blob/main/LICENSE)
-file for more information.
+1) To use the mock contracts in your tests just import them.
+
+`import { MockMyContractName } from '/path/to/mock-contracts/MockMyContractName.sol'`
+
+2) To mock a function or variable e.g.:
+
+```
+/// Deploy mock contract
+mock_myContract = new MockMyContractname(...);
+/// Mock myFuncName function, when called with `arg1`, `arg2` to return `return1`
+mock_myContract.mock_myFuncName(arg1, arg2, return1);
+/// Mock myVarName variable, to return `return1`
+mock_myContract.mock_myVarName(return1);
+```
 
 # Contributors
 

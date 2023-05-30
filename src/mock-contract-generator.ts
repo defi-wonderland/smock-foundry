@@ -9,7 +9,7 @@ import {
 } from "./index";
 import { ethers } from "ethers";
 import { Interface } from "@ethersproject/abi";
-import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNames } from "./utils";
+import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNames, compileSolidityFilesFoundry } from "./utils";
 import Handlebars from "handlebars";
 import { writeFileSync } from "fs";
 import { ensureDir, emptyDir } from "fs-extra";
@@ -67,6 +67,7 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       // All data which will be use for create the template
       const data = {
         contractName: contractName,
+        contractsDir: contractsDir,
         import: getImports(ast),
         constructor: getConstructor(ast),
         mockStateVariables: mockStateVariables,
@@ -93,10 +94,9 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       );
     });
 
-    console.log('Compiling contracts...');
-    compileSolidityFiles(generatedContractsDir);
-
     console.log("Mock contracts generated successfully");
+    // Compile the mock contracts
+    compileSolidityFilesFoundry(generatedContractsDir);
   } catch (error) {
     console.log(error);
   }

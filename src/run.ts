@@ -1,37 +1,32 @@
+#!/usr/bin/env node
+
 import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 import {generateMockContracts} from './index';
 
-const defaultOutDir = './solidity/test/mock-contracts';
+(async () => {
+  const { contractsDir, outDir, genDir } = getProcessArguments();
+  generateMockContracts(contractsDir, outDir, genDir);
+})();
 
-yargs.command({
-    command: 'mock-gen',
-    describe: 'Generate mock contracts',
-    builder: {
+function getProcessArguments() {
+  return yargs(hideBin(process.argv))
+    .options({
       contractsDir: {
         describe: 'Contracts directory (default: ./solidity/contracts)',
-        demandOption: true, // User must specify this option
+        demandOption: true,
         type: 'string',
       },
       outDir: {
         describe: 'Foundry compiled output directory (default: ./out)',
-        demandOption: true, // User must specify this option
+        demandOption: true,
         type: 'string',
       },
       genDir: {
-        describe: `Generated contracts directory (default: ${defaultOutDir})`,
-        default: defaultOutDir,
+        describe: `Generated contracts directory`,
+        default: './solidity/test/mock-contracts',
         type: 'string',
       },
-    },
-    handler: (argv) => {
-      const { contractsDir, outDir, genDir } = argv;
-      generateMockContracts(contractsDir, outDir, genDir);
-    },
-  });
-
-yargs.usage('Usage: $0 [command] [options]')
-  .help('h')
-  .alias('h', 'help')
-  .epilog(`Default output directory: ${defaultOutDir}`);
-
-yargs.parse();
+    })
+    .parseSync();
+}

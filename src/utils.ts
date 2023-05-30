@@ -1,6 +1,10 @@
 import { arrayRegex, memoryTypes } from "./types";
 import { resolve, join } from 'path';
 import { readFileSync, readdirSync, statSync } from "fs";
+<<<<<<< HEAD
+=======
+import { exec } from 'child_process';
+>>>>>>> 9639eed... feat: compile calling forge build
 import Handlebars from "handlebars";
 
 /**
@@ -103,3 +107,24 @@ export const getContractNames = (contractsDir: string) : string[] => {
 
   return contractFileNames;
 };
+
+/**
+ * Compiles the solidity files in the given directory calling forge build command
+ * @param mockContractsDir The directory of the generated contracts
+ */
+export const compileSolidityFilesFoundry = (mockContractsDir: string) => {
+  console.log('Compiling contracts...');
+  exec(`forge build -C ${mockContractsDir}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing command: ${error.message}`);
+      return;
+    }
+    
+    console.log(stdout);
+    
+    if (stderr) {
+      console.error('Command error:');
+      console.error(stderr);
+    }
+  });
+}
