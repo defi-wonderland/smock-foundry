@@ -28,20 +28,22 @@
     "package.json": "sort-package-json"
   },
   "dependencies": {
-    "@ethersproject/abi": "^5.7.0",
+    "@defi-wonderland/solidity-utils": "0.0.0-4298c6c6",
+    "@ethersproject/abi": "5.7.0",
     "ethers": "5.7.0",
     "handlebars": "4.7.7",
     "nodemon": "2.0.22",
     "sinon": "15.1.0",
+    "solc": "0.8.20",
     "typescript": "5.0.4",
-    "yargs": "^17.7.2"
+    "yargs": "17.7.2"
   },
   "devDependencies": {
     "@commitlint/cli": "17.0.3",
     "@commitlint/config-conventional": "17.0.3",
     "@types/chai": "4.3.5",
     "@types/chai-as-promised": "7.1.5",
-    "@types/fs-extra": "^11.0.1",
+    "@types/fs-extra": "11.0.1",
     "@types/mocha": "10.0.1",
     "@types/node": "20.2.3",
     "@typescript-eslint/eslint-plugin": "5.59.6",

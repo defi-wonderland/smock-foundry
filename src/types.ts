@@ -129,3 +129,19 @@ export interface MappingStateVariableOptions {
 export const memoryTypes = ["string", "bytes", "[]", "mapping"];
 
 export const arrayRegex = /(\w+)\[\]/;
+
+export interface CompilerInput {
+  language: string;
+  sources: {
+    [fileName: string]: {
+      content: string;
+    };
+  };
+  settings: {
+    outputSelection: {
+      [contractName: string]: {
+        [artifactType: string]: string[];
+      };
+    };
+  };
+}

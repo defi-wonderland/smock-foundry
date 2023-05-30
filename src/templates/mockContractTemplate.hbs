@@ -10,5 +10,20 @@ import { {{~contractName~}} } from 'contracts/{{contractName}}.sol';
 contract mock{{contractName}} is {{contractName}}, DSTestPlus {
 
   {{constructor}}
-  {{functions}}
+  /// Mocked State Variables
+  {{#each mockStateVariables}}
+  {{> mockStateVariable}}
+  {{/each}}
+
+  {{#each mockArrayStateVariables}}
+  {{> mockArrayStateVariable}}
+  {{/each}}
+
+  {{#each mockMappingStateVariables}}
+  {{> mockMappingStateVariable}}
+  {{/each}}
+  /// Mocked External Functions
+  {{#each mockExternalFunctions}}
+  {{> mockExternalFunction}}
+  {{/each}}
 }

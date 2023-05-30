@@ -34,25 +34,53 @@ export const getArrayFunctions = (ast: Ast): BasicStateVariableOptions[] => {
   const contractName: string = contractNode.name;
 
   // Array with functions
-  const functions: string[] = [];
-  // Create the string with all mock for arrays
-  arrayVariableNodes.forEach((arrayNode: VariableDeclarationNode) => {
-    // Get the current function
-    const arrayFunc = getArrayFunction(arrayNode, contractName);
-    functions.push(arrayFunc);
-  });
+  const functions: BasicStateVariableOptions[] = [];
+  if (arrayVariableNodes.length) {
+    // Create the string with all mock for arrays
+    arrayVariableNodes.forEach((arrayNode: VariableDeclarationNode) => {
+      // Get the current function
+      const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(arrayNode, contractName);
+      functions.push(arrayMockFunction);
+    });
+  }
+
+  return functions;
+};
+
+export const getMappingFunctions = (ast: Ast): MappingStateVariableOptions[] => {
+  // Grab the ContractDefinition node that has all the nodes for the contract
+  const contractNode = ast.nodes.find(
+    node => node.nodeType === "ContractDefinition"
+  ) as ContractDefinitionNode;
+
+  // Checks if contract node exist
+  if (!contractNode) {
+    throw new Error(`Invalid target ast: ${ast.absolutePath}`);
+  }
+
+  // Filter the nodes and keep only the VariableDeclaration related ones
+  const stateVariableNodes = contractNode.nodes.filter(
+    node => node.nodeType === "VariableDeclaration"
+  ) as VariableDeclarationNode[];
+
+  // Get the contract's name
+  const contractName: string = contractNode.name;
 
   // Find the nodes from the stateVariableNodes that are mappings
   const mappingVariableNodes = stateVariableNodes.filter(
     node => node.typeDescriptions.typeString.includes("mapping")
   ) as VariableDeclarationNode[];
-
-  // Create the string with all mock for mappings
-  mappingVariableNodes.forEach((mappingNode: VariableDeclarationNode) => {
-    // Get the current function
-    const arrayFunc = getMappingFunction(mappingNode, contractName);
-    functions.push(arrayFunc);
-  });
+  
+  // Array with functions
+  const functions: MappingStateVariableOptions[] = [];
+  if (mappingVariableNodes.length) {
+    // Create the string with all mock for mappings
+    mappingVariableNodes.forEach((mappingNode: VariableDeclarationNode) => {
+      // Get the current function
+      const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(mappingNode, contractName);
+      functions.push(mappingMockFunction);
+    });
+  }
 
   return functions;
 };

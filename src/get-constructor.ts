@@ -57,6 +57,7 @@ export const getConstructor = (ast: Ast): string => {
 
     // We create the string that will be used in the constructor signature
     const parameterString = `${typeName} ${storageLocation}${parameter.name}`;
+
     // We save the strings in the arrays
     mockConstructorParameters.push(parameterString);
     parameterNames.push(parameter.name);

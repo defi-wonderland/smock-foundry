@@ -14,14 +14,17 @@ import Handlebars from "handlebars";
 import { writeFileSync } from "fs";
 import { ensureDir, emptyDir } from "fs-extra";
 import { resolve } from 'path';
+import { BasicStateVariableOptions, ExternalFunctionOptions, MappingStateVariableOptions } from "./types";
 
+/**
+ * Generates the mock contracts
+ * @param contractsDir The directory where the contracts are located
+ * @param compiledArtifactsDir The directory where the compiled artifacts are located
+ * @param generatedContractsDir The directory where the mock contracts will be generated
+ */
 export const generateMockContracts = async (contractsDir: string, compiledArtifactsDir: string, generatedContractsDir: string) => {
-  // Template path
-  const templatePath = resolve(__dirname, 'templates', 'mockContractTemplate.hbs');
-  // Read the template and compile it
-  const templateContent = readFileSync(templatePath, 'utf8');
+  const templateContent: string = registerHandlebarsTemplates();
   const template = Handlebars.compile(templateContent);
-
   try {
     // Create the directory if it doesn't exist
     try {
@@ -89,6 +92,9 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
         cleanedCode
       );
     });
+
+    console.log('Compiling contracts...');
+    compileSolidityFiles(generatedContractsDir);
 
     console.log("Mock contracts generated successfully");
   } catch (error) {

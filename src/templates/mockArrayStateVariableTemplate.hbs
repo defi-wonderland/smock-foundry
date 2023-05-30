@@ -2,11 +2,19 @@ function mock_set{{setFunction.functionName}}({{setFunction.paramType}} memory _
   {{setFunction.paramName}} = _{{setFunction.paramName}};
 }
 
+<<<<<<< HEAD
+function mock_{{mockFunction.functionName}}({{mockFunction.paramType}} memory _{{mockFunction.functionName}}) public {
+  vm.mockCall(
+    address(this),
+    abi.encodeWithSelector(I{{mockFunction.contractName}}.{{mockFunction.functionName}}.selector),
+    abi.encode(_{{mockFunction.functionName}})
+=======
 function mock_{{mockFunction.functionName}}({{mockFunction.paramType}} memory _{{mockFunction.paramName}}) public {
   vm.mockCall(
     address(this),
     abi.encodeWithSelector(I{{mockFunction.contractName}}.{{mockFunction.functionName}}.selector),
     abi.encode(_{{mockFunction.paramName}})
+>>>>>>> 71579bf... feat: refactor get functions and add more handlebars templates
   );
 }
 {{nl}}
