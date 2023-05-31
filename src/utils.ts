@@ -1,10 +1,7 @@
 import { arrayRegex, memoryTypes } from "./types";
 import { resolve, join } from 'path';
 import { readFileSync, readdirSync, statSync } from "fs";
-<<<<<<< HEAD
-=======
 import { exec } from 'child_process';
->>>>>>> 9639eed... feat: compile calling forge build
 import Handlebars from "handlebars";
 
 /**

@@ -1,4 +1,4 @@
-function mock_{{functionName}}({{inputsString}}{{outputsString}}) public {
+function mock_{{functionName}}({{arguments}}) public {
   vm.mockCall(
     address(this),
     abi.encodeWithSelector(I{{contractName}}.{{functionName}}.selector, {{inputsStringNames}}),

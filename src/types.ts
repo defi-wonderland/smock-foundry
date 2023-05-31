@@ -22,13 +22,18 @@ export interface ContractDefinitionNode {
   nodes: AstNode[];
   abstract: boolean;
   baseContracts: any[];
+  contractKind: string;
   name: string;
 }
 
 export interface FunctionDefinitionNode {
+  name: string;
   nodeType: "FunctionDefinition";
   kind: string;
   parameters: {
+    parameters: VariableDeclarationNode[];
+  };
+  returnParameters: {
     parameters: VariableDeclarationNode[];
   };
   virtual: boolean;
@@ -102,10 +107,15 @@ export interface BasicStateVariableOptions {
   mockFunction: BasicStateVariableMockOptions;
 }
 
+export interface StateVariablesOptions {
+  basicStateVariables: BasicStateVariableOptions[];
+  arrayStateVariables: BasicStateVariableOptions[];
+  mappingStateVariables: MappingStateVariableOptions[];
+}
+
 export interface ExternalFunctionOptions {
   functionName: string;
-  inputsString: string;
-  outputsString: string;
+  arguments: string;
   contractName: string;
   inputsStringNames: string;
   outputsStringNames: string;

@@ -1,10 +1,8 @@
 import {
-  getMappingFunctions,
-  getArrayFunctions,
-  getBasicStateVariablesMockFunctions,
   getExternalMockFunctions,
   getConstructor,
   getImports,
+  getStateVariables,
   Ast,
 } from "./index";
 import { ethers } from "ethers";
@@ -14,7 +12,7 @@ import Handlebars from "handlebars";
 import { writeFileSync } from "fs";
 import { ensureDir, emptyDir } from "fs-extra";
 import { resolve } from 'path';
-import { BasicStateVariableOptions, ExternalFunctionOptions, MappingStateVariableOptions } from "./types";
+import { StateVariablesOptions, ContractDefinitionNode } from "./types";
 
 /**
  * Generates the mock contracts
@@ -49,31 +47,30 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       const subDirName: string = getSubDirNameFromPath(contractPath);
       const compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirName);
       const contractName: string = subDirName.replace(".json", "");
-      // Get the abi
-      // TODO: add check that it exists
-      const abi: any = require(compiledArtifactsPath).abi;
       // Get the ast
       // TODO: add check that it exists
       const ast: Ast = require(compiledArtifactsPath).ast;
       // Check if the abi and ast exist
-      if(!abi || !ast) return;
-      // Get the contract's interface
-      const iface: Interface = new ethers.utils.Interface(abi);
+      if(!ast) return;
 
-      const mockStateVariables: BasicStateVariableOptions[] = getBasicStateVariablesMockFunctions(iface, contractName);
-      const mockExternalFunctions: ExternalFunctionOptions[] = getExternalMockFunctions(iface, contractName);
-      const mockArrayFunctions: BasicStateVariableOptions[] = getArrayFunctions(ast);
-      const mockMappingFunctions: MappingStateVariableOptions[] = getMappingFunctions(ast);
+      // Get the contract node and check if it's a library
+      // TODO: check what happens if there are more than 1 contracts in a single file
+      const contractNode = ast.nodes.find(
+        (node) => node.nodeType === "ContractDefinition"
+      ) as ContractDefinitionNode;
+      if(!contractNode || contractNode.contractKind === 'library') return;
+
+      const functions: StateVariablesOptions = getStateVariables(contractNode);
       // All data which will be use for create the template
       const data = {
         contractName: contractName,
         contractsDir: contractsDir,
         import: getImports(ast),
-        constructor: getConstructor(ast),
-        mockStateVariables: mockStateVariables,
-        mockExternalFunctions: mockExternalFunctions,
-        mockArrayStateVariables: mockArrayFunctions,
-        mockMappingStateVariables: mockMappingFunctions,
+        constructor: getConstructor(contractNode),
+        mockExternalFunctions: getExternalMockFunctions(contractNode),
+        mockStateVariables: functions.basicStateVariables,
+        mockArrayStateVariables: functions.arrayStateVariables,
+        mockMappingStateVariables: functions.mappingStateVariables,
       };
 
       console.log(`Generating mock contract for ${contractName}...`);

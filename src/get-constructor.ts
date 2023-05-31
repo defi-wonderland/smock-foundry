@@ -7,16 +7,10 @@ import {
 
 /**
  * Return the constructor of the contract
- * @param ast The ast of the contract from foundry's compiled artifacts
+ * @param contractNode The contract node that has all the nodes for the contract
  * @returns The constructor of the contract
  */
-export const getConstructor = (ast: Ast): string => {
-  // Grab the ContractDefinition node that has all the nodes for the contract
-  // TODO: check what happens if there are more than 1 contracts in a single file
-  const contractNode = ast.nodes.find(
-    (node) => node.nodeType === "ContractDefinition"
-  ) as ContractDefinitionNode;
-
+export const getConstructor = (contractNode: ContractDefinitionNode): string => {
   // Get the contract's name
   const contractName: string = contractNode.name;
   
@@ -30,8 +24,6 @@ export const getConstructor = (ast: Ast): string => {
     node => node.kind === "constructor"
   ) as FunctionDefinitionNode;
   
-  // If there is no constructor then return an empty string
-  if(!constructorNode) return "";
   // Get the parameters of the constructor, if there are no parameters then we use an empty array
   const parameters: VariableDeclarationNode[] =
     constructorNode.parameters.parameters ? constructorNode.parameters.parameters : [];
