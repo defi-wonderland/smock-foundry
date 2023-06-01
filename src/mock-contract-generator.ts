@@ -5,8 +5,6 @@ import {
   getStateVariables,
   Ast,
 } from "./index";
-import { ethers } from "ethers";
-import { Interface } from "@ethersproject/abi";
 import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNames, compileSolidityFilesFoundry } from "./utils";
 import Handlebars from "handlebars";
 import { writeFileSync } from "fs";
