@@ -7,12 +7,15 @@ export interface VariableDeclarationNode {
     typeString: string;
   };
   typeName: {
-    id: number;
     keyType: {
-      name: string;
+      typeDescriptions: {
+        typeString: string;
+      };
     };
     valueType: {
-      name: string;
+      typeDescriptions: {
+        typeString: string;
+      };
     };
   };
 }

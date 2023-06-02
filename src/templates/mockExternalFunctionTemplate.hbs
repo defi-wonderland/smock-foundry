@@ -1,7 +1,7 @@
 function mock_{{functionName}}({{arguments}}) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSelector(I{{contractName}}.{{functionName}}.selector, {{inputsStringNames}}),
+    abi.encodeWithSelector(I{{contractName}}.{{functionName}}.selector{{inputsStringNames}}),
     abi.encode({{outputsStringNames}})
   );
 }

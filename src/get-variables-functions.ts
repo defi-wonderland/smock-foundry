@@ -34,12 +34,16 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
     // Get the type of the state variable
     const stateVariableType: string = stateVariableNode.typeDescriptions.typeString;
     // Check if the state variable is an array or a mapping or a basic type
-    if(stateVariableType.includes('[]')) {
-      const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(stateVariableNode, contractName);
-      arrayFunctions.push(arrayMockFunction);
-    } else if(stateVariableType.includes('mapping')) {
+    if(stateVariableType.startsWith('mapping')) {
       const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode, contractName);
       mappingFunctions.push(mappingMockFunction);
+    } else if(stateVariableType.includes('[]')) {
+      const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(stateVariableNode, contractName);
+      arrayFunctions.push(arrayMockFunction);
+    } else if(stateVariableType.includes('struct')) {
+      // Do nothing for now
+    } else if(stateVariableType.includes('enum')) {
+      // Do nothing for now
     } else {
       const basicStateVariableMockFunction: BasicStateVariableOptions = getBasicStateVariableFunction(stateVariableNode, contractName);
       basicStateVariableFunctions.push(basicStateVariableMockFunction);
@@ -69,10 +73,7 @@ function getArrayFunction(
   // Name of the array
   const arrayName: string = arrayNode.name;
   // Type string of the array, we remove the "contract " string if it exists
-  const arrayType: string = arrayNode.typeDescriptions.typeString.replace(
-    /contract /g,
-    ''
-  );
+  const arrayType: string = arrayNode.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
 
   const setFunction: BasicStateVariableSetOptions = {
     functionName: capitalizeFirstLetter(arrayName),
@@ -108,9 +109,9 @@ function getMappingFunction(
   // Name of the mapping
   const mappingName: string = mappingNode.name;
   // Type name
-  const keyType: string = typeFix(mappingNode.typeName.keyType.name);
+  const keyType: string = typeFix(mappingNode.typeName.keyType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
   // Value type
-  const valueType: string = typeFix(mappingNode.typeName.valueType.name);
+  const valueType: string = typeFix(mappingNode.typeName.valueType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
 
   const mappingStateVariableFunction: MappingStateVariableOptions = {
     setFunction: {

@@ -41,10 +41,7 @@ export const getConstructor = (contractNode: ContractDefinitionNode): string => 
         : '';
     
     // We remove the "contract " string from the type name if it exists
-    const typeName: string = parameter.typeDescriptions.typeString.replace(
-      /contract /g,
-      ""
-    );
+    const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
 
     // We create the string that will be used in the constructor signature
     const parameterString = `${typeName} ${storageLocation}${parameter.name}`;

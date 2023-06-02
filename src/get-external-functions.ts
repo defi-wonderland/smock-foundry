@@ -39,10 +39,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
           : '';
       
       // We remove the "contract " string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(
-        /contract /g,
-        ''
-      );
+      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
   
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${parameter.name}`;
@@ -67,11 +64,8 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
           : '';
       
       // We remove the "contract " string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(
-        /contract /g,
-        ''
-      );
-  
+      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
+      
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${parameter.name}`;
   
@@ -84,7 +78,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const outputsString: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
     
     // We create the strings that will be used in the mock call arguments and returns
-    const inputsStringNames: string = parameterNames.length ? parameterNames.join(', ') : '';
+    const inputsStringNames: string = parameterNames.length ? `, ${parameterNames.join(', ')}` : '';
     const outputsStringNames: string = returnParameterNames.length ? returnParameterNames.join(', ') : '';
     let args: string;
 
