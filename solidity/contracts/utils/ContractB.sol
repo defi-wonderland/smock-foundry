@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-import {IContractB} from '../interfaces/IContractB.sol';
+import {IContractB} from '../../interfaces/IContractB.sol';
 
 contract ContractB is IContractB {
   string public stringVariable;

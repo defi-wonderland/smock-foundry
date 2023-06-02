@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
-import {IContractA} from '../interfaces/IContractA.sol';
+import {IContractA} from '../../interfaces/IContractA.sol';
+import {IContractZ} from '../../interfaces/IContractZ.sol';
 import {ContractB} from './ContractB.sol';
 
 contract ContractA is IContractA, ContractB {
@@ -15,4 +16,8 @@ contract ContractA is IContractA, ContractB {
     uintVariable = _newValue;
     _result = true;
   }
+}
+
+contract ContractZ is IContractZ {
+  uint256 public uintVariable;
 }

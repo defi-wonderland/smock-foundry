@@ -31,19 +31,24 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
   stateVariableNodes.forEach((stateVariableNode: VariableDeclarationNode) => {
     // If the state variable is constant then we don't need to mock it
     if(stateVariableNode.constant) return;
+
     // Get the type of the state variable
     const stateVariableType: string = stateVariableNode.typeDescriptions.typeString;
+
+    // If nested mapping return
+    if(stateVariableType.includes('=> mapping')) return;
+
     // Check if the state variable is an array or a mapping or a basic type
-    if(stateVariableType.startsWith('mapping')) {
-      const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode, contractName);
-      mappingFunctions.push(mappingMockFunction);
-    } else if(stateVariableType.includes('[]')) {
-      const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(stateVariableNode, contractName);
-      arrayFunctions.push(arrayMockFunction);
-    } else if(stateVariableType.includes('struct')) {
-      // Do nothing for now
-    } else if(stateVariableType.includes('enum')) {
-      // Do nothing for now
+      if(stateVariableType.startsWith('mapping')) {
+        const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode, contractName);
+        mappingFunctions.push(mappingMockFunction);
+      } else if(stateVariableType.includes('[]')) {
+        const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(stateVariableNode, contractName);
+        arrayFunctions.push(arrayMockFunction);
+      } else if(stateVariableType.includes('struct')) {
+        // Do nothing for now
+      } else if(stateVariableType.includes('enum')) {
+        // Do nothing for now
     } else {
       const basicStateVariableMockFunction: BasicStateVariableOptions = getBasicStateVariableFunction(stateVariableNode, contractName);
       basicStateVariableFunctions.push(basicStateVariableMockFunction);
@@ -115,7 +120,7 @@ function getMappingFunction(
 
   const mappingStateVariableFunction: MappingStateVariableOptions = {
     setFunction: {
-      functionName: `set${capitalizeFirstLetter(mappingName)}`,
+      functionName: `${capitalizeFirstLetter(mappingName)}`,
       keyType: keyType,
       valueType: valueType,
       mappingName: mappingName

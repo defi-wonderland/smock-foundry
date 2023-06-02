@@ -22,6 +22,7 @@ export interface VariableDeclarationNode {
 
 export interface ContractDefinitionNode {
   nodeType: "ContractDefinition";
+  canonicalName: string;
   nodes: AstNode[];
   abstract: boolean;
   baseContracts: any[];

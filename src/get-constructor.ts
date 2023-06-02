@@ -17,12 +17,14 @@ export const getConstructor = (contractNode: ContractDefinitionNode): string => 
   const functionNodes = contractNode.nodes.filter(
     (node) => node.nodeType === "FunctionDefinition"
   ) as FunctionDefinitionNode[];
+  if(!functionNodes) return;
 
   // Find the node from the functionNodes that is the constructor
   const constructorNode = functionNodes.find(
     node => node.kind === "constructor"
   ) as FunctionDefinitionNode;
-  if(!constructorNode) return '';
+  if (!constructorNode || constructorNode.kind !== "constructor") return;
+  
   // Get the parameters of the constructor, if there are no parameters then we use an empty array
   const parameters: VariableDeclarationNode[] =
     constructorNode.parameters.parameters ? constructorNode.parameters.parameters : [];

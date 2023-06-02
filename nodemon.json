@@ -11,5 +11,5 @@
     "src/**/*"
   ],
   "ext": "ts",
-  "exec": "ts-node src/run"
+  "exec": "yarn mock-gen --contractsDir ./solidity/contracts --outDir ./out"
 }

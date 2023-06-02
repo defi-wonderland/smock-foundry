@@ -23,8 +23,8 @@ export const getImports = (ast: Ast): string[] => {
     const imports = symbolAliases.map(
       (symbolAlias) => symbolAlias.foreign.name
     );
+
     return `import {${imports.join(", ")}} from '${absolutePath}';`;
   });
-
   return importStatements;
 };

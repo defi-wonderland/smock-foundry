@@ -1,5 +1,5 @@
 import { arrayRegex, memoryTypes } from "./types";
-import { resolve, join } from 'path';
+import { resolve, join } from "path";
 import { readFileSync, readdirSync, statSync } from "fs";
 import { exec } from 'child_process';
 import Handlebars from "handlebars";
@@ -56,39 +56,39 @@ export const typeFix = (str: string): string => {
  * @returns The content of the template
  */
 export const registerHandlebarsTemplates = (): string => {
-    // Template paths
-    const templatePath = resolve(__dirname, 'templates', 'mockContractTemplate.hbs');
-    const externalFuncsTemplatePath = resolve(__dirname, 'templates', 'mockExternalFunctionTemplate.hbs');
-    const basicStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockBasicStateVariableTemplate.hbs');
-    const arrayStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockArrayStateVariableTemplate.hbs');
-    const mappingStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockMappingStateVariableTemplate.hbs');
-    // Read the templates
-    const templateContent = readFileSync(templatePath, 'utf8');
-    const externalFuncsTemplateContent = readFileSync(externalFuncsTemplatePath, 'utf8');
-    const basicStateVariablesTemplateContent = readFileSync(basicStateVariablesTemplatePath, 'utf8');
-    const arrayStateVariablesTemplateContent = readFileSync(arrayStateVariablesTemplatePath, 'utf8');
-    const mappingStateVariablesTemplateContent = readFileSync(mappingStateVariablesTemplatePath, 'utf8');
-  
-    // Register the partial templates
-    Handlebars.registerPartial('mockStateVariable', basicStateVariablesTemplateContent);
-    Handlebars.registerPartial('mockExternalFunction', externalFuncsTemplateContent);
-    Handlebars.registerPartial('mockArrayStateVariable', arrayStateVariablesTemplateContent);
-    Handlebars.registerPartial('mockMappingStateVariable', mappingStateVariablesTemplateContent);
-    return templateContent;
-}
+     // Template paths
+     const templatePath = resolve(__dirname, 'templates', 'mockContractTemplate.hbs');
+     const externalFuncsTemplatePath = resolve(__dirname, 'templates', 'mockExternalFunctionTemplate.hbs');
+     const basicStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockBasicStateVariableTemplate.hbs');
+     const arrayStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockArrayStateVariableTemplate.hbs');
+     const mappingStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockMappingStateVariableTemplate.hbs');
+     // Read the templates
+     const templateContent = readFileSync(templatePath, 'utf8');
+     const externalFuncsTemplateContent = readFileSync(externalFuncsTemplatePath, 'utf8');
+     const basicStateVariablesTemplateContent = readFileSync(basicStateVariablesTemplatePath, 'utf8');
+     const arrayStateVariablesTemplateContent = readFileSync(arrayStateVariablesTemplatePath, 'utf8');
+     const mappingStateVariablesTemplateContent = readFileSync(mappingStateVariablesTemplatePath, 'utf8');
+ 
+     // Register the partial templates
+     Handlebars.registerPartial('mockStateVariable', basicStateVariablesTemplateContent);
+     Handlebars.registerPartial('mockExternalFunction', externalFuncsTemplateContent);
+     Handlebars.registerPartial('mockArrayStateVariable', arrayStateVariablesTemplateContent);
+     Handlebars.registerPartial('mockMappingStateVariable', mappingStateVariablesTemplateContent);
+     return templateContent;
+};
 
 /**
  * Returns the names of the contracts in the given directory and its subdirectories
  * @param contractsDir The directory where the contracts are located
  * @returns The names of the contracts in the given directory and its subdirectories
  */
-export const getContractNames = (contractsDir: string) : string[] => {
+export const getContractNames = (contractsDir: string): string[] => {
   const contractFileNames: string[] = [];
   // Recursive function to traverse the directory and its subdirectories
   function traverseDirectory(currentPath: string) {
     const fileNames = readdirSync(currentPath);
     // Loop through the files and directories
-    fileNames.forEach((fileName: string) => { 
+    fileNames.forEach((fileName: string) => {
       const filePath = join(currentPath, fileName);
       const stats = statSync(filePath);
       // If the file is a contract then we add it to the array, if it is a directory then we call the function again
@@ -97,7 +97,7 @@ export const getContractNames = (contractsDir: string) : string[] => {
       } else if (stats.isDirectory()) {
         traverseDirectory(filePath);
       }
-    })
+    });
   }
 
   traverseDirectory(contractsDir);
@@ -116,12 +116,12 @@ export const compileSolidityFilesFoundry = (mockContractsDir: string) => {
       console.error(`Error executing command: ${error.message}`);
       return;
     }
-    
+
     console.log(stdout);
-    
+
     if (stderr) {
       console.error('Command error:');
       console.error(stderr);
     }
   });
-}
+};
