@@ -1,4 +1,4 @@
-import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, ExternalFunctionOptions } from "./types";
+import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, ExternalFunctionOptions } from './types';
 
 /**
  * Returns the infomration of the external function for the mock contract
@@ -11,7 +11,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
 
   // Filter the nodes and keep only the FunctionDefinition related ones
   const functionNodes = contractNode.nodes.filter(
-    (node) => node.nodeType === "FunctionDefinition"
+    (node) => node.nodeType === 'FunctionDefinition'
   ) as FunctionDefinitionNode[];
 
   const externalFunctions: ExternalFunctionOptions[] = [];
@@ -38,7 +38,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
           ? `${parameter.storageLocation} `
           : '';
       
-      // We remove the "contract " string from the type name if it exists
+      // We remove the 'contract ' string from the type name if it exists
       const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
   
       // We create the string that will be used in the constructor signature
@@ -63,7 +63,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
           ? `${parameter.storageLocation} `
           : '';
       
-      // We remove the "contract " string from the type name if it exists
+      // We remove the 'contract ' string from the type name if it exists
       const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
   
       // We create the string that will be used in the constructor signature

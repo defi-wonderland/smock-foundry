@@ -1,7 +1,7 @@
 export interface VariableDeclarationNode {
   constant: boolean;
   name: string;
-  nodeType: "VariableDeclaration";
+  nodeType: 'VariableDeclaration';
   storageLocation: string;
   typeDescriptions: {
     typeString: string;
@@ -21,7 +21,7 @@ export interface VariableDeclarationNode {
 }
 
 export interface ContractDefinitionNode {
-  nodeType: "ContractDefinition";
+  nodeType: 'ContractDefinition';
   canonicalName: string;
   nodes: AstNode[];
   abstract: boolean;
@@ -32,7 +32,7 @@ export interface ContractDefinitionNode {
 
 export interface FunctionDefinitionNode {
   name: string;
-  nodeType: "FunctionDefinition";
+  nodeType: 'FunctionDefinition';
   kind: string;
   parameters: {
     parameters: VariableDeclarationNode[];
@@ -55,13 +55,13 @@ export interface Ast {
 }
 
 export interface ImportDirectiveNode {
-  nodeType: "ImportDirective";
+  nodeType: 'ImportDirective';
   absolutePath: string;
   file: string;
   symbolAliases: {
     foreign: {
       name: string;
-      nodeType: "Identifier";
+      nodeType: 'Identifier';
     };
   }[];
 }
@@ -98,7 +98,7 @@ export interface BasicStateVariableSetOptions {
  * The options of the BasicStateVariable template for the mockFunction section
  * @param functionName The name of the function, this is gonna be the state variable name
  * @param paramType The type of the state variable we mock
- * @param contractName The name of the contract we mock, we add an "I" infront in the template
+ * @param contractName The name of the contract we mock, we add an 'I' infront in the template
  */
 export interface BasicStateVariableMockOptions {
   functionName: string;
@@ -140,6 +140,6 @@ export interface MappingStateVariableOptions {
   }
 }
 
-export const memoryTypes = ["string", "bytes", "[]", "mapping"];
+export const memoryTypes = ['string', 'bytes', '[]', 'mapping'];
 
 export const arrayRegex = /(\w+)\[\]/;

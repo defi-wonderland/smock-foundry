@@ -1,4 +1,4 @@
-import { Ast, ImportDirectiveNode } from "./types";
+import { Ast, ImportDirectiveNode } from './types';
 
 /**
  * Returns an array with all the import signautres of the contract
@@ -8,7 +8,7 @@ import { Ast, ImportDirectiveNode } from "./types";
 export const getImports = (ast: Ast): string[] => {
   // Filter the nodes and keep only the ImportDirective related ones
   const importNodes = ast.nodes.filter(
-    node => node.nodeType === "ImportDirective"
+    node => node.nodeType === 'ImportDirective'
   ) as ImportDirectiveNode[];
 
   // Create the import code for every node and save it in the importStatements array
@@ -24,7 +24,7 @@ export const getImports = (ast: Ast): string[] => {
       (symbolAlias) => symbolAlias.foreign.name
     );
 
-    return `import {${imports.join(", ")}} from '${absolutePath}';`;
+    return `import {${imports.join(', ')}} from '${absolutePath}';`;
   });
   return importStatements;
 };

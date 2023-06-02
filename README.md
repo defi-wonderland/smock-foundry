@@ -26,6 +26,7 @@ yarn foundry-mock-generation --contractsDir <path/to/contracts> --outDir <path/t
 ```
 
 Note: --genDir default path is `solidity/test/mock-contracts`
+Note: --outDir default path is `out`
 
 1) To use the mock contracts in your tests just import them.
 

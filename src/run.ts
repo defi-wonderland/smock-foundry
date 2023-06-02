@@ -13,13 +13,13 @@ function getProcessArguments() {
   return yargs(hideBin(process.argv))
     .options({
       contractsDir: {
-        describe: 'Contracts directory (default: ./solidity/contracts)',
+        describe: 'Contracts directory',
         demandOption: true,
         type: 'string',
       },
       outDir: {
-        describe: 'Foundry compiled output directory (default: ./out)',
-        demandOption: true,
+        describe: 'Foundry compiled output directory',
+        default: './out',
         type: 'string',
       },
       genDir: {

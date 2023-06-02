@@ -6,8 +6,8 @@ import {
   BasicStateVariableMockOptions,
   MappingStateVariableOptions,
   StateVariablesOptions
-} from "./types";
-import { capitalizeFirstLetter, typeFix } from "./utils";
+} from './types';
+import { capitalizeFirstLetter, typeFix } from './utils';
 
 /**
  * Returns all the mock functions information for state variables
@@ -20,7 +20,7 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
 
   // Filter the nodes and keep only the VariableDeclaration related ones
   const stateVariableNodes = contractNode.nodes.filter(
-    node => node.nodeType === "VariableDeclaration"
+    node => node.nodeType === 'VariableDeclaration'
   ) as VariableDeclarationNode[];
   
   // Define arrays to save our data
@@ -77,7 +77,7 @@ function getArrayFunction(
 ): BasicStateVariableOptions {
   // Name of the array
   const arrayName: string = arrayNode.name;
-  // Type string of the array, we remove the "contract " string if it exists
+  // Type string of the array, we remove the 'contract ' string if it exists
   const arrayType: string = arrayNode.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
 
   const setFunction: BasicStateVariableSetOptions = {
@@ -148,7 +148,7 @@ function getBasicStateVariableFunction(
 ): BasicStateVariableOptions {
   // Name of the variable
   const variableName: string = variableNode.name;
-  // Type of the variable, we remove the "contract " string if it exists
+  // Type of the variable, we remove the 'contract ' string if it exists
   const variableType: string = typeFix(variableNode.typeDescriptions.typeString.replace(
     /contract /g,
     ''

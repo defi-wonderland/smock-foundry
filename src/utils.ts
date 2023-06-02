@@ -1,8 +1,8 @@
-import { arrayRegex, memoryTypes } from "./types";
-import { resolve, join } from "path";
-import { readFileSync, readdirSync, statSync } from "fs";
+import { arrayRegex, memoryTypes } from './types';
+import { resolve, join } from 'path';
+import { readFileSync, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
-import Handlebars from "handlebars";
+import Handlebars from 'handlebars';
 
 /**
  * Given a path returns the name of the file with the extension replaced with .json
@@ -12,11 +12,11 @@ import Handlebars from "handlebars";
  */
 export const getSubDirNameFromPath = (path: string): string => {
   // Split the path by the slash
-  const pathSegments: string[] = path.split("/");
+  const pathSegments: string[] = path.split('/');
   // Get the last file
   const lastFile: string = pathSegments[pathSegments.length - 1];
   // Get the subDir name
-  const subDir: string = lastFile.replace(".sol", ".json");
+  const subDir: string = lastFile.replace('.sol', '.json');
   return subDir;
 };
 
