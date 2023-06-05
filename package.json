@@ -11,7 +11,7 @@
   "author": "Wonderland",
   "main": "dist/run.js",
   "types": "dist/run.d.ts",
-  "bin": "node ./dist/run.js",
+  "bin": "dist/run.js",
   "files": [
     "dist"
   ],

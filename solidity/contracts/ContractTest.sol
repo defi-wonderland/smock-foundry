@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 import {IContractTest} from '../interfaces/IContractTest.sol';
 
 contract ContractTest is IContractTest {
+  uint256 public immutable immutableUintVariable = 10;
+  uint256 internal internalUint256;
   /// @inheritdoc IContractTest
   uint256 public uintVariable;
   /// @inheritdoc IContractTest
@@ -68,5 +70,14 @@ contract ContractTest is IContractTest {
   function setVariables(uint256 _newValue) public returns (bool _result) {
     uintVariable = _newValue;
     _result = true;
+  }
+
+  function setVariables(uint256 _newValue, bool) public returns (bool _result) {
+    uintVariable = _newValue;
+    _result = true;
+  }
+
+  function testFunc(uint256) public pure returns (bool) {
+    return true;
   }
 }

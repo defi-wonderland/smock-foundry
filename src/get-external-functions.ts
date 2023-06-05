@@ -30,6 +30,9 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const functionParameters: string[] = [];
     // We save the parameters names in an other array
     const parameterNames: string[] = [];
+    // We save the types in an array to use them in order to create the signature
+    const parameterTypes: string[] = [];
+    let parameterIndex = 0;
     parameters.forEach((parameter: VariableDeclarationNode) => {
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
@@ -41,12 +44,17 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
       // We remove the 'contract ' string from the type name if it exists
       const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
   
+      const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
-      const parameterString = `${typeName} ${storageLocation}${parameter.name}`;
-  
+      const parameterString = `${typeName} ${storageLocation}${paramName}`;
+      
+      parameterTypes.push(typeName);
       functionParameters.push(parameterString);
-      parameterNames.push(parameter.name);
+      parameterNames.push(paramName);
+      parameterIndex++;
     });
+
+    const signature = parameterTypes ? `${funcNode.name}(${parameterTypes.join(', ')})`: `${funcNode.name}()`;
 
     const returnParameters: VariableDeclarationNode[] =
       funcNode.returnParameters.parameters ? funcNode.returnParameters.parameters : [];
@@ -55,6 +63,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const functionReturnParameters: string[] = [];
     // We save the return parameters names in an other array
     const returnParameterNames: string[] = [];
+    parameterIndex = 0;
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
@@ -65,12 +74,14 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
       
       // We remove the 'contract ' string from the type name if it exists
       const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
-  
+
+      const returnName: string = parameter.name == '' ? `_return${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
-      const parameterString = `${typeName} ${storageLocation}${parameter.name}`;
+      const parameterString = `${typeName} ${storageLocation}${returnName}`;
   
       functionReturnParameters.push(parameterString);
-      returnParameterNames.push(parameter.name);
+      returnParameterNames.push(returnName);
+      parameterIndex++;
     });
 
     // We create the string that will be used in the mock function signature
@@ -94,7 +105,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const externalMockFunction: ExternalFunctionOptions = {
       functionName: funcNode.name,
       arguments: args,
-      contractName: contractName,
+      signature: signature,
       inputsStringNames: inputsStringNames,
       outputsStringNames: outputsStringNames
     };

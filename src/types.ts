@@ -1,5 +1,7 @@
 export interface VariableDeclarationNode {
   constant: boolean;
+  mutability: string;
+  visibility: string;
   name: string;
   nodeType: 'VariableDeclaration';
   storageLocation: string;
@@ -120,7 +122,7 @@ export interface StateVariablesOptions {
 export interface ExternalFunctionOptions {
   functionName: string;
   arguments: string;
-  contractName: string;
+  signature: string;
   inputsStringNames: string;
   outputsStringNames: string;
 }

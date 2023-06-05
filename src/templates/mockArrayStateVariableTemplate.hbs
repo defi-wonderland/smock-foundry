@@ -1,8 +1,8 @@
-function mock_set{{setFunction.functionName}}({{setFunction.paramType}} memory _{{setFunction.paramName}}) public {
+function set_{{setFunction.functionName}}({{setFunction.paramType}} memory _{{setFunction.paramName}}) public {
   {{setFunction.paramName}} = _{{setFunction.paramName}};
 }
 
-function mock_{{mockFunction.functionName}}({{mockFunction.paramType}} memory _{{mockFunction.functionName}}) public {
+function mock_call_{{mockFunction.functionName}}({{mockFunction.paramType}} memory _{{mockFunction.functionName}}) public {
   vm.mockCall(
     address(this),
     abi.encodeWithSelector(I{{mockFunction.contractName}}.{{mockFunction.functionName}}.selector),
