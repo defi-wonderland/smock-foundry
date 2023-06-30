@@ -105,7 +105,6 @@ export interface BasicStateVariableSetOptions {
 export interface BasicStateVariableMockOptions {
   functionName: string;
   paramType: string;
-  contractName: string;
 }
 
 export interface BasicStateVariableOptions {
@@ -138,7 +137,6 @@ export interface MappingStateVariableOptions {
     functionName: string;
     keyType: string;
     valueType: string;
-    contractName: string;
   }
 }
 

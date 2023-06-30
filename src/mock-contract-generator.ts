@@ -101,7 +101,7 @@ export const generateMockContracts = async (
           node.nodeType === 'ContractDefinition' &&
           node.canonicalName === contractName
       ) as ContractDefinitionNode;
-      if (!contractNode || contractNode.contractKind === 'library') return;
+      if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') return;
 
       const functions: StateVariablesOptions = getStateVariables(contractNode);
       // All data which will be use for create the template

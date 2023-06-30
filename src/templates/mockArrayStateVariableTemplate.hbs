@@ -5,7 +5,7 @@ function set_{{setFunction.functionName}}({{setFunction.paramType}} memory _{{se
 function mock_call_{{mockFunction.functionName}}({{mockFunction.paramType}} memory _{{mockFunction.functionName}}) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSelector(I{{mockFunction.contractName}}.{{mockFunction.functionName}}.selector),
+    abi.encodeWithSignature("{{mockFunction.functionName}}()"),
     abi.encode(_{{mockFunction.functionName}})
   );
 }

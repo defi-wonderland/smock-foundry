@@ -5,7 +5,7 @@ function set_{{setFunction.functionName}}({{setFunction.keyType}} _key, {{setFun
 function mock_call_{{mockFunction.functionName}}({{mockFunction.keyType}} _key, {{mockFunction.valueType}} _value) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSelector(I{{mockFunction.contractName}}.{{mockFunction.functionName}}.selector, _key),
+    abi.encodeWithSignature("{{signature}}", _key),
     abi.encode(_value)
   );
 }

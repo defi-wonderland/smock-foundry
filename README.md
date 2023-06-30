@@ -22,11 +22,12 @@ yarn add foundry-mock-generator@<latest-canary>
 To generate the mock contracts all you have to do is run:
 
 ```bash
-yarn foundry-mock-generation --contractsDir <path/to/contracts> --outDir <path/to/foundry/out> --genDir <path/to/generate/contracts>
+yarn foundry-mock-generator --contracts <path/to/contracts> --out <path/to/foundry/out> --genDir <path/to/generate/contracts>
 ```
 
-Note: --genDir default path is `solidity/test/mock-contracts`
-Note: --outDir default path is `out`
+Note: --contracts required by the user, tha path to the solidity contracts to mock
+Note: --genDir default path is `solidity/test/mock-contracts`, the path to generate the mock contracts
+Note: --out default path is `out`, the path that has foundry's compiled artifacts
 
 1) To use the mock contracts in your tests just import them.
 
@@ -42,6 +43,12 @@ mock_myContract.mock_myFuncName(arg1, arg2, return1);
 /// Mock myVarName variable, to return `return1`
 mock_myContract.mock_myVarName(return1);
 ```
+
+## Release
+
+We use changesets to mark packages for new releases. When merging commits to the dev branch you MUST include a changeset file if your change would require that a new version of a package be released.
+
+To add a changeset, run the command `yarn changeset` in the root of this repo. You will be presented with a small prompt to select the packages to be released, the scope of the release (major, minor, or patch), and the reason for the release. Comments within changeset files will be automatically included in the changelog of the package.
 
 # Contributors
 

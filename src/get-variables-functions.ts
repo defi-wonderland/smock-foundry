@@ -7,7 +7,7 @@ import {
   MappingStateVariableOptions,
   StateVariablesOptions
 } from './types';
-import { capitalizeFirstLetter, typeFix } from './utils';
+import { typeFix } from './utils';
 
 /**
  * Returns all the mock functions information for state variables
@@ -15,9 +15,6 @@ import { capitalizeFirstLetter, typeFix } from './utils';
  * @returns All the mock functions information for state variables
  */
 export const getStateVariables = (contractNode: ContractDefinitionNode): StateVariablesOptions => {
-  // Get the contract's name
-  const contractName: string = contractNode.name;
-
   // Filter the nodes and keep only the VariableDeclaration related ones
   const stateVariableNodes = contractNode.nodes.filter(
     node => node.nodeType === 'VariableDeclaration'
@@ -41,18 +38,20 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
     if(stateVariableType.includes('=> mapping')) return;
 
     // Check if the state variable is an array or a mapping or a basic type
-      if(stateVariableType.startsWith('mapping')) {
-        const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode, contractName);
-        mappingFunctions.push(mappingMockFunction);
-      } else if(stateVariableType.includes('[]')) {
-        const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(stateVariableNode, contractName);
-        arrayFunctions.push(arrayMockFunction);
-      } else if(stateVariableType.includes('struct')) {
-        // Do nothing for now
-      } else if(stateVariableType.includes('enum')) {
-        // Do nothing for now
+    if(stateVariableType.startsWith('mapping')) {
+      // If value is of type struct we don't mock it
+      if(stateVariableNode.typeName.valueType.typeDescriptions.typeString.includes('struct')) return;
+      const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode);
+      mappingFunctions.push(mappingMockFunction);
+    } else if(stateVariableType.includes('struct')) {
+      // Do nothing for now
+    } else if(stateVariableType.includes('enum')) {
+      // Do nothing for now
+    } else if(stateVariableType.includes('[]')) {
+      const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(stateVariableNode);
+      arrayFunctions.push(arrayMockFunction);
     } else {
-      const basicStateVariableMockFunction: BasicStateVariableOptions = getBasicStateVariableFunction(stateVariableNode, contractName);
+      const basicStateVariableMockFunction: BasicStateVariableOptions = getBasicStateVariableFunction(stateVariableNode);
       basicStateVariableFunctions.push(basicStateVariableMockFunction);
     }
   });
@@ -75,7 +74,6 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
  */
 function getArrayFunction(
   arrayNode: VariableDeclarationNode,
-  contractName: string
 ): BasicStateVariableOptions {
   // Name of the array
   const arrayName: string = arrayNode.name;
@@ -83,7 +81,7 @@ function getArrayFunction(
   const arrayType: string = arrayNode.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
 
   const setFunction: BasicStateVariableSetOptions = {
-    functionName: capitalizeFirstLetter(arrayName),
+    functionName: arrayName,
     paramType: arrayType,
     paramName: arrayName,
   };
@@ -91,7 +89,6 @@ function getArrayFunction(
   const mockFunction: BasicStateVariableMockOptions = {
     functionName: arrayName,
     paramType: arrayType,
-    contractName: contractName
   };
   // Save the state variable information
   const arrayStateVariableFunctions: BasicStateVariableOptions = {
@@ -111,7 +108,6 @@ function getArrayFunction(
  */
 function getMappingFunction(
   mappingNode: VariableDeclarationNode,
-  contractName: string
 ): MappingStateVariableOptions {
   // Name of the mapping
   const mappingName: string = mappingNode.name;
@@ -122,7 +118,7 @@ function getMappingFunction(
 
   const mappingStateVariableFunction: MappingStateVariableOptions = {
     setFunction: {
-      functionName: `${capitalizeFirstLetter(mappingName)}`,
+      functionName: `${mappingName}`,
       keyType: keyType,
       valueType: valueType,
       mappingName: mappingName
@@ -131,7 +127,6 @@ function getMappingFunction(
       functionName: mappingName,
       keyType: keyType,
       valueType: valueType,
-      contractName: contractName
     }
   };
 
@@ -146,7 +141,6 @@ function getMappingFunction(
  */
 function getBasicStateVariableFunction(
   variableNode: VariableDeclarationNode,
-  contractName: string
 ): BasicStateVariableOptions {
   // Name of the variable
   const variableName: string = variableNode.name;
@@ -158,7 +152,7 @@ function getBasicStateVariableFunction(
 
   // Save the set function information
   const setFunction: BasicStateVariableSetOptions = {
-    functionName: capitalizeFirstLetter(variableName),
+    functionName: variableName,
     paramType: variableType,
     paramName: variableName,
   };
@@ -166,7 +160,6 @@ function getBasicStateVariableFunction(
   const mockFunction: BasicStateVariableMockOptions = {
     functionName: variableName,
     paramType: variableType,
-    contractName: contractName
   };
   // Save the state variable information
   const basicStateVariableFunctions: BasicStateVariableOptions = {
