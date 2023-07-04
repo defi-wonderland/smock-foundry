@@ -1,6 +1,6 @@
 {
   "name": "foundry-mock-generator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A mock contract generator for Foundry",
   "homepage": "https://github.com/defi-wonderland/mock-foundry#readme",
   "repository": {
