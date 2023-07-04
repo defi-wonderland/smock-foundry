@@ -96,7 +96,7 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const outputsString: string = functionReturnParameters.length ? functionReturnParameters.join(", ") : "";
 
     // We create the strings that will be used in the mock call arguments and returns
-    const inputsStringNames: string = parameterNames.length ? `, ${parameterNames.join(", ")}` : "";
+    const inputsStringNames: string = parameterNames.length ? `${parameterNames.join(", ")}` : "";
     const outputsStringNames: string = returnParameterNames.length ? returnParameterNames.join(", ") : "";
     let args: string;
 

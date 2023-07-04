@@ -1,14 +1,13 @@
 function mock_call_{{functionName}}({{arguments}}) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{signature}}"{{inputsStringNames}}),
+    abi.encodeWithSignature("{{signature}}", {{inputsStringNames}}),
     abi.encode({{outputsStringNames}})
   );
 }
 
 function {{functionName}}({{inputsString}}) internal override returns ({{outputsString}}) {
-    (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature("{{signature}}"{{inputsStringNames}}));
-    require(_success, "mock call failed");
-    ({{outputsStringNames}}) = abi.decode(_data, ({{outputsTypesString}}));
+    (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature("{{signature}}", {{inputsStringNames}}));
+    ({{outputsStringNames}}) = _success ? abi.decode(_data, ({{outputsTypesString}})) : super.{{functionName}}({{inputsStringNames}});
 }
 {{nl}}
