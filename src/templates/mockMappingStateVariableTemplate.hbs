@@ -2,6 +2,7 @@ function set_{{setFunction.functionName}}({{setFunction.keyType}} _key, {{setFun
   {{setFunction.mappingName}}[_key] = _value;
 }
 
+{{#unless isInternal}}
 function mock_call_{{mockFunction.functionName}}({{mockFunction.keyType}} _key, {{mockFunction.valueType}} _value) public {
   vm.mockCall(
     address(this),
@@ -9,4 +10,5 @@ function mock_call_{{mockFunction.functionName}}({{mockFunction.keyType}} _key, 
     abi.encode(_value)
   );
 }
+{{/unless}}
 {{nl}}

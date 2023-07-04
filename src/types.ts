@@ -106,6 +106,7 @@ export interface BasicStateVariableMockOptions {
 export interface BasicStateVariableOptions {
   setFunction: BasicStateVariableSetOptions;
   mockFunction: BasicStateVariableMockOptions;
+  isInternal: boolean;
 }
 
 export interface StateVariablesOptions {
@@ -145,6 +146,7 @@ export interface MappingStateVariableOptions {
     keyType: string;
     valueType: string;
   };
+  isInternal: boolean;
 }
 
 export const memoryTypes = ["string", "bytes", "[]", "mapping"];

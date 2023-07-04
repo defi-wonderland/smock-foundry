@@ -29,7 +29,7 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
     // If the state variable is constant then we don't need to mock it
     if (stateVariableNode.constant || stateVariableNode.mutability == "immutable") return;
     // If the state variable is internal or private we don't mock it
-    if (stateVariableNode.visibility == "internal" || stateVariableNode.visibility == "private") return;
+    if (stateVariableNode.visibility == "private") return;
 
     // Get the type of the state variable
     const stateVariableType: string = stateVariableNode.typeDescriptions.typeString;
@@ -78,6 +78,8 @@ function getArrayFunction(arrayNode: VariableDeclarationNode): BasicStateVariabl
   const arrayName: string = arrayNode.name;
   // Type string of the array, we remove the 'contract ' string if it exists
   const arrayType: string = arrayNode.typeDescriptions.typeString.replace(/contract |struct |enum /g, "");
+  // If the array is internal we don't create mockCall for it
+  const isInternal: boolean = arrayNode.visibility == "internal";
 
   const setFunction: BasicStateVariableSetOptions = {
     functionName: arrayName,
@@ -93,6 +95,7 @@ function getArrayFunction(arrayNode: VariableDeclarationNode): BasicStateVariabl
   const arrayStateVariableFunctions: BasicStateVariableOptions = {
     setFunction: setFunction,
     mockFunction: mockFunction,
+    isInternal: isInternal,
   };
 
   // Return the array function
@@ -118,6 +121,8 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
     /contract |struct |enum /g,
     ""
   );
+  // If the mapping is internal we don't create mockCall for it
+  const isInternal: boolean = mappingNode.visibility == "internal";
 
   const mappingStateVariableFunction: MappingStateVariableOptions = {
     setFunction: {
@@ -131,6 +136,7 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
       keyType: keyType,
       valueType: valueType,
     },
+    isInternal: isInternal,
   };
 
   return mappingStateVariableFunction;
@@ -147,6 +153,8 @@ function getBasicStateVariableFunction(variableNode: VariableDeclarationNode): B
   const variableName: string = variableNode.name;
   // Type of the variable, we remove the 'contract ' string if it exists
   const variableType: string = typeFix(variableNode.typeDescriptions.typeString.replace(/contract /g, ""));
+  // If the variable is internal we don't create mockCall for it
+  const isInternal: boolean = variableNode.visibility == "internal";
 
   // Save the set function information
   const setFunction: BasicStateVariableSetOptions = {
@@ -163,6 +171,7 @@ function getBasicStateVariableFunction(variableNode: VariableDeclarationNode): B
   const basicStateVariableFunctions: BasicStateVariableOptions = {
     setFunction: setFunction,
     mockFunction: mockFunction,
+    isInternal: isInternal,
   };
 
   return basicStateVariableFunctions;
