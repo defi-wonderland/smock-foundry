@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@defi-wonderland/solidity-utils": "0.0.0-4298c6c6",
+    "foundry-mock-generator": "^0.0.0-88d8ced7",
     "handlebars": "4.7.7",
     "yargs": "17.7.2"
   },

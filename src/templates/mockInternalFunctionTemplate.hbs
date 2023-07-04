@@ -1,0 +1,18 @@
+// todo: solve collision names problem
+
+bool callSupper_{{functionName}} = true;
+
+function set_CallSupper_{{functionName}}(bool _callSuper) external {
+    callSupper_{{functionName}} = _callSuper;
+}
+
+{{#each functionMockReturnVarsInit}}
+{{this}}; 
+{{/each}}
+
+function set_Mock_{{functionName}}({{outputsString}}) external {
+    {{#each functionMockReturnVarsSet}}
+    {{this}};
+    {{/each}}
+}
+{{nl}}

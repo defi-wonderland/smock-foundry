@@ -3,7 +3,7 @@ export interface VariableDeclarationNode {
   mutability: string;
   visibility: string;
   name: string;
-  nodeType: 'VariableDeclaration';
+  nodeType: "VariableDeclaration";
   storageLocation: string;
   typeDescriptions: {
     typeString: string;
@@ -23,7 +23,7 @@ export interface VariableDeclarationNode {
 }
 
 export interface ContractDefinitionNode {
-  nodeType: 'ContractDefinition';
+  nodeType: "ContractDefinition";
   canonicalName: string;
   nodes: AstNode[];
   abstract: boolean;
@@ -34,7 +34,7 @@ export interface ContractDefinitionNode {
 
 export interface FunctionDefinitionNode {
   name: string;
-  nodeType: 'FunctionDefinition';
+  nodeType: "FunctionDefinition";
   kind: string;
   parameters: {
     parameters: VariableDeclarationNode[];
@@ -57,13 +57,13 @@ export interface Ast {
 }
 
 export interface ImportDirectiveNode {
-  nodeType: 'ImportDirective';
+  nodeType: "ImportDirective";
   absolutePath: string;
   file: string;
   symbolAliases: {
     foreign: {
       name: string;
-      nodeType: 'Identifier';
+      nodeType: "Identifier";
     };
   }[];
 }
@@ -78,11 +78,7 @@ export interface OutputType {
   arrayChildren: null | any;
 }
 
-export type AstNode =
-  | ImportDirectiveNode
-  | FunctionDefinitionNode
-  | ContractDefinitionNode
-  | VariableDeclarationNode;
+export type AstNode = ImportDirectiveNode | FunctionDefinitionNode | ContractDefinitionNode | VariableDeclarationNode;
 
 /**
  * The options of the BasicStateVariable template for the setFunction section
@@ -126,20 +122,31 @@ export interface ExternalFunctionOptions {
   outputsStringNames: string;
 }
 
+export interface InternalFunctionOptions {
+  functionName: string;
+  arguments: string;
+  signature: string;
+  inputsStringNames: string;
+  functionMockReturnVarsInit: string[];
+  functionMockReturnVarsSet: string[];
+  outputsStringNames: string;
+  outputsString: string;
+}
+
 export interface MappingStateVariableOptions {
   setFunction: {
     functionName: string;
     keyType: string;
     valueType: string;
     mappingName: string;
-  },
+  };
   mockFunction: {
     functionName: string;
     keyType: string;
     valueType: string;
-  }
+  };
 }
 
-export const memoryTypes = ['string', 'bytes', '[]', 'mapping'];
+export const memoryTypes = ["string", "bytes", "[]", "mapping"];
 
 export const arrayRegex = /(\w+)\[\]/;

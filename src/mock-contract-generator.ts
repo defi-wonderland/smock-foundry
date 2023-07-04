@@ -1,21 +1,22 @@
 import {
   getExternalMockFunctions,
+  getInternalMockFunctions,
   getConstructor,
   getImports,
   getStateVariables,
   Ast,
-} from './index';
+} from "./index";
 import {
   getSubDirNameFromPath,
   registerHandlebarsTemplates,
   getContractNames,
   compileSolidityFilesFoundry,
-} from './utils';
-import Handlebars from 'handlebars';
-import { writeFileSync, existsSync, readdirSync } from 'fs';
-import { ensureDir, emptyDir } from 'fs-extra';
-import { resolve } from 'path';
-import { StateVariablesOptions, ContractDefinitionNode } from './types';
+} from "./utils";
+import Handlebars from "handlebars";
+import { writeFileSync, existsSync, readdirSync } from "fs";
+import { ensureDir, emptyDir } from "fs-extra";
+import { resolve } from "path";
+import { StateVariablesOptions, ContractDefinitionNode } from "./types";
 
 /**
  * Generates the mock contracts
@@ -35,16 +36,16 @@ export const generateMockContracts = async (
     try {
       await ensureDir(generatedContractsDir);
     } catch (error) {
-      console.error('Error while creating the mock directory: ', error);
+      console.error("Error while creating the mock directory: ", error);
     }
 
     // Empty the directory, if it exists
     try {
       await emptyDir(generatedContractsDir);
     } catch (error) {
-      console.error('Error while trying to empty the mock directory: ', error);
+      console.error("Error while trying to empty the mock directory: ", error);
     }
-    console.log('Parsing contracts...');
+    console.log("Parsing contracts...");
     // Get all contracts directories
     const contractPaths: string[] = getContractNames(contractsDir);
     // Loop for each contract path
@@ -54,15 +55,11 @@ export const generateMockContracts = async (
 
       // Get contract name
       // If the contract and the file have different names, it will be modified.
-      let contractName: string = subDirName.replace('.json', '');
+      let contractName: string = subDirName.replace(".json", "");
 
       // Get the compiled path
       // If the contract and the file have different names, it will be modified.
-      let compiledArtifactsPath = resolve(
-        compiledArtifactsDir,
-        contractPath,
-        subDirName
-      );
+      let compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirName);
 
       // Check if contract and file have different names
       if (!existsSync(compiledArtifactsPath)) {
@@ -76,14 +73,10 @@ export const generateMockContracts = async (
 
         // Get the real path of the json file
         // If this !path means that the file is not compiled
-        compiledArtifactsPath = resolve(
-          compiledArtifactsDir,
-          contractPath,
-          subDirContractName[0]
-        );
+        compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirContractName[0]);
         if (!compiledArtifactsPath) return;
 
-        contractName = subDirContractName[0].replace('.json', '');
+        contractName = subDirContractName[0].replace(".json", "");
       }
       // Get the ast
       const ast: Ast = require(compiledArtifactsPath).ast;
@@ -97,20 +90,20 @@ export const generateMockContracts = async (
       // Get the contract node and check if it's a library
       // Also check if is another contract inside the file and avoid it
       const contractNode = ast.nodes.find(
-        (node) =>
-          node.nodeType === 'ContractDefinition' &&
-          node.canonicalName === contractName
+        (node) => node.nodeType === "ContractDefinition" && node.canonicalName === contractName
       ) as ContractDefinitionNode;
-      if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') return;
+      if (!contractNode || contractNode.abstract || contractNode.contractKind === "library") return;
 
       const functions: StateVariablesOptions = getStateVariables(contractNode);
       // All data which will be use for create the template
+
       const data = {
         contractName: contractName,
         contractImport: contractImport,
         import: getImports(ast),
         constructor: getConstructor(contractNode),
         mockExternalFunctions: getExternalMockFunctions(contractNode),
+        mockInternalFunctions: getInternalMockFunctions(contractNode),
         mockStateVariables: functions.basicStateVariables,
         mockArrayStateVariables: functions.arrayStateVariables,
         mockMappingStateVariables: functions.mappingStateVariables,
@@ -128,13 +121,10 @@ export const generateMockContracts = async (
         .replace(/;;/g, ";");
 
       // Write the contract
-      writeFileSync(
-        `${generatedContractsDir}/Mock${contractName}.sol`,
-        cleanedCode
-      );
+      writeFileSync(`${generatedContractsDir}/Mock${contractName}.sol`, cleanedCode);
     });
 
-    console.log('Mock contracts generated successfully');
+    console.log("Mock contracts generated successfully");
     // Compile the mock contracts
     compileSolidityFilesFoundry(generatedContractsDir);
   } catch (error) {
