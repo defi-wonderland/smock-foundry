@@ -67,10 +67,8 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const functionReturnParameters: string[] = [];
     // We save the return parameters names in an other array
     const returnParameterNames: string[] = [];
-    // We create the strings to init mock return vars
-    const functionMockReturnVarsInit: string[] = [];
-    // We create the strings to set mock return vars
-    const functionMockReturnVarsSet: string[] = [];
+    // We save the types of output params
+    const returnParameterTypes: string[] = [];
 
     parameterIndex = 0;
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
@@ -89,8 +87,7 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
 
       functionReturnParameters.push(parameterString);
       returnParameterNames.push(returnName);
-      functionMockReturnVarsSet.push(`mock_${funcNode.name}_${returnName} = ${returnName}`);
-      functionMockReturnVarsInit.push(`${typeName} internal mock_${funcNode.name}_${returnName}`);
+      returnParameterTypes.push(typeName);
       parameterIndex++;
     });
 
@@ -117,10 +114,10 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
       arguments: args,
       signature: signature,
       inputsStringNames: inputsStringNames,
-      functionMockReturnVarsInit: functionMockReturnVarsInit,
-      functionMockReturnVarsSet: functionMockReturnVarsSet,
-      outputsStringNames: outputsStringNames,
+      inputsString: inputsString,
       outputsString: outputsString,
+      outputsStringNames: outputsStringNames,
+      outputsTypesString: returnParameterTypes.join(", "),
     };
 
     internalFunctions.push(internalMockFunction);

@@ -127,10 +127,10 @@ export interface InternalFunctionOptions {
   arguments: string;
   signature: string;
   inputsStringNames: string;
-  functionMockReturnVarsInit: string[];
-  functionMockReturnVarsSet: string[];
+  inputsString: string;
   outputsStringNames: string;
   outputsString: string;
+  outputsTypesString: string;
 }
 
 export interface MappingStateVariableOptions {

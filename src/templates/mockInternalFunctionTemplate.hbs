@@ -1,18 +1,14 @@
-// todo: solve collision names problem
-
-bool callSupper_{{functionName}} = true;
-
-function set_CallSupper_{{functionName}}(bool _callSuper) external {
-    callSupper_{{functionName}} = _callSuper;
+function mock_call_{{functionName}}({{arguments}}) public {
+  vm.mockCall(
+    address(this),
+    abi.encodeWithSignature("{{signature}}"{{inputsStringNames}}),
+    abi.encode({{outputsStringNames}})
+  );
 }
 
-{{#each functionMockReturnVarsInit}}
-{{this}}; 
-{{/each}}
-
-function set_Mock_{{functionName}}({{outputsString}}) external {
-    {{#each functionMockReturnVarsSet}}
-    {{this}};
-    {{/each}}
+function {{functionName}}({{inputsString}}) internal override returns ({{outputsString}}) {
+    (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature("{{signature}}"{{inputsStringNames}}));
+    require(_success, "mock call failed");
+    ({{outputsStringNames}}) = abi.decode(_data, ({{outputsTypesString}}));
 }
 {{nl}}
