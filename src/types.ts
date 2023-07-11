@@ -1,14 +1,14 @@
 export interface VariableDeclarationNode {
-  constant: boolean;
-  mutability: string;
-  visibility: string;
+  constant?: boolean;
+  mutability?: string;
+  visibility?: string;
   name: string;
   nodeType: 'VariableDeclaration';
   storageLocation: string;
   typeDescriptions: {
     typeString: string;
   };
-  typeName: {
+  typeName?: {
     keyType: {
       typeDescriptions: {
         typeString: string;
@@ -48,7 +48,7 @@ export interface FunctionDefinitionNode {
 
 export interface Ast {
   absolutePath: string;
-  id: number;
+  id?: number;
   exportedSymbols: { [key: string]: any };
   nodeType: string;
   src: string;

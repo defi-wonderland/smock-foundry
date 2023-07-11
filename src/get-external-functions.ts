@@ -6,9 +6,6 @@ import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode
  * @returns The infomration of the external function for the mock contract
  */
 export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): ExternalFunctionOptions[] => {
-  // Get the contract's name
-  const contractName: string = contractNode.name;
-
   // Filter the nodes and keep only the FunctionDefinition related ones
   const functionNodes = contractNode.nodes.filter(
     (node) => node.nodeType === 'FunctionDefinition'
