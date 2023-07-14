@@ -3,7 +3,7 @@ export interface VariableDeclarationNode {
   mutability: string;
   visibility: string;
   name: string;
-  nodeType: "VariableDeclaration";
+  nodeType: 'VariableDeclaration';
   storageLocation: string;
   typeDescriptions: {
     typeString: string;
@@ -19,22 +19,26 @@ export interface VariableDeclarationNode {
         typeString: string;
       };
     };
+    baseType: {
+      typeDescriptions: {
+        typeString: string;
+      };
+    };
   };
 }
 
 export interface ContractDefinitionNode {
-  nodeType: "ContractDefinition";
+  nodeType: 'ContractDefinition';
   canonicalName: string;
   nodes: AstNode[];
   abstract: boolean;
-  baseContracts: any[];
   contractKind: string;
   name: string;
 }
 
 export interface FunctionDefinitionNode {
   name: string;
-  nodeType: "FunctionDefinition";
+  nodeType: 'FunctionDefinition';
   kind: string;
   parameters: {
     parameters: VariableDeclarationNode[];
@@ -49,7 +53,6 @@ export interface FunctionDefinitionNode {
 export interface Ast {
   absolutePath: string;
   id: number;
-  exportedSymbols: { [key: string]: any };
   nodeType: string;
   src: string;
   nodes: AstNode[];
@@ -57,13 +60,13 @@ export interface Ast {
 }
 
 export interface ImportDirectiveNode {
-  nodeType: "ImportDirective";
+  nodeType: 'ImportDirective';
   absolutePath: string;
   file: string;
   symbolAliases: {
     foreign: {
       name: string;
-      nodeType: "Identifier";
+      nodeType: 'Identifier';
     };
   }[];
 }
@@ -73,9 +76,6 @@ export interface OutputType {
   type: string;
   baseType: string;
   indexed?: boolean;
-  components: null | any;
-  arrayLength: null | any;
-  arrayChildren: null | any;
 }
 
 export type AstNode = ImportDirectiveNode | FunctionDefinitionNode | ContractDefinitionNode | VariableDeclarationNode;
@@ -149,6 +149,6 @@ export interface MappingStateVariableOptions {
   isInternal: boolean;
 }
 
-export const memoryTypes = ["string", "bytes", "[]", "mapping"];
+export const memoryTypes = ['string', 'bytes', '[]', 'mapping'];
 
 export const arrayRegex = /(\w+)\[\]/;

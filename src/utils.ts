@@ -3,6 +3,7 @@ import { resolve, join } from "path";
 import { readFileSync, readdirSync, statSync } from "fs";
 import { exec } from "child_process";
 import Handlebars from "handlebars";
+import { promisify } from "util";
 
 /**
  * Given a path returns the name of the file with the extension replaced with .json
@@ -112,19 +113,13 @@ export const getContractNames = (contractsDir: string): string[] => {
  * Compiles the solidity files in the given directory calling forge build command
  * @param mockContractsDir The directory of the generated contracts
  */
-export const compileSolidityFilesFoundry = (mockContractsDir: string) => {
+export const compileSolidityFilesFoundry = async (mockContractsDir: string) => {
   console.log("Compiling contracts...");
-  exec(`forge build -C ${mockContractsDir}`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing command: ${error.message}`);
-      return;
-    }
-
-    console.log(stdout);
-
-    if (stderr) {
-      console.error("Command error:");
-      console.error(stderr);
-    }
-  });
+  try {
+    const { stdout, stderr } = await promisify(exec)(`forge build -C ${mockContractsDir}`);
+    if (stderr) throw new Error(stderr);
+    if (stdout) console.log(stdout);
+  } catch (e) {
+    throw new Error(`Error while compiling contracts: ${e}`);
+  }
 };

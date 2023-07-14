@@ -4,6 +4,7 @@ import {IContractTest} from '../interfaces/IContractTest.sol';
 
 contract ContractTest is IContractTest {
   uint256 public immutable immutableUintVariable = 10;
+
   uint256 internal internalUint256;
   /// @inheritdoc IContractTest
   uint256 public uintVariable;
@@ -15,12 +16,16 @@ contract ContractTest is IContractTest {
   address public addressVariable;
   /// @inheritdoc IContractTest
   bytes32 public bytes32Variable;
+
+  address[] internal internalAddressArray;
   /// @inheritdoc IContractTest
   address[] public addressArray;
   /// @inheritdoc IContractTest
   uint256[] public uint256Array;
   /// @inheritdoc IContractTest
   bytes32[] public bytes32Array;
+
+  mapping(uint256 => address) internal internalUint256ToAddress;
   /// @inheritdoc IContractTest
   mapping(uint256 => address) public uint256ToAddress;
   /// @inheritdoc IContractTest
@@ -77,7 +82,51 @@ contract ContractTest is IContractTest {
     _result = true;
   }
 
+  function internalVirtualFunction(uint256 _newValue)
+    internal
+    virtual
+    returns (bool _result, uint256 _value, string memory _string)
+  {
+    internalUint256 = _newValue;
+    _result = true;
+    _value = 1;
+    _string = 'test';
+  }
+
+  function internalNonVirtualFunction(
+    uint256 _newValue,
+    bool
+  ) internal returns (bool _result, uint256 _value, string memory _string) {
+    internalUint256 = _newValue;
+    _result = true;
+    _value = 1;
+    _string = 'test';
+  }
+
   function testFunc(uint256) public pure returns (bool) {
     return true;
+  }
+
+  // ========================= View =========================
+
+  function getInternalUint256() public view returns (uint256) {
+    return internalUint256;
+  }
+
+  function getInternalAddressArray() public view returns (address[] memory) {
+    return internalAddressArray;
+  }
+
+  function getInternalUint256ToAddress(uint256 _index) public view returns (address) {
+    return internalUint256ToAddress[_index];
+  }
+
+  // =============== virtual call ===============
+
+  function callInternalVirtualFunction(uint256 _newValue)
+    public
+    returns (bool _result, uint256 _value, string memory _string)
+  {
+    (_result, _value, _string) = internalVirtualFunction(_newValue);
   }
 }

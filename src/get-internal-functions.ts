@@ -3,7 +3,7 @@ import {
   FunctionDefinitionNode,
   VariableDeclarationNode,
   InternalFunctionOptions,
-} from "./types";
+} from './types';
 
 /**
  * Returns the infomration of the internal function for the mock contract
@@ -11,21 +11,18 @@ import {
  * @returns The infomration of the internal function for the mock contract
  */
 export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): InternalFunctionOptions[] => {
-  // Get the contract's name
-  const contractName: string = contractNode.name;
-
   // Filter the nodes and keep only the FunctionDefinition related ones
   const functionNodes = contractNode.nodes.filter(
-    (node) => node.nodeType === "FunctionDefinition"
+    (node) => node.nodeType === 'FunctionDefinition'
   ) as FunctionDefinitionNode[];
 
   const internalFunctions: InternalFunctionOptions[] = [];
   // Loop through the function nodes
   functionNodes.forEach((funcNode: FunctionDefinitionNode) => {
     // Check if the node is a function kind (not a constructor, modifier etc.)
-    if (funcNode.kind != "function") return;
+    if (funcNode.kind != 'function') return;
     // Check if the function is internal or public
-    if (funcNode.visibility != "internal" && !funcNode.virtual) return;
+    if (funcNode.visibility != 'internal' || !funcNode.virtual) return;
 
     // Get the parameters of the constructor, if there are no parameters then we use an empty array
     const parameters: VariableDeclarationNode[] = funcNode.parameters.parameters ? funcNode.parameters.parameters : [];
@@ -40,14 +37,15 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
     parameters.forEach((parameter: VariableDeclarationNode) => {
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
-        parameter.storageLocation === "memory" || parameter.storageLocation === "calldata"
+        parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata'
           ? `${parameter.storageLocation} `
-          : "";
+          : '';
 
       // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, "");
+      // We remove '[]' at the end of array types
+      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
 
-      const paramName: string = parameter.name == "" ? `_param${parameterIndex}` : parameter.name;
+      const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
@@ -57,7 +55,7 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
       parameterIndex++;
     });
 
-    const signature = parameterTypes ? `${funcNode.name}(${parameterTypes.join(", ")})` : `${funcNode.name}()`;
+    const signature = parameterTypes ? `${funcNode.name}(${parameterTypes.join(',')})` : `${funcNode.name}()`;
 
     const returnParameters: VariableDeclarationNode[] = funcNode.returnParameters.parameters
       ? funcNode.returnParameters.parameters
@@ -74,14 +72,14 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
-        parameter.storageLocation === "memory" || parameter.storageLocation === "calldata"
+        parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata'
           ? `${parameter.storageLocation} `
-          : "";
+          : '';
 
       // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, "");
+      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
 
-      const returnName: string = parameter.name == "" ? `_return${parameterIndex}` : parameter.name;
+      const returnName: string = parameter.name == '' ? `_return${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${returnName}`;
 
@@ -92,12 +90,12 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
     });
 
     // We create the string that will be used in the mock function signature
-    const inputsString: string = functionParameters.length ? functionParameters.join(", ") : "";
-    const outputsString: string = functionReturnParameters.length ? functionReturnParameters.join(", ") : "";
+    const inputsString: string = functionParameters.length ? functionParameters.join(', ') : '';
+    const outputsString: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
 
     // We create the strings that will be used in the mock call arguments and returns
-    const inputsStringNames: string = parameterNames.length ? `${parameterNames.join(", ")}` : "";
-    const outputsStringNames: string = returnParameterNames.length ? returnParameterNames.join(", ") : "";
+    const inputsStringNames: string = parameterNames.length ? `${parameterNames.join(', ')}` : '';
+    const outputsStringNames: string = returnParameterNames.length ? returnParameterNames.join(', ') : '';
     let args: string;
 
     if (!inputsString) {
@@ -117,9 +115,8 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
       inputsString: inputsString,
       outputsString: outputsString,
       outputsStringNames: outputsStringNames,
-      outputsTypesString: returnParameterTypes.join(", "),
+      outputsTypesString: returnParameterTypes.join(', '),
     };
-
     internalFunctions.push(internalMockFunction);
   });
 

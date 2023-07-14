@@ -1,13 +1,13 @@
-function set_{{setFunction.functionName}}({{setFunction.paramType}} memory _{{setFunction.paramName}}) public {
+function set_{{setFunction.functionName}}({{setFunction.paramType}}[] memory _{{setFunction.paramName}}) public {
   {{setFunction.paramName}} = _{{setFunction.paramName}};
 }
 
 {{#unless isInternal}}
-function mock_call_{{mockFunction.functionName}}({{mockFunction.paramType}} memory _{{mockFunction.functionName}}) public {
+function mock_call_{{mockFunction.functionName}}(uint256 _index, {{mockFunction.paramType}}  _value) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{mockFunction.functionName}}()"),
-    abi.encode(_{{mockFunction.functionName}})
+    abi.encodeWithSignature("{{mockFunction.functionName}}(uint256)", _index),
+    abi.encode(_value)
   );
 }
 {{/unless}}

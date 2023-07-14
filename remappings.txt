@@ -3,3 +3,4 @@ forge-std/=lib/forge-std/src
 
 contracts/=solidity/contracts
 interfaces/=solidity/interfaces
+test/=solidity/test

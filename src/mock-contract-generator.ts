@@ -126,7 +126,7 @@ export const generateMockContracts = async (
 
     console.log("Mock contracts generated successfully");
     // Compile the mock contracts
-    compileSolidityFilesFoundry(generatedContractsDir);
+    await compileSolidityFilesFoundry(generatedContractsDir);
   } catch (error) {
     console.log(error);
   }

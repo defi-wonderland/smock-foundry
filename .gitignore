@@ -22,4 +22,4 @@ out-via-ir
 out/*/*
 
 # Ignore generated mock contracts
-solidity/test
+solidity/test/mock-contracts/
