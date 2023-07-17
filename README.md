@@ -29,20 +29,31 @@ Note: --contracts required by the user, tha path to the solidity contracts to mo
 Note: --genDir default path is `solidity/test/mock-contracts`, the path to generate the mock contracts
 Note: --out default path is `out`, the path that has foundry's compiled artifacts
 
-1) To use the mock contracts in your tests just import them.
+1. To use the mock contracts in your tests just import them.
 
 `import { MockMyContractName } from '/path/to/mock-contracts/MockMyContractName.sol'`
 
-2) To mock a function or variable e.g.:
+2. To mock a function or variable e.g.:
 
-```
+```JavaScript
 /// Deploy mock contract
 mock_myContract = new MockMyContractname(...);
+/// Allow mocks for the contract
+vm.allowCheatcodes(address(mock_myContract));
 /// Mock myFuncName function, when called with `arg1`, `arg2` to return `return1`
-mock_myContract.mock_myFuncName(arg1, arg2, return1);
+mock_myContract.mock_call_myFuncName(arg1, arg2, return1);
 /// Mock myVarName variable, to return `return1`
-mock_myContract.mock_myVarName(return1);
+mock_myContract.mock_call_myVarName(return1);
 ```
+
+3. You also can change value of any variable (except of `private`)
+
+```JavaScript
+/// Change value of a variable
+mock_myContract.set_myVarName(value);
+```
+
+- Please, note that if you want to mock `internal` functions, you **must** make them `virtual`. The tool will not generate mocks for internal functions that are not virtual.
 
 ## Release
 
