@@ -28,7 +28,7 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
   stateVariableNodes.forEach((stateVariableNode: VariableDeclarationNode) => {
     // If the state variable is constant then we don't need to mock it
     if (stateVariableNode.constant || stateVariableNode.mutability == 'immutable') return;
-    // If the state variable is internal or private we don't mock it
+    // If the state variable is private we don't mock it
     if (stateVariableNode.visibility == 'private') return;
 
     // Get the type of the state variable
