@@ -2,7 +2,6 @@ import { getConstructor } from '../../src/get-constructor';
 import { expect } from 'chai';
 import { ContractDefinitionNode } from '../../src/types';
 
-
 describe('getConstructor', () => {
   let contractNode: ContractDefinitionNode;
   beforeEach(() => {
@@ -12,7 +11,6 @@ describe('getConstructor', () => {
       canonicalName: 'MyContract',
       nodes: [],
       abstract: false,
-      baseContracts: [],
       contractKind: 'contract',
       name: 'MyContract',
     };
@@ -57,7 +55,7 @@ describe('getConstructor', () => {
                 typeString: 'string',
               },
               storageLocation: 'memory',
-            }
+            },
           ],
         },
         returnParameters: {
@@ -68,11 +66,9 @@ describe('getConstructor', () => {
       },
     ];
     const constructorSignature = getConstructor(contractNode);
-    expect(constructorSignature).to.equal(
-      'constructor(string memory _greeting) MyContract(_greeting) {}'
-    );
+    expect(constructorSignature).to.equal('constructor(string memory _greeting) MyContract(_greeting) {}');
   });
-  
+
   it('should return the correct signature when storage location param is calldata', async () => {
     contractNode.nodes = [
       {
@@ -88,7 +84,7 @@ describe('getConstructor', () => {
                 typeString: 'string',
               },
               storageLocation: 'calldata',
-            }
+            },
           ],
         },
         returnParameters: {
@@ -99,9 +95,7 @@ describe('getConstructor', () => {
       },
     ];
     const constructorSignature = getConstructor(contractNode);
-    expect(constructorSignature).to.equal(
-      'constructor(string calldata _greeting) MyContract(_greeting) {}'
-    );
+    expect(constructorSignature).to.equal('constructor(string calldata _greeting) MyContract(_greeting) {}');
   });
 
   it('should return the correct signature when param is a contract', async () => {
@@ -119,7 +113,7 @@ describe('getConstructor', () => {
                 typeString: 'contract IERC20',
               },
               storageLocation: '',
-            }
+            },
           ],
         },
         returnParameters: {
@@ -130,9 +124,7 @@ describe('getConstructor', () => {
       },
     ];
     const constructorSignature = getConstructor(contractNode);
-    expect(constructorSignature).to.equal(
-      'constructor(IERC20 _token) MyContract(_token) {}'
-    );
+    expect(constructorSignature).to.equal('constructor(IERC20 _token) MyContract(_token) {}');
   });
 
   it('should return the correct signature when param is a struct', async () => {
@@ -150,7 +142,7 @@ describe('getConstructor', () => {
                 typeString: 'struct MyStruct',
               },
               storageLocation: 'memory',
-            }
+            },
           ],
         },
         returnParameters: {
@@ -161,9 +153,7 @@ describe('getConstructor', () => {
       },
     ];
     const constructorSignature = getConstructor(contractNode);
-    expect(constructorSignature).to.equal(
-      'constructor(MyStruct memory _myStruct) MyContract(_myStruct) {}'
-    );
+    expect(constructorSignature).to.equal('constructor(MyStruct memory _myStruct) MyContract(_myStruct) {}');
   });
 
   it('should return the correct signature when param is an enum', async () => {
@@ -181,7 +171,7 @@ describe('getConstructor', () => {
                 typeString: 'enum MyEnum',
               },
               storageLocation: 'memory',
-            }
+            },
           ],
         },
         returnParameters: {
@@ -192,8 +182,6 @@ describe('getConstructor', () => {
       },
     ];
     const constructorSignature = getConstructor(contractNode);
-    expect(constructorSignature).to.equal(
-      'constructor(MyEnum memory _myEnum) MyContract(_myEnum) {}'
-    );
+    expect(constructorSignature).to.equal('constructor(MyEnum memory _myEnum) MyContract(_myEnum) {}');
   });
 });
