@@ -3,6 +3,7 @@ import { resolve, join } from 'path';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
 import Handlebars from 'handlebars';
+import { promisify } from 'util';
 
 /**
  * Given a path returns the name of the file with the extension replaced with .json
@@ -56,25 +57,28 @@ export const typeFix = (str: string): string => {
  * @returns The content of the template
  */
 export const registerHandlebarsTemplates = (): string => {
-     // Template paths
-     const templatePath = resolve(__dirname, 'templates', 'mockContractTemplate.hbs');
-     const externalFuncsTemplatePath = resolve(__dirname, 'templates', 'mockExternalFunctionTemplate.hbs');
-     const basicStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockBasicStateVariableTemplate.hbs');
-     const arrayStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockArrayStateVariableTemplate.hbs');
-     const mappingStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockMappingStateVariableTemplate.hbs');
-     // Read the templates
-     const templateContent = readFileSync(templatePath, 'utf8');
-     const externalFuncsTemplateContent = readFileSync(externalFuncsTemplatePath, 'utf8');
-     const basicStateVariablesTemplateContent = readFileSync(basicStateVariablesTemplatePath, 'utf8');
-     const arrayStateVariablesTemplateContent = readFileSync(arrayStateVariablesTemplatePath, 'utf8');
-     const mappingStateVariablesTemplateContent = readFileSync(mappingStateVariablesTemplatePath, 'utf8');
- 
-     // Register the partial templates
-     Handlebars.registerPartial('mockStateVariable', basicStateVariablesTemplateContent);
-     Handlebars.registerPartial('mockExternalFunction', externalFuncsTemplateContent);
-     Handlebars.registerPartial('mockArrayStateVariable', arrayStateVariablesTemplateContent);
-     Handlebars.registerPartial('mockMappingStateVariable', mappingStateVariablesTemplateContent);
-     return templateContent;
+  // Template paths
+  const templatePath = resolve(__dirname, 'templates', 'mockContractTemplate.hbs');
+  const externalFuncsTemplatePath = resolve(__dirname, 'templates', 'mockExternalFunctionTemplate.hbs');
+  const internalFuncsTemplatePath = resolve(__dirname, 'templates', 'mockInternalFunctionTemplate.hbs');
+  const basicStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockBasicStateVariableTemplate.hbs');
+  const arrayStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockArrayStateVariableTemplate.hbs');
+  const mappingStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockMappingStateVariableTemplate.hbs');
+  // Read the templates
+  const templateContent = readFileSync(templatePath, 'utf8');
+  const externalFuncsTemplateContent = readFileSync(externalFuncsTemplatePath, 'utf8');
+  const internalFuncsTemplateContent = readFileSync(internalFuncsTemplatePath, 'utf8');
+  const basicStateVariablesTemplateContent = readFileSync(basicStateVariablesTemplatePath, 'utf8');
+  const arrayStateVariablesTemplateContent = readFileSync(arrayStateVariablesTemplatePath, 'utf8');
+  const mappingStateVariablesTemplateContent = readFileSync(mappingStateVariablesTemplatePath, 'utf8');
+
+  // Register the partial templates
+  Handlebars.registerPartial('mockStateVariable', basicStateVariablesTemplateContent);
+  Handlebars.registerPartial('mockExternalFunction', externalFuncsTemplateContent);
+  Handlebars.registerPartial('mockInternalFunction', internalFuncsTemplateContent);
+  Handlebars.registerPartial('mockArrayStateVariable', arrayStateVariablesTemplateContent);
+  Handlebars.registerPartial('mockMappingStateVariable', mappingStateVariablesTemplateContent);
+  return templateContent;
 };
 
 /**
@@ -109,19 +113,13 @@ export const getContractNames = (contractsDir: string): string[] => {
  * Compiles the solidity files in the given directory calling forge build command
  * @param mockContractsDir The directory of the generated contracts
  */
-export const compileSolidityFilesFoundry = (mockContractsDir: string) => {
+export const compileSolidityFilesFoundry = async (mockContractsDir: string) => {
   console.log('Compiling contracts...');
-  exec(`forge build -C ${mockContractsDir}`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing command: ${error.message}`);
-      return;
-    }
-
-    console.log(stdout);
-
-    if (stderr) {
-      console.error('Command error:');
-      console.error(stderr);
-    }
-  });
+  try {
+    const { stdout, stderr } = await promisify(exec)(`forge build -C ${mockContractsDir}`);
+    if (stderr) throw new Error(stderr);
+    if (stdout) console.log(stdout);
+  } catch (e) {
+    throw new Error(`Error while compiling contracts: ${e}`);
+  }
 };

@@ -2,27 +2,27 @@ import {
   ContractDefinitionNode,
   FunctionDefinitionNode,
   VariableDeclarationNode,
-  ExternalFunctionOptions,
+  InternalFunctionOptions,
 } from './types';
 
 /**
- * Returns the infomration of the external function for the mock contract
+ * Returns the infomration of the internal function for the mock contract
  * @param contractNode The contract node that has all the nodes for the contract
- * @returns The infomration of the external function for the mock contract
+ * @returns The infomration of the internal function for the mock contract
  */
-export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): ExternalFunctionOptions[] => {
+export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): InternalFunctionOptions[] => {
   // Filter the nodes and keep only the FunctionDefinition related ones
   const functionNodes = contractNode.nodes.filter(
     (node) => node.nodeType === 'FunctionDefinition'
   ) as FunctionDefinitionNode[];
 
-  const externalFunctions: ExternalFunctionOptions[] = [];
+  const internalFunctions: InternalFunctionOptions[] = [];
   // Loop through the function nodes
   functionNodes.forEach((funcNode: FunctionDefinitionNode) => {
     // Check if the node is a function kind (not a constructor, modifier etc.)
     if (funcNode.kind != 'function') return;
-    // Check if the function is external or public
-    if (funcNode.visibility != 'external' && funcNode.visibility != 'public') return;
+    // Check if the function is internal virtual
+    if (funcNode.visibility != 'internal' || !funcNode.virtual) return;
 
     // Get the parameters of the function, if there are no parameters then we use an empty array
     const parameters: VariableDeclarationNode[] = funcNode.parameters.parameters ? funcNode.parameters.parameters : [];
@@ -42,6 +42,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
           : '';
 
       // We remove the 'contract ' string from the type name if it exists
+      // We remove '[]' at the end of array types
       const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
 
       const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
@@ -64,6 +65,9 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const functionReturnParameters: string[] = [];
     // We save the return parameters names in an other array
     const returnParameterNames: string[] = [];
+    // We save the types of output params
+    const returnParameterTypes: string[] = [];
+
     parameterIndex = 0;
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
       // If the storage location is memory or calldata then we keep it
@@ -81,6 +85,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
 
       functionReturnParameters.push(parameterString);
       returnParameterNames.push(returnName);
+      returnParameterTypes.push(typeName);
       parameterIndex++;
     });
 
@@ -89,7 +94,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const outputsString: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
 
     // We create the strings that will be used in the mock call arguments and returns
-    const inputsStringNames: string = parameterNames.length ? `, ${parameterNames.join(', ')}` : '';
+    const inputsStringNames: string = parameterNames.length ? `${parameterNames.join(', ')}` : '';
     const outputsStringNames: string = returnParameterNames.length ? returnParameterNames.join(', ') : '';
     let args: string;
 
@@ -101,17 +106,19 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
       args = `${inputsString}, ${outputsString}`;
     }
 
-    // Save the external function information
-    const externalMockFunction: ExternalFunctionOptions = {
+    // Save the internal function information
+    const internalMockFunction: InternalFunctionOptions = {
       functionName: funcNode.name,
       arguments: args,
       signature: signature,
       inputsStringNames: inputsStringNames,
+      inputsString: inputsString,
+      outputsString: outputsString,
       outputsStringNames: outputsStringNames,
+      outputsTypesString: returnParameterTypes.join(', '),
     };
-
-    externalFunctions.push(externalMockFunction);
+    internalFunctions.push(internalMockFunction);
   });
 
-  return externalFunctions;
+  return internalFunctions;
 };

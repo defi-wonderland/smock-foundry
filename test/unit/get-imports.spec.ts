@@ -8,7 +8,6 @@ describe('getImports', () => {
     // Reset ast
     ast = {
       absolutePath: 'test.sol',
-      exportedSymbols: {},
       nodeType: 'SourceUnit',
       src: '',
       nodes: [],

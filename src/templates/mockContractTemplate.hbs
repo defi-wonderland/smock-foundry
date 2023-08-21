@@ -24,4 +24,9 @@ contract Mock{{contractName}} is {{contractName}}, Test {
   {{#each mockExternalFunctions}}
   {{> mockExternalFunction}}
   {{/each}}
+  /// Mocked Internal Functions
+  {{#each mockInternalFunctions}}
+  {{> mockInternalFunction}}
+  {{/each}}
+
 }

@@ -1,5 +1,6 @@
 import {
   getExternalMockFunctions,
+  getInternalMockFunctions,
   getConstructor,
   getImports,
   getStateVariables,
@@ -58,11 +59,7 @@ export const generateMockContracts = async (
 
       // Get the compiled path
       // If the contract and the file have different names, it will be modified.
-      let compiledArtifactsPath = resolve(
-        compiledArtifactsDir,
-        contractPath,
-        subDirName
-      );
+      let compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirName);
 
       // Check if contract and file have different names
       if (!existsSync(compiledArtifactsPath)) {
@@ -76,11 +73,7 @@ export const generateMockContracts = async (
 
         // Get the real path of the json file
         // If this !path means that the file is not compiled
-        compiledArtifactsPath = resolve(
-          compiledArtifactsDir,
-          contractPath,
-          subDirContractName[0]
-        );
+        compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirContractName[0]);
         if (!compiledArtifactsPath) return;
 
         contractName = subDirContractName[0].replace('.json', '');
@@ -97,20 +90,20 @@ export const generateMockContracts = async (
       // Get the contract node and check if it's a library
       // Also check if is another contract inside the file and avoid it
       const contractNode = ast.nodes.find(
-        (node) =>
-          node.nodeType === 'ContractDefinition' &&
-          node.canonicalName === contractName
+        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === contractName
       ) as ContractDefinitionNode;
       if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') return;
 
       const functions: StateVariablesOptions = getStateVariables(contractNode);
       // All data which will be use for create the template
+
       const data = {
         contractName: contractName,
         contractImport: contractImport,
         import: getImports(ast),
         constructor: getConstructor(contractNode),
         mockExternalFunctions: getExternalMockFunctions(contractNode),
+        mockInternalFunctions: getInternalMockFunctions(contractNode),
         mockStateVariables: functions.basicStateVariables,
         mockArrayStateVariables: functions.arrayStateVariables,
         mockMappingStateVariables: functions.mappingStateVariables,
@@ -124,19 +117,16 @@ export const generateMockContracts = async (
       // TODO: check if there are other symbols we should account for, or if there is a better way to handle this
       const cleanedCode: string = code
         .replace(/&#x27;/g, "'")
-        .replace(/&#x3D;/g, "=")
-        .replace(/;;/g, ";");
+        .replace(/&#x3D;/g, '=')
+        .replace(/;;/g, ';');
 
       // Write the contract
-      writeFileSync(
-        `${generatedContractsDir}/Mock${contractName}.sol`,
-        cleanedCode
-      );
+      writeFileSync(`${generatedContractsDir}/Mock${contractName}.sol`, cleanedCode);
     });
 
     console.log('Mock contracts generated successfully');
     // Compile the mock contracts
-    compileSolidityFilesFoundry(generatedContractsDir);
+    await compileSolidityFilesFoundry(generatedContractsDir);
   } catch (error) {
     console.log(error);
   }

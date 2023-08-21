@@ -22,7 +22,7 @@
     "lint:ts-logic": "eslint ./src/**/*.ts",
     "mock-gen": "ts-node src/run.ts mock-gen",
     "release": "yarn build && yarn changeset publish",
-    "test": "forge build && cross-env mocha 'test/**/*.spec.ts'"
+    "test": "forge build --skip test && cross-env mocha 'test/**/*.spec.ts' && forge test"
   },
   "lint-staged": {
     "*.{js,css,md,ts,sol}": "forge fmt",

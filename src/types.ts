@@ -19,6 +19,11 @@ export interface VariableDeclarationNode {
         typeString: string;
       };
     };
+    baseType: {
+      typeDescriptions: {
+        typeString: string;
+      };
+    };
   };
 }
 
@@ -27,7 +32,6 @@ export interface ContractDefinitionNode {
   canonicalName: string;
   nodes: AstNode[];
   abstract: boolean;
-  baseContracts: any[];
   contractKind: string;
   name: string;
 }
@@ -49,7 +53,6 @@ export interface FunctionDefinitionNode {
 export interface Ast {
   absolutePath: string;
   id?: number;
-  exportedSymbols: { [key: string]: any };
   nodeType: string;
   src: string;
   nodes: AstNode[];
@@ -73,16 +76,9 @@ export interface OutputType {
   type: string;
   baseType: string;
   indexed?: boolean;
-  components: null | any;
-  arrayLength: null | any;
-  arrayChildren: null | any;
 }
 
-export type AstNode =
-  | ImportDirectiveNode
-  | FunctionDefinitionNode
-  | ContractDefinitionNode
-  | VariableDeclarationNode;
+export type AstNode = ImportDirectiveNode | FunctionDefinitionNode | ContractDefinitionNode | VariableDeclarationNode;
 
 /**
  * The options of the BasicStateVariable template for the setFunction section
@@ -110,6 +106,7 @@ export interface BasicStateVariableMockOptions {
 export interface BasicStateVariableOptions {
   setFunction: BasicStateVariableSetOptions;
   mockFunction: BasicStateVariableMockOptions;
+  isInternal: boolean;
 }
 
 export interface StateVariablesOptions {
@@ -126,18 +123,30 @@ export interface ExternalFunctionOptions {
   outputsStringNames: string;
 }
 
+export interface InternalFunctionOptions {
+  functionName: string;
+  arguments: string;
+  signature: string;
+  inputsStringNames: string;
+  inputsString: string;
+  outputsStringNames: string;
+  outputsString: string;
+  outputsTypesString: string;
+}
+
 export interface MappingStateVariableOptions {
   setFunction: {
     functionName: string;
     keyType: string;
     valueType: string;
     mappingName: string;
-  },
+  };
   mockFunction: {
     functionName: string;
     keyType: string;
     valueType: string;
-  }
+  };
+  isInternal: boolean;
 }
 
 export const memoryTypes = ['string', 'bytes', '[]', 'mapping'];
