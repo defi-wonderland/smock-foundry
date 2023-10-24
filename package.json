@@ -1,6 +1,6 @@
 {
-  "name": "foundry-mock-generator",
-  "version": "1.0.0",
+  "name": "@defi-wonderland/foundry-mock-generator",
+  "version": "1.0.2",
   "description": "A mock contract generator for Foundry",
   "homepage": "https://github.com/defi-wonderland/mock-foundry#readme",
   "repository": {
@@ -22,7 +22,8 @@
     "lint:ts-logic": "eslint ./src/**/*.ts",
     "mock-gen": "ts-node src/run.ts mock-gen",
     "release": "yarn build && yarn changeset publish",
-    "test": "forge build --skip test && cross-env mocha 'test/**/*.spec.ts' && forge test"
+    "test": "forge build --skip test && cross-env mocha 'test/**/*.spec.ts' && forge test",
+    "test:mocha": "cross-env mocha 'test/**/*.spec.ts'"
   },
   "lint-staged": {
     "*.{js,css,md,ts,sol}": "forge fmt",

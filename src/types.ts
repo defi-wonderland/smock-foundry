@@ -80,38 +80,52 @@ export interface OutputType {
 
 export type AstNode = ImportDirectiveNode | FunctionDefinitionNode | ContractDefinitionNode | VariableDeclarationNode;
 
-/**
- * The options of the BasicStateVariable template for the setFunction section
- * @param functionName The name of the function, this is gonna be the state variable name with the first letter capitalized
- * @param paramType The type of the state variable we mock
- * @param paramName The name of the state variable we mock, this is the name of the state variable
- */
-export interface BasicStateVariableSetOptions {
-  functionName: string;
-  paramType: string;
-  paramName: string;
-}
-
-/**
- * The options of the BasicStateVariable template for the mockFunction section
- * @param functionName The name of the function, this is gonna be the state variable name
- * @param paramType The type of the state variable we mock
- * @param contractName The name of the contract we mock, we add an 'I' infront in the template
- */
-export interface BasicStateVariableMockOptions {
-  functionName: string;
-  paramType: string;
-}
-
 export interface BasicStateVariableOptions {
-  setFunction: BasicStateVariableSetOptions;
-  mockFunction: BasicStateVariableMockOptions;
+  setFunction: {
+    functionName: string;
+    paramType: string;
+    paramName: string;
+  };
+  mockFunction: {
+    functionName: string;
+    paramType: string;
+  };
   isInternal: boolean;
+}
+
+export interface MappingStateVariableOptions {
+  setFunction: {
+    functionName: string;
+    keyType: string;
+    valueType: string;
+    mappingName: string;
+  };
+  mockFunction: {
+    functionName: string;
+    keyType: string;
+    valueType: string;
+  };
+  isInternal: boolean;
+}
+
+export interface ArrayStateVariableOptions {
+  setFunction: {
+    functionName: string;
+    paramType: string;
+    paramName: string;
+  };
+  mockFunction: {
+    functionName: string;
+    paramType: string;
+    baseType: string;
+  };
+  isInternal: boolean;
+  isStruct: boolean;
 }
 
 export interface StateVariablesOptions {
   basicStateVariables: BasicStateVariableOptions[];
-  arrayStateVariables: BasicStateVariableOptions[];
+  arrayStateVariables: ArrayStateVariableOptions[];
   mappingStateVariables: MappingStateVariableOptions[];
 }
 
@@ -134,21 +148,7 @@ export interface InternalFunctionOptions {
   outputsTypesString: string;
 }
 
-export interface MappingStateVariableOptions {
-  setFunction: {
-    functionName: string;
-    keyType: string;
-    valueType: string;
-    mappingName: string;
-  };
-  mockFunction: {
-    functionName: string;
-    keyType: string;
-    valueType: string;
-  };
-  isInternal: boolean;
-}
-
-export const memoryTypes = ['string', 'bytes', '[]', 'mapping'];
+export const memoryTypes = ['string', 'bytes', 'mapping'];
 
 export const arrayRegex = /(\w+)\[\]/;
+export const structRegex = /struct (\w+)/;

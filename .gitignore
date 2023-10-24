@@ -23,3 +23,6 @@ out/*/*
 
 # Ignore generated mock contracts
 solidity/test/mock-contracts/
+
+# mac
+**/.DS_Store

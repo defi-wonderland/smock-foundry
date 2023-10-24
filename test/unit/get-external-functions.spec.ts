@@ -1,7 +1,7 @@
 // Write unit tests for the getExternalFunctions function here like the other tests.
 import { getExternalMockFunctions } from '../../src/get-external-functions';
 import { expect } from 'chai';
-import { ContractDefinitionNode, ExternalFunctionOptions, VariableDeclarationNode } from '../../src/types';
+import { ContractDefinitionNode, ExternalFunctionOptions } from '../../src/types';
 
 // We use the describe function to group together related tests
 describe('getExternalMockFunctions', () => {

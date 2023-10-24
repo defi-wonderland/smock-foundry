@@ -1,4 +1,4 @@
-import { arrayRegex, memoryTypes } from './types';
+import { arrayRegex, memoryTypes, structRegex } from './types';
 import { resolve, join } from 'path';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
@@ -46,6 +46,8 @@ export const lowercaseFirstLetter = (str: string): string => {
  */
 export const typeFix = (str: string): string => {
   if (memoryTypes.includes(str) || arrayRegex.exec(str)) {
+    return `${str} memory`;
+  } else if (structRegex.exec(str)) {
     return `${str} memory`;
   } else {
     return str;

@@ -1,9 +1,17 @@
-function set_{{setFunction.functionName}}({{setFunction.paramType}}[] memory _{{setFunction.paramName}}) public {
+function set_{{setFunction.functionName}}({{setFunction.paramType}} _{{setFunction.paramName}}) public {
+  {{#if isStruct}}
+  uint256 _i;
+  for (; _i < {{setFunction.paramName}}.length;) {
+    {{setFunction.paramName}}[_i] = _{{setFunction.paramName}}[_i];
+    _i++;
+  }
+  {{else}}
   {{setFunction.paramName}} = _{{setFunction.paramName}};
+  {{/if}}
 }
 
 {{#unless isInternal}}
-function mock_call_{{mockFunction.functionName}}(uint256 _index, {{mockFunction.paramType}}  _value) public {
+function mock_call_{{mockFunction.functionName}}(uint256 _index, {{mockFunction.baseType}} _value) public {
   vm.mockCall(
     address(this),
     abi.encodeWithSignature("{{mockFunction.functionName}}(uint256)", _index),

@@ -2,8 +2,7 @@ import {
   ContractDefinitionNode,
   VariableDeclarationNode,
   BasicStateVariableOptions,
-  BasicStateVariableSetOptions,
-  BasicStateVariableMockOptions,
+  ArrayStateVariableOptions,
   MappingStateVariableOptions,
   StateVariablesOptions,
 } from './types';
@@ -22,7 +21,7 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
 
   // Define arrays to save our data
   const mappingFunctions: MappingStateVariableOptions[] = [];
-  const arrayFunctions: BasicStateVariableOptions[] = [];
+  const arrayFunctions: ArrayStateVariableOptions[] = [];
   const basicStateVariableFunctions: BasicStateVariableOptions[] = [];
   // Loop through all the state variables
   stateVariableNodes.forEach((stateVariableNode: VariableDeclarationNode) => {
@@ -40,15 +39,10 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
     // Check if the state variable is an array or a mapping or a basic type
     if (stateVariableType.startsWith('mapping')) {
       // If value is of type struct we don't mock it
-      if (stateVariableNode.typeName.valueType.typeDescriptions.typeString.includes('struct')) return;
       const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode);
       mappingFunctions.push(mappingMockFunction);
-    } else if (stateVariableType.includes('struct')) {
-      // Do nothing for now
-    } else if (stateVariableType.includes('enum')) {
-      // Do nothing for now
     } else if (stateVariableType.includes('[]')) {
-      const arrayMockFunction: BasicStateVariableOptions = getArrayFunction(stateVariableNode);
+      const arrayMockFunction: ArrayStateVariableOptions = getArrayFunction(stateVariableNode);
       arrayFunctions.push(arrayMockFunction);
     } else {
       const basicStateVariableMockFunction: BasicStateVariableOptions =
@@ -73,32 +67,38 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
  * @param contractName The name of the contract
  * @returns The mock function information for an array state variable
  */
-function getArrayFunction(arrayNode: VariableDeclarationNode): BasicStateVariableOptions {
+function getArrayFunction(arrayNode: VariableDeclarationNode): ArrayStateVariableOptions {
   // Name of the array
   const arrayName: string = arrayNode.name;
-  // Type string of the array, we remove the 'contract ' string if it exists
-  const arrayType: string = arrayNode.typeName.baseType.typeDescriptions.typeString.replace(
+
+  // compile param type
+  const paramType: string = typeFix(arrayNode.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+
+  // struct flag
+  const isStruct: boolean = arrayNode.typeName.baseType.typeDescriptions.typeString.includes('struct ');
+
+  // compile base type
+  const baseType: string = typeFix(arrayNode.typeName.baseType.typeDescriptions.typeString).replace(
     /contract |struct |enum /g,
     ''
   );
+
   // If the array is internal we don't create mockCall for it
   const isInternal: boolean = arrayNode.visibility == 'internal';
 
-  const setFunction: BasicStateVariableSetOptions = {
-    functionName: arrayName,
-    paramType: arrayType,
-    paramName: arrayName,
-  };
-  // Save the mock function information
-  const mockFunction: BasicStateVariableMockOptions = {
-    functionName: arrayName,
-    paramType: arrayType,
-  };
-  // Save the state variable information
-  const arrayStateVariableFunctions: BasicStateVariableOptions = {
-    setFunction: setFunction,
-    mockFunction: mockFunction,
+  const arrayStateVariableFunctions: ArrayStateVariableOptions = {
+    setFunction: {
+      functionName: arrayName,
+      paramType: paramType,
+      paramName: arrayName,
+    },
+    mockFunction: {
+      functionName: arrayName,
+      paramType: paramType,
+      baseType: baseType,
+    },
     isInternal: isInternal,
+    isStruct: isStruct,
   };
 
   // Return the array function
@@ -119,6 +119,7 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
     /contract |struct |enum /g,
     ''
   );
+
   // Value type
   const valueType: string = typeFix(mappingNode.typeName.valueType.typeDescriptions.typeString).replace(
     /contract |struct |enum /g,
@@ -154,26 +155,27 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
 function getBasicStateVariableFunction(variableNode: VariableDeclarationNode): BasicStateVariableOptions {
   // Name of the variable
   const variableName: string = variableNode.name;
-  // Type of the variable, we remove the 'contract ' string if it exists
-  const variableType: string = typeFix(variableNode.typeDescriptions.typeString.replace(/contract /g, ''));
+
+  // remove spec type leading string
+  const variableType: string = typeFix(variableNode.typeDescriptions.typeString).replace(
+    /contract |struct |enum /g,
+    ''
+  );
+
   // If the variable is internal we don't create mockCall for it
   const isInternal: boolean = variableNode.visibility == 'internal';
 
-  // Save the set function information
-  const setFunction: BasicStateVariableSetOptions = {
-    functionName: variableName,
-    paramType: variableType,
-    paramName: variableName,
-  };
-  // Save the mock function information
-  const mockFunction: BasicStateVariableMockOptions = {
-    functionName: variableName,
-    paramType: variableType,
-  };
   // Save the state variable information
   const basicStateVariableFunctions: BasicStateVariableOptions = {
-    setFunction: setFunction,
-    mockFunction: mockFunction,
+    setFunction: {
+      functionName: variableName,
+      paramType: variableType,
+      paramName: variableName,
+    },
+    mockFunction: {
+      functionName: variableName,
+      paramType: variableType,
+    },
     isInternal: isInternal,
   };
 

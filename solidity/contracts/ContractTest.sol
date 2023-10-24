@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-import {IContractTest} from '../interfaces/IContractTest.sol';
+import {IContractTest, MyContract} from '../interfaces/IContractTest.sol';
 
 contract ContractTest is IContractTest {
   uint256 public immutable immutableUintVariable = 10;
@@ -16,6 +16,12 @@ contract ContractTest is IContractTest {
   address public addressVariable;
   /// @inheritdoc IContractTest
   bytes32 public bytes32Variable;
+  /// @inheritdoc IContractTest
+  MyStruct public myStructVariable;
+  /// @inheritdoc IContractTest
+  MyEnum public myEnumVariable;
+  /// @inheritdoc IContractTest
+  MyContract public myContractVariable;
 
   address[] internal internalAddressArray;
   /// @inheritdoc IContractTest
@@ -24,6 +30,8 @@ contract ContractTest is IContractTest {
   uint256[] public uint256Array;
   /// @inheritdoc IContractTest
   bytes32[] public bytes32Array;
+  /// @inheritdoc IContractTest
+  MyStruct[] public myStructArray;
 
   mapping(uint256 => address) internal internalUint256ToAddress;
   /// @inheritdoc IContractTest
@@ -34,6 +42,8 @@ contract ContractTest is IContractTest {
   mapping(bytes32 => bytes) public bytes32ToBytes;
   /// @inheritdoc IContractTest
   mapping(uint256 => mapping(address => bytes32)) public uint256ToAddressToBytes32;
+  /// @inheritdoc IContractTest
+  mapping(uint256 => MyStruct) public uint256ToMyStruct;
 
   /// Constructor
   constructor(
