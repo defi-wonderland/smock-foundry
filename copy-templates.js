@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// prettier-ignore
-
 /**
  * Copies the mockContractTemplate.hbs file from the src/templates folder to the dist/templates folder
  */
@@ -10,9 +8,24 @@ const copyTemplate = () => {
   fs.mkdirSync(path.resolve(__dirname, 'dist/templates'));
   const templatePath = path.resolve(__dirname, 'src', 'templates', 'mockContractTemplate.hbs');
   const mockArrayTemplatePath = path.resolve(__dirname, 'src', 'templates', 'mockArrayStateVariableTemplate.hbs');
-  const mockBasicStateVarTemplatePath = path.resolve(__dirname, 'src', 'templates', 'mockBasicStateVariableTemplate.hbs');
-  const mockExternalFunctionTemplatePath = path.resolve(__dirname, 'src', 'templates', 'mockExternalFunctionTemplate.hbs');
-  const mockInternalFunctionTemplatePath = path.resolve(__dirname, 'src', 'templates', 'mockInternalFunctionTemplate.hbs');
+  const mockBasicStateVarTemplatePath = path.resolve(
+    __dirname,
+    'src',
+    'templates',
+    'mockBasicStateVariableTemplate.hbs'
+  );
+  const mockExternalFunctionTemplatePath = path.resolve(
+    __dirname,
+    'src',
+    'templates',
+    'mockExternalFunctionTemplate.hbs'
+  );
+  const mockInternalFunctionTemplatePath = path.resolve(
+    __dirname,
+    'src',
+    'templates',
+    'mockInternalFunctionTemplate.hbs'
+  );
   const mockMappingTemplatePath = path.resolve(__dirname, 'src', 'templates', 'mockMappingStateVariableTemplate.hbs');
 
   const destinationPath = path.resolve(__dirname, 'dist/templates', 'mockContractTemplate.hbs');
