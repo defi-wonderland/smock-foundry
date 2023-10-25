@@ -1,17 +1,5 @@
-import {
-  getExternalMockFunctions,
-  getInternalMockFunctions,
-  getConstructor,
-  getImports,
-  getStateVariables,
-  Ast,
-} from './index';
-import {
-  getSubDirNameFromPath,
-  registerHandlebarsTemplates,
-  getContractNames,
-  compileSolidityFilesFoundry,
-} from './utils';
+import { getExternalMockFunctions, getInternalMockFunctions, getConstructor, getImports, getStateVariables, Ast } from './index';
+import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNames, compileSolidityFilesFoundry } from './utils';
 import Handlebars from 'handlebars';
 import { writeFileSync, existsSync, readdirSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
@@ -24,11 +12,7 @@ import { StateVariablesOptions, ContractDefinitionNode } from './types';
  * @param compiledArtifactsDir The directory where the compiled artifacts are located
  * @param generatedContractsDir The directory where the mock contracts will be generated
  */
-export const generateMockContracts = async (
-  contractsDir: string,
-  compiledArtifactsDir: string,
-  generatedContractsDir: string
-) => {
+export const generateMockContracts = async (contractsDir: string, compiledArtifactsDir: string, generatedContractsDir: string) => {
   const templateContent: string = registerHandlebarsTemplates();
   const template = Handlebars.compile(templateContent);
   try {
@@ -90,7 +74,7 @@ export const generateMockContracts = async (
       // Get the contract node and check if it's a library
       // Also check if is another contract inside the file and avoid it
       const contractNode = ast.nodes.find(
-        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === contractName
+        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === contractName,
       ) as ContractDefinitionNode;
       if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') return;
 

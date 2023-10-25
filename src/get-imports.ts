@@ -7,9 +7,7 @@ import { Ast, ImportDirectiveNode } from './types';
  */
 export const getImports = (ast: Ast): string[] => {
   // Filter the nodes and keep only the ImportDirective related ones
-  const importNodes = ast.nodes.filter(
-    node => node.nodeType === 'ImportDirective'
-  ) as ImportDirectiveNode[];
+  const importNodes = ast.nodes.filter((node) => node.nodeType === 'ImportDirective') as ImportDirectiveNode[];
 
   // Create the import code for every node and save it in the importStatements array
   const importStatements: string[] = importNodes.map((importDirective) => {
@@ -20,9 +18,7 @@ export const getImports = (ast: Ast): string[] => {
       return `import '${absolutePath}';`;
     }
     // Get the names of the named imports
-    const imports = symbolAliases.map(
-      (symbolAlias) => symbolAlias.foreign.name
-    );
+    const imports = symbolAliases.map((symbolAlias) => symbolAlias.foreign.name);
 
     return `import {${imports.join(', ')}} from '${absolutePath}';`;
   });

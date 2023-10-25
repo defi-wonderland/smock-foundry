@@ -169,11 +169,7 @@ describe('getInternalMockFunctions', () => {
         nodeType: 'FunctionDefinition',
         kind: 'function',
         parameters: {
-          parameters: [
-            FakeParameter(1, 'contract IERC20', ''),
-            FakeParameter(2, 'struct MyStruct', ''),
-            FakeParameter(3, 'enum MyEnum', ''),
-          ],
+          parameters: [FakeParameter(1, 'contract IERC20', ''), FakeParameter(2, 'struct MyStruct', ''), FakeParameter(3, 'enum MyEnum', '')],
         },
         returnParameters: {
           parameters: [],
@@ -242,11 +238,7 @@ describe('getInternalMockFunctions', () => {
           parameters: [],
         },
         returnParameters: {
-          parameters: [
-            FakeParameter(1, 'contract IERC20', ''),
-            FakeParameter(2, 'struct MyStruct', ''),
-            FakeParameter(3, 'enum MyEnum', ''),
-          ],
+          parameters: [FakeParameter(1, 'contract IERC20', ''), FakeParameter(2, 'struct MyStruct', ''), FakeParameter(3, 'enum MyEnum', '')],
         },
         virtual: true,
         visibility: 'internal',

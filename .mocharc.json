@@ -1,7 +1,7 @@
 {
-    "require": ["ts-node/register"],
-    "extension": [".ts"],
-    "spec": "test/unit/**/*.spec.ts",
-    "timeout": "10000",
-    "exit": true
+  "require": ["ts-node/register"],
+  "extension": [".ts"],
+  "spec": "test/unit/**/*.spec.ts",
+  "timeout": "10000",
+  "exit": true
 }

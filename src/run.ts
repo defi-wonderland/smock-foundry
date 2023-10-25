@@ -2,7 +2,7 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import {generateMockContracts} from './index';
+import { generateMockContracts } from './index';
 
 (async () => {
   const { contracts, out, genDir } = getProcessArguments();

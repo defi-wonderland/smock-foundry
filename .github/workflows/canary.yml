@@ -30,7 +30,7 @@ jobs:
 
       - name: Update version
         run: yarn version --new-version "0.0.0-${GITHUB_SHA::8}" --no-git-tag-version
-      
+
       - name: Publish
         run: npm publish --access public --tag canary
         env:
