@@ -33,6 +33,7 @@
   "dependencies": {
     "@defi-wonderland/solidity-utils": "0.0.0-4298c6c6",
     "handlebars": "4.7.7",
+    "prettier": "^3.0.3",
     "yargs": "17.7.2"
   },
   "devDependencies": {
