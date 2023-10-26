@@ -1,3 +1,6 @@
+{{#if isInterface}}
+function {{functionName}}({{inputString}}) external{{stateMutabilityString}}returns ({{outputString}}) {}
+{{/if}}
 function mock_call_{{functionName}}({{arguments}}) public {
   vm.mockCall(
     address(this),

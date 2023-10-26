@@ -76,6 +76,8 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       const contractNode = ast.nodes.find(
         (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === contractName,
       ) as ContractDefinitionNode;
+
+      // Skip unneeded contracts
       if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') return;
 
       const functions: StateVariablesOptions = getStateVariables(contractNode);
