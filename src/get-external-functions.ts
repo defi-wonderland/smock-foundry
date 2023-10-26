@@ -1,9 +1,4 @@
-import {
-  ContractDefinitionNode,
-  FunctionDefinitionNode,
-  VariableDeclarationNode,
-  ExternalFunctionOptions,
-} from './types';
+import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, ExternalFunctionOptions } from './types';
 
 /**
  * Returns the infomration of the external function for the mock contract
@@ -12,9 +7,7 @@ import {
  */
 export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): ExternalFunctionOptions[] => {
   // Filter the nodes and keep only the FunctionDefinition related ones
-  const functionNodes = contractNode.nodes.filter(
-    (node) => node.nodeType === 'FunctionDefinition'
-  ) as FunctionDefinitionNode[];
+  const functionNodes = contractNode.nodes.filter((node) => node.nodeType === 'FunctionDefinition') as FunctionDefinitionNode[];
 
   const externalFunctions: ExternalFunctionOptions[] = [];
   // Loop through the function nodes
@@ -37,9 +30,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     parameters.forEach((parameter: VariableDeclarationNode) => {
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
-        parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata'
-          ? `${parameter.storageLocation} `
-          : '';
+        parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
 
       // We remove the 'contract ' string from the type name if it exists
       const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
@@ -56,9 +47,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
 
     const signature = parameterTypes ? `${funcNode.name}(${parameterTypes.join(',')})` : `${funcNode.name}()`;
 
-    const returnParameters: VariableDeclarationNode[] = funcNode.returnParameters.parameters
-      ? funcNode.returnParameters.parameters
-      : [];
+    const returnParameters: VariableDeclarationNode[] = funcNode.returnParameters.parameters ? funcNode.returnParameters.parameters : [];
 
     // We save the return parameters in an array with their types and storage location
     const functionReturnParameters: string[] = [];
@@ -68,9 +57,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
-        parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata'
-          ? `${parameter.storageLocation} `
-          : '';
+        parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
 
       // We remove the 'contract ' string from the type name if it exists
       const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');

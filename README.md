@@ -45,6 +45,7 @@ vm.allowCheatcodes(address(mock_myContract));
 ```
 
 3. Enjoy of easy mock calls
+
 ```JavaScript
 /// Mock myFuncName function, when called with `arg1`, `arg2` to return `return1`
 mock_myContract.mock_call_myFuncName(arg1, arg2, return1);

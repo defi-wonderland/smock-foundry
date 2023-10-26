@@ -23,10 +23,9 @@ describe('getInternalMockFunctions', () => {
       const ast = require(compiledArtifactsPath).ast;
       if (!ast) throw new Error(`AST for ${mockName} not found`);
       const contractNode = ast.nodes.find(
-        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === mockName
+        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === mockName,
       ) as ContractDefinitionNode;
-      if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library')
-        throw new Error(`Contract ${mockName} not found`);
+      if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') throw new Error(`Contract ${mockName} not found`);
 
       contractNodes = { ...contractNodes, [mockName]: contractNode };
     });
@@ -36,7 +35,7 @@ describe('getInternalMockFunctions', () => {
   it('contract D must include constructor', async () => {
     const contractNode = contractNodes['MockContractD'];
     const constructor = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.kind === 'constructor'
+      (node) => node.nodeType === 'FunctionDefinition' && node.kind === 'constructor',
     ) as FunctionDefinitionNode;
     expect(constructor).to.not.be.undefined;
 
@@ -48,7 +47,7 @@ describe('getInternalMockFunctions', () => {
   it('MockContractD must include setting variable', async () => {
     const contractNode = contractNodes['MockContractD'];
     const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set__internalUintVar'
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set__internalUintVar',
     ) as FunctionDefinitionNode;
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('public');
@@ -61,7 +60,7 @@ describe('getInternalMockFunctions', () => {
   it('MockContractD must include mock call', async () => {
     const contractNode = contractNodes['MockContractD'];
     const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__setInternalUintVar'
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__setInternalUintVar',
     ) as FunctionDefinitionNode;
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('public');
@@ -87,7 +86,7 @@ describe('getInternalMockFunctions', () => {
   it('MockContractD must include overriden internal func', async () => {
     const contractNode = contractNodes['MockContractD'];
     const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_setInternalUintVar'
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_setInternalUintVar',
     ) as FunctionDefinitionNode;
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('internal');

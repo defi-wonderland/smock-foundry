@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// prettier-ignore
-
 /**
  * Copies the mockContractTemplate.hbs file from the src/templates folder to the dist/templates folder
  */

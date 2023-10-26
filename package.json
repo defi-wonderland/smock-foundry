@@ -33,6 +33,7 @@
   "dependencies": {
     "@defi-wonderland/solidity-utils": "0.0.0-4298c6c6",
     "handlebars": "4.7.7",
+    "prettier": "^3.0.3",
     "yargs": "17.7.2"
   },
   "devDependencies": {
@@ -51,7 +52,7 @@
     "chai-as-promised": "7.1.1",
     "cross-env": "7.0.3",
     "eslint": "8.40.0",
-    "husky": "8.0.3",
+    "husky": "^8.0.3",
     "lint-staged": "10",
     "mocha": "10.2.0",
     "nodemon": "2.0.22",
