@@ -58,6 +58,7 @@ export interface Ast {
   src: string;
   nodes: AstNode[];
   license: string;
+  exportedSymbols: { [key: string]: number[] };
 }
 
 export interface ImportDirectiveNode {

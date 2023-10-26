@@ -71,6 +71,9 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       const contractImport: string = ast.absolutePath;
       if (!contractImport) return;
 
+      // Get all exported entities
+      const exportedSymbols = Object.keys(ast.exportedSymbols);
+
       // Get the contract node and check if it's a library
       // Also check if is another contract inside the file and avoid it
       const contractNode = ast.nodes.find(
@@ -86,6 +89,7 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       const data = {
         contractName: contractName,
         contractImport: contractImport,
+        exportedSymbols: exportedSymbols.join(', '),
         import: getImports(ast),
         constructor: getConstructor(contractNode),
         mockExternalFunctions: getExternalMockFunctions(contractNode),
