@@ -3,7 +3,7 @@ import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types'
 import { generateMockContracts } from '../../src/index';
 import { resolve } from 'path';
 
-describe('getInternalMockFunctions', () => {
+describe('E2E: getStateVariables', () => {
   let contractNodes: { [name: string]: ContractDefinitionNode };
   before(async () => {
     // generate mock contracts

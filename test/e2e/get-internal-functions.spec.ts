@@ -1,11 +1,11 @@
-// Write unit tests for the getInternalFunctions function here like the other tests.
+// Write e2e tests for the getInternalFunctions function here like the other tests.
 import { expect } from 'chai';
 import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types';
 import { generateMockContracts } from '../../src/index';
 import { resolve } from 'path';
 
 // We use the describe function to group together related tests
-describe('getInternalMockFunctions', () => {
+describe('E2E: getInternalMockFunctions', () => {
   // We use the beforeEach function to reset the contract node before each test
   let contractNodes: { [name: string]: ContractDefinitionNode };
   before(async () => {
