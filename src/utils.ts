@@ -88,7 +88,7 @@ export const registerHandlebarsTemplates = (): string => {
  * @param contractsDir The directory where the contracts are located
  * @returns The names of the contracts in the given directory and its subdirectories
  */
-export const getContractNames = (contractsDir: string): string[] => {
+export const getContractNames = (contractsDir: string[], ignoreDir: string[]): string[] => {
   const contractFileNames: string[] = [];
   // Recursive function to traverse the directory and its subdirectories
   function traverseDirectory(currentPath: string) {
@@ -100,13 +100,15 @@ export const getContractNames = (contractsDir: string): string[] => {
       // If the file is a contract then we add it to the array, if it is a directory then we call the function again
       if (stats.isFile() && fileName.endsWith('.sol')) {
         contractFileNames.push(fileName);
-      } else if (stats.isDirectory()) {
+      } else if (stats.isDirectory() && !ignoreDir.includes(fileName)) {
         traverseDirectory(filePath);
       }
     });
   }
 
-  traverseDirectory(contractsDir);
+  contractsDir.map((dir: string) => {
+    traverseDirectory(dir);
+  });
 
   return contractFileNames;
 };

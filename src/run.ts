@@ -5,17 +5,18 @@ import { hideBin } from 'yargs/helpers';
 import { generateMockContracts } from './index';
 
 (async () => {
-  const { contracts, out, genDir } = getProcessArguments();
-  generateMockContracts(contracts, out, genDir);
+  const { contracts, out, genDir, ignore } = getProcessArguments();
+  generateMockContracts(contracts, out, genDir, ignore);
 })();
 
 function getProcessArguments() {
   return yargs(hideBin(process.argv))
     .options({
       contracts: {
-        describe: 'Contracts directory',
+        describe: 'Contracts directories',
         demandOption: true,
-        type: 'string',
+        type: 'array',
+        string: true,
       },
       out: {
         describe: 'Foundry compiled output directory',
@@ -26,6 +27,12 @@ function getProcessArguments() {
         describe: `Generated contracts directory`,
         default: './solidity/test/mock-contracts',
         type: 'string',
+      },
+      ignore: {
+        describe: 'Ignore folders',
+        default: [],
+        type: 'array',
+        string: true,
       },
     })
     .parseSync();

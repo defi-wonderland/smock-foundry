@@ -12,7 +12,12 @@ import { StateVariablesOptions, ContractDefinitionNode } from './types';
  * @param compiledArtifactsDir The directory where the compiled artifacts are located
  * @param generatedContractsDir The directory where the mock contracts will be generated
  */
-export const generateMockContracts = async (contractsDir: string, compiledArtifactsDir: string, generatedContractsDir: string) => {
+export const generateMockContracts = async (
+  contractsDir: string[],
+  compiledArtifactsDir: string,
+  generatedContractsDir: string,
+  ignoreDir: string[],
+) => {
   const templateContent: string = registerHandlebarsTemplates();
   const template = Handlebars.compile(templateContent);
   try {
@@ -31,7 +36,7 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
     }
     console.log('Parsing contracts...');
     // Get all contracts directories
-    const contractPaths: string[] = getContractNames(contractsDir);
+    const contractPaths: string[] = getContractNames(contractsDir, ignoreDir);
     // Loop for each contract path
     contractPaths.forEach(async (contractPath: string) => {
       // Get the sub dir name
