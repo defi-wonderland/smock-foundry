@@ -357,4 +357,66 @@ describe('getExternalMockFunctions', () => {
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
     expect(externalFunctions).to.deep.equal(expectedData);
   });
+
+  it('should return the correct function data if the contract is interface', async () => {
+    contractNode = {
+      nodeType: 'ContractDefinition',
+      canonicalName: 'MyContract',
+      nodes: [],
+      abstract: false,
+      contractKind: 'interface',
+      name: 'MyContract',
+    };
+
+    contractNode.nodes = [
+      {
+        name: 'myFunction',
+        nodeType: 'FunctionDefinition',
+        kind: 'function',
+        parameters: {
+          parameters: [
+            {
+              name: '_param',
+              nodeType: 'VariableDeclaration',
+              typeDescriptions: {
+                typeString: 'string',
+              },
+              storageLocation: 'memory',
+            },
+          ],
+        },
+        returnParameters: {
+          parameters: [
+            {
+              name: '_output',
+              nodeType: 'VariableDeclaration',
+              typeDescriptions: {
+                typeString: 'string',
+              },
+              storageLocation: 'memory',
+            },
+          ],
+        },
+        virtual: false,
+        visibility: 'public',
+        stateMutability: 'nonpayable',
+      },
+    ];
+    const externalFunctions = getExternalMockFunctions(contractNode);
+    const expectedData: ExternalFunctionOptions[] = [
+      {
+        functionName: 'myFunction',
+        arguments: 'string memory _param, string memory _output',
+        signature: 'myFunction(string)',
+        inputsStringNames: ', _param',
+        outputsStringNames: '_output',
+        inputString: 'string memory _param',
+        outputString: 'string memory _output',
+        isInterface: true,
+        stateMutabilityString: ' ',
+      },
+    ];
+    expect(externalFunctions).to.be.an('array').that.is.not.empty;
+    expect(externalFunctions).to.deep.equal(expectedData);
+  });
 });
