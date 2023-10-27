@@ -70,6 +70,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: false,
         visibility: 'external',
+        stateMutability: 'nonpayable',
       },
       {
         name: 'myFunction2',
@@ -83,6 +84,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: false,
         visibility: 'private',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -103,6 +105,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: false,
         visibility: 'public',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -123,6 +126,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: true,
         visibility: 'internal',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -156,6 +160,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: false,
         visibility: 'internal',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -176,6 +181,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: true,
         visibility: 'internal',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -209,6 +215,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: true,
         visibility: 'internal',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -242,6 +249,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: true,
         visibility: 'internal',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -275,6 +283,7 @@ describe('getInternalMockFunctions', () => {
         },
         virtual: true,
         visibility: 'internal',
+        stateMutability: 'nonpayable',
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);

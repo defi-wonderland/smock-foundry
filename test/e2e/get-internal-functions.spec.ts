@@ -10,10 +10,11 @@ describe('getInternalMockFunctions', () => {
   let contractNodes: { [name: string]: ContractDefinitionNode };
   before(async () => {
     // generate mock contracts
-    const contractsDir = 'solidity/contracts';
+    const contractsDir = ['solidity/contracts', 'solidity/interfaces'];
     const compiledArtifactsDir = 'out';
     const generatedContractsDir = 'solidity/test/mock-contracts';
-    await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir);
+    const ignoreDir = [];
+    await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir, ignoreDir);
 
     const contractsNames = ['ContractD'];
 

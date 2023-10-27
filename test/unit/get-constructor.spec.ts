@@ -34,6 +34,7 @@ describe('getConstructor', () => {
         },
         virtual: false,
         visibility: 'public',
+        stateMutability: 'nonpayable',
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -63,6 +64,7 @@ describe('getConstructor', () => {
         },
         virtual: false,
         visibility: 'public',
+        stateMutability: 'nonpayable',
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -92,6 +94,7 @@ describe('getConstructor', () => {
         },
         virtual: false,
         visibility: 'public',
+        stateMutability: 'nonpayable',
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -121,6 +124,7 @@ describe('getConstructor', () => {
         },
         virtual: false,
         visibility: 'public',
+        stateMutability: 'nonpayable',
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -150,6 +154,7 @@ describe('getConstructor', () => {
         },
         virtual: false,
         visibility: 'public',
+        stateMutability: 'nonpayable',
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -179,6 +184,7 @@ describe('getConstructor', () => {
         },
         virtual: false,
         visibility: 'public',
+        stateMutability: 'nonpayable',
       },
     ];
     const constructorSignature = getConstructor(contractNode);

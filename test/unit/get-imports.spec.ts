@@ -12,6 +12,7 @@ describe('getImports', () => {
       src: '',
       nodes: [],
       license: '',
+      exportedSymbols: {},
     };
   });
   it('should return an empty array if there are no import directives', async () => {
