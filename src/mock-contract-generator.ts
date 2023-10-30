@@ -1,5 +1,5 @@
 import { getExternalMockFunctions, getInternalMockFunctions, getConstructor, getImports, getStateVariables, Ast } from './index';
-import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNames, compileSolidityFilesFoundry } from './utils';
+import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNamesAndFolders, compileSolidityFilesFoundry } from './utils';
 import Handlebars from 'handlebars';
 import { writeFileSync, existsSync, readdirSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
@@ -35,12 +35,14 @@ export const generateMockContracts = async (
       console.error('Error while trying to empty the mock directory: ', error);
     }
     console.log('Parsing contracts...');
-    // Get all contracts directories
-    const contractPaths: string[] = getContractNames(contractsDir, ignoreDir);
+
+    // Get all contracts names and paths
+    const [contractFileNames, contractFolders] = getContractNamesAndFolders(contractsDir, ignoreDir);
+
     // Loop for each contract path
-    contractPaths.forEach(async (contractPath: string) => {
+    contractFileNames.forEach(async (contractFileName: string, ind: number) => {
       // Get the sub dir name
-      const subDirName: string = getSubDirNameFromPath(contractPath);
+      const subDirName: string = getSubDirNameFromPath(contractFileName);
 
       // Get contract name
       // If the contract and the file have different names, it will be modified.
@@ -48,11 +50,11 @@ export const generateMockContracts = async (
 
       // Get the compiled path
       // If the contract and the file have different names, it will be modified.
-      let compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirName);
+      let compiledArtifactsPath = resolve(compiledArtifactsDir, contractFileName, subDirName);
 
       // Check if contract and file have different names
       if (!existsSync(compiledArtifactsPath)) {
-        const directoryPath = resolve(compiledArtifactsDir, contractPath);
+        const directoryPath = resolve(compiledArtifactsDir, contractFileName);
 
         // If the directory path does not exist, the contract is not compiled.
         if (!existsSync(directoryPath)) return;
@@ -62,7 +64,7 @@ export const generateMockContracts = async (
 
         // Get the real path of the json file
         // If this !path means that the file is not compiled
-        compiledArtifactsPath = resolve(compiledArtifactsDir, contractPath, subDirContractName[0]);
+        compiledArtifactsPath = resolve(compiledArtifactsDir, contractFileName, subDirContractName[0]);
         if (!compiledArtifactsPath) return;
 
         contractName = subDirContractName[0].replace('.json', '');
@@ -116,7 +118,15 @@ export const generateMockContracts = async (
         .replace(/;;/g, ';');
 
       // Write the contract
-      writeFileSync(`${generatedContractsDir}/Mock${contractName}.sol`, cleanedCode);
+      const contractFolder = `${generatedContractsDir}/${contractFolders[ind]}`;
+      // Create the directory if it doesn't exist
+      try {
+        await ensureDir(contractFolder);
+      } catch (error) {
+        console.error('Error while creating the mock directory: ', error);
+      }
+
+      writeFileSync(`${contractFolder}/Mock${contractName}.sol`, cleanedCode);
     });
 
     console.log('Mock contracts generated successfully');
