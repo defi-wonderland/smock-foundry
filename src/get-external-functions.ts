@@ -106,6 +106,8 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
       outputString: outputsString,
       isInterface: contractKind === 'interface',
       stateMutabilityString: stateMutabilityString,
+      abstractAndVirtual: contractNode.abstract && funcNode.virtual,
+      visibility: funcNode.visibility,
     };
 
     externalFunctions.push(externalMockFunction);
