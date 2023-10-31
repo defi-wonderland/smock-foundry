@@ -127,6 +127,8 @@ describe('getExternalMockFunctions', () => {
         outputString: '',
         isInterface: false,
         stateMutabilityString: ' view ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -187,6 +189,8 @@ describe('getExternalMockFunctions', () => {
         outputString: '',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -239,6 +243,8 @@ describe('getExternalMockFunctions', () => {
         outputString: 'string memory _param, string calldata _param2',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -299,6 +305,8 @@ describe('getExternalMockFunctions', () => {
         outputString: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -352,6 +360,8 @@ describe('getExternalMockFunctions', () => {
         outputString: 'string memory _output',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -414,6 +424,8 @@ describe('getExternalMockFunctions', () => {
         outputString: 'string memory _output',
         isInterface: true,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
