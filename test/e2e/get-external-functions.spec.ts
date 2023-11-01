@@ -16,7 +16,7 @@ describe('E2E: getExternalMockFunctions', () => {
     const ignoreDir = [];
     await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir, ignoreDir);
 
-    const contractsNames = ['ContractTest', 'IContractTest'];
+    const contractsNames = ['ContractTest', 'IContractTest', 'ContractAbstract'];
 
     contractsNames.forEach((contractName: string) => {
       const mockName = `Mock${contractName}`;
@@ -123,6 +123,37 @@ describe('E2E: getExternalMockFunctions', () => {
     expect(param1?.typeDescriptions.typeString).to.equal('bool');
 
     const param2 = func.parameters.parameters.find((param) => param.name === '_return0');
+    expect(param2).to.not.be.undefined;
+    expect(param2?.typeDescriptions.typeString).to.equal('bool');
+  });
+
+  it('Should create mocks for abstract contracts', async () => {
+    let func: FunctionDefinitionNode;
+    const contractNode = contractNodes['MockContractAbstract'];
+
+    func = contractNode.nodes.find(
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_uintVariable',
+    ) as FunctionDefinitionNode;
+    expect(func).to.not.be.undefined;
+
+    func = contractNode.nodes.find(
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_setVariablesA',
+    ) as FunctionDefinitionNode;
+    expect(func).to.not.be.undefined;
+
+    func = contractNode.nodes.find(
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_undefinedFunc',
+    ) as FunctionDefinitionNode;
+    expect(func).to.not.be.undefined;
+
+    func = contractNode.nodes.find((node) => node.nodeType === 'FunctionDefinition' && node.name === 'undefinedFunc') as FunctionDefinitionNode;
+    expect(func).to.not.be.undefined;
+
+    const param0 = func.parameters.parameters.find((param) => param.name === '_someText');
+    expect(param0).to.not.be.undefined;
+    expect(param0?.typeDescriptions.typeString).to.equal('string');
+
+    const param2 = func.returnParameters.parameters.find((param) => param.name === '_result');
     expect(param2).to.not.be.undefined;
     expect(param2?.typeDescriptions.typeString).to.equal('bool');
   });
