@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'isolmate/interfaces/tokens/IERC20.sol';
-import {MockContractTest} from 'test/mock-contracts/MockContractTest.sol';
+import {MockContractTest} from 'test/mock-contracts/contracts/MockContractTest.sol';
 import {console} from 'forge-std/console.sol';
 
 contract CommonE2EBase is Test {

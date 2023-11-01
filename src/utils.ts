@@ -1,5 +1,5 @@
 import { arrayRegex, memoryTypes, structRegex } from './types';
-import { resolve, join } from 'path';
+import { resolve, join, relative, dirname } from 'path';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
 import Handlebars from 'handlebars';
@@ -88,10 +88,12 @@ export const registerHandlebarsTemplates = (): string => {
  * @param contractsDir The directory where the contracts are located
  * @returns The names of the contracts in the given directory and its subdirectories
  */
-export const getContractNames = (contractsDir: string[], ignoreDir: string[]): string[] => {
+export const getContractNamesAndFolders = (contractsDir: string[], ignoreDir: string[]): [string[], string[]] => {
+
   const contractFileNames: string[] = [];
+  const contractFolders: string[] = [];
   // Recursive function to traverse the directory and its subdirectories
-  function traverseDirectory(currentPath: string) {
+  function traverseDirectory(currentPath: string, baseDir: string) {
     const fileNames = readdirSync(currentPath);
     // Loop through the files and directories
     fileNames.forEach((fileName: string) => {
@@ -100,17 +102,18 @@ export const getContractNames = (contractsDir: string[], ignoreDir: string[]): s
       // If the file is a contract then we add it to the array, if it is a directory then we call the function again
       if (stats.isFile() && fileName.endsWith('.sol')) {
         contractFileNames.push(fileName);
+        contractFolders.push(dirname(relative(baseDir, filePath)));
       } else if (stats.isDirectory() && !ignoreDir.includes(fileName)) {
-        traverseDirectory(filePath);
+        traverseDirectory(filePath, baseDir);
       }
     });
   }
 
   contractsDir.map((dir: string) => {
-    traverseDirectory(dir);
+    traverseDirectory(dir, dirname(dir));
   });
 
-  return contractFileNames;
+  return [contractFileNames, contractFolders];
 };
 
 /**
