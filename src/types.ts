@@ -48,6 +48,7 @@ export interface FunctionDefinitionNode {
   };
   virtual: boolean;
   visibility: string;
+  stateMutability: string;
 }
 
 export interface Ast {
@@ -57,6 +58,7 @@ export interface Ast {
   src: string;
   nodes: AstNode[];
   license: string;
+  exportedSymbols: { [key: string]: number[] };
 }
 
 export interface ImportDirectiveNode {
@@ -135,6 +137,10 @@ export interface ExternalFunctionOptions {
   signature: string;
   inputsStringNames: string;
   outputsStringNames: string;
+  inputString: string;
+  outputString: string;
+  isInterface: boolean;
+  stateMutabilityString: string;
 }
 
 export interface InternalFunctionOptions {

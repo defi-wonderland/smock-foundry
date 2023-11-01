@@ -3,14 +3,15 @@ import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types'
 import { generateMockContracts } from '../../src/index';
 import { resolve } from 'path';
 
-describe('getInternalMockFunctions', () => {
+describe('E2E: getStateVariables', () => {
   let contractNodes: { [name: string]: ContractDefinitionNode };
   before(async () => {
     // generate mock contracts
-    const contractsDir = 'solidity/contracts';
+    const contractsDir = ['solidity/contracts', 'solidity/interfaces'];
     const compiledArtifactsDir = 'out';
     const generatedContractsDir = 'solidity/test/mock-contracts';
-    await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir);
+    const ignoreDir = [];
+    await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir, ignoreDir);
 
     const contractsNames = ['ContractTest'];
 

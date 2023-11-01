@@ -12,7 +12,12 @@ import { StateVariablesOptions, ContractDefinitionNode } from './types';
  * @param compiledArtifactsDir The directory where the compiled artifacts are located
  * @param generatedContractsDir The directory where the mock contracts will be generated
  */
-export const generateMockContracts = async (contractsDir: string, compiledArtifactsDir: string, generatedContractsDir: string) => {
+export const generateMockContracts = async (
+  contractsDir: string[],
+  compiledArtifactsDir: string,
+  generatedContractsDir: string,
+  ignoreDir: string[],
+) => {
   const templateContent: string = registerHandlebarsTemplates();
   const template = Handlebars.compile(templateContent);
   try {
@@ -31,7 +36,7 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
     }
     console.log('Parsing contracts...');
     // Get all contracts directories
-    const contractPaths: string[] = getContractNames(contractsDir);
+    const contractPaths: string[] = getContractNames(contractsDir, ignoreDir);
     // Loop for each contract path
     contractPaths.forEach(async (contractPath: string) => {
       // Get the sub dir name
@@ -71,11 +76,16 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       const contractImport: string = ast.absolutePath;
       if (!contractImport) return;
 
+      // Get all exported entities
+      const exportedSymbols = Object.keys(ast.exportedSymbols);
+
       // Get the contract node and check if it's a library
       // Also check if is another contract inside the file and avoid it
       const contractNode = ast.nodes.find(
         (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === contractName,
       ) as ContractDefinitionNode;
+
+      // Skip unneeded contracts
       if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') return;
 
       const functions: StateVariablesOptions = getStateVariables(contractNode);
@@ -84,6 +94,7 @@ export const generateMockContracts = async (contractsDir: string, compiledArtifa
       const data = {
         contractName: contractName,
         contractImport: contractImport,
+        exportedSymbols: exportedSymbols.join(', '),
         import: getImports(ast),
         constructor: getConstructor(contractNode),
         mockExternalFunctions: getExternalMockFunctions(contractNode),

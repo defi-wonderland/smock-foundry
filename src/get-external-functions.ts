@@ -9,6 +9,9 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
   // Filter the nodes and keep only the FunctionDefinition related ones
   const functionNodes = contractNode.nodes.filter((node) => node.nodeType === 'FunctionDefinition') as FunctionDefinitionNode[];
 
+  // Get contract kind
+  const contractKind = contractNode.contractKind;
+
   const externalFunctions: ExternalFunctionOptions[] = [];
   // Loop through the function nodes
   functionNodes.forEach((funcNode: FunctionDefinitionNode) => {
@@ -16,6 +19,10 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     if (funcNode.kind != 'function') return;
     // Check if the function is external or public
     if (funcNode.visibility != 'external' && funcNode.visibility != 'public') return;
+
+    // Save state mutability
+    const stateMutability = funcNode.stateMutability;
+    const stateMutabilityString = stateMutability == 'nonpayable' ? ' ' : ` ${stateMutability} `;
 
     // Get the parameters of the function, if there are no parameters then we use an empty array
     const parameters: VariableDeclarationNode[] = funcNode.parameters.parameters ? funcNode.parameters.parameters : [];
@@ -95,6 +102,10 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
       signature: signature,
       inputsStringNames: inputsStringNames,
       outputsStringNames: outputsStringNames,
+      inputString: inputsString,
+      outputString: outputsString,
+      isInterface: contractKind === 'interface',
+      stateMutabilityString: stateMutabilityString,
     };
 
     externalFunctions.push(externalMockFunction);
