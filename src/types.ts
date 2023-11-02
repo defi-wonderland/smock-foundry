@@ -141,6 +141,8 @@ export interface ExternalFunctionOptions {
   outputString: string;
   isInterface: boolean;
   stateMutabilityString: string;
+  abstractAndVirtual: boolean;
+  visibility: string;
 }
 
 export interface InternalFunctionOptions {
@@ -148,10 +150,10 @@ export interface InternalFunctionOptions {
   arguments: string;
   signature: string;
   inputsStringNames: string;
-  inputsString: string;
   outputsStringNames: string;
-  outputsString: string;
   outputsTypesString: string;
+  inputsString: string;
+  outputsString: string;
 }
 
 export const memoryTypes = ['string', 'bytes', 'mapping'];

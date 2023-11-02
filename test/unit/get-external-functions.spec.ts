@@ -127,6 +127,8 @@ describe('getExternalMockFunctions', () => {
         outputString: '',
         isInterface: false,
         stateMutabilityString: ' view ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -187,6 +189,8 @@ describe('getExternalMockFunctions', () => {
         outputString: '',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -239,6 +243,8 @@ describe('getExternalMockFunctions', () => {
         outputString: 'string memory _param, string calldata _param2',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -299,6 +305,8 @@ describe('getExternalMockFunctions', () => {
         outputString: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -352,6 +360,8 @@ describe('getExternalMockFunctions', () => {
         outputString: 'string memory _output',
         isInterface: false,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -414,6 +424,72 @@ describe('getExternalMockFunctions', () => {
         outputString: 'string memory _output',
         isInterface: true,
         stateMutabilityString: ' ',
+        abstractAndVirtual: false,
+        visibility: 'public',
+      },
+    ];
+    expect(externalFunctions).to.be.an('array').that.is.not.empty;
+    expect(externalFunctions).to.deep.equal(expectedData);
+  });
+
+  it('should rewrite abstract contracts virtual functions', async () => {
+    contractNode = {
+      nodeType: 'ContractDefinition',
+      canonicalName: 'MyContract',
+      nodes: [],
+      abstract: true,
+      contractKind: 'function',
+      name: 'MyContract',
+    };
+
+    contractNode.nodes = [
+      {
+        name: 'myFunction',
+        nodeType: 'FunctionDefinition',
+        kind: 'function',
+        parameters: {
+          parameters: [
+            {
+              name: '_param',
+              nodeType: 'VariableDeclaration',
+              typeDescriptions: {
+                typeString: 'string',
+              },
+              storageLocation: 'memory',
+            },
+          ],
+        },
+        returnParameters: {
+          parameters: [
+            {
+              name: '_output',
+              nodeType: 'VariableDeclaration',
+              typeDescriptions: {
+                typeString: 'string',
+              },
+              storageLocation: 'memory',
+            },
+          ],
+        },
+        virtual: true,
+        visibility: 'public',
+        stateMutability: 'nonpayable',
+      },
+    ];
+    const externalFunctions = getExternalMockFunctions(contractNode);
+    const expectedData: ExternalFunctionOptions[] = [
+      {
+        functionName: 'myFunction',
+        arguments: 'string memory _param, string memory _output',
+        signature: 'myFunction(string)',
+        inputsStringNames: ', _param',
+        outputsStringNames: '_output',
+        inputString: 'string memory _param',
+        outputString: 'string memory _output',
+        isInterface: false,
+        stateMutabilityString: ' ',
+        abstractAndVirtual: true,
+        visibility: 'public',
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;

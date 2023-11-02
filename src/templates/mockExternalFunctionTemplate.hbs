@@ -1,5 +1,10 @@
 {{#if isInterface}}
 function {{functionName}}({{inputString}}) external{{stateMutabilityString}}returns ({{outputString}}) {}
+
+{{/if}}
+{{#if abstractAndVirtual}}
+function {{functionName}}({{inputString}}) {{visibility}}{{stateMutabilityString}}override returns ({{outputString}}) {}
+
 {{/if}}
 function mock_call_{{functionName}}({{arguments}}) public {
   vm.mockCall(

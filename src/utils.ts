@@ -89,7 +89,6 @@ export const registerHandlebarsTemplates = (): string => {
  * @returns The names of the contracts in the given directory and its subdirectories
  */
 export const getContractNamesAndFolders = (contractsDir: string[], ignoreDir: string[]): [string[], string[]] => {
-
   const contractFileNames: string[] = [];
   const contractFolders: string[] = [];
   // Recursive function to traverse the directory and its subdirectories
