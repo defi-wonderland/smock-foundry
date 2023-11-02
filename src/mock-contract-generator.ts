@@ -1,5 +1,11 @@
 import { getExternalMockFunctions, getInternalMockFunctions, getConstructor, getImports, getStateVariables, Ast } from './index';
-import { getSubDirNameFromPath, registerHandlebarsTemplates, getContractNamesAndFolders, compileSolidityFilesFoundry } from './utils';
+import {
+  getSubDirNameFromPath,
+  registerHandlebarsTemplates,
+  getContractNamesAndFolders,
+  compileSolidityFilesFoundry,
+  registerMockHelperTemplate,
+} from './utils';
 import Handlebars from 'handlebars';
 import { writeFileSync, existsSync, readdirSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
@@ -128,6 +134,12 @@ export const generateMockContracts = async (
 
       writeFileSync(`${contractFolder}/Mock${contractName}.sol`, cleanedCode);
     });
+
+    // Generate MockHelper contract
+    const mockHelperTemplateContent: string = registerMockHelperTemplate();
+    const mockHelperTemplate = Handlebars.compile(mockHelperTemplateContent);
+    const mockHelperCode: string = mockHelperTemplate({});
+    writeFileSync(`${generatedContractsDir}/MockHelper.sol`, mockHelperCode);
 
     console.log('Mock contracts generated successfully');
     // Compile the mock contracts

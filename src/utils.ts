@@ -66,6 +66,7 @@ export const registerHandlebarsTemplates = (): string => {
   const basicStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockBasicStateVariableTemplate.hbs');
   const arrayStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockArrayStateVariableTemplate.hbs');
   const mappingStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockMappingStateVariableTemplate.hbs');
+
   // Read the templates
   const templateContent = readFileSync(templatePath, 'utf8');
   const externalFuncsTemplateContent = readFileSync(externalFuncsTemplatePath, 'utf8');
@@ -80,7 +81,15 @@ export const registerHandlebarsTemplates = (): string => {
   Handlebars.registerPartial('mockInternalFunction', internalFuncsTemplateContent);
   Handlebars.registerPartial('mockArrayStateVariable', arrayStateVariablesTemplateContent);
   Handlebars.registerPartial('mockMappingStateVariable', mappingStateVariablesTemplateContent);
+
   return templateContent;
+};
+
+export const registerMockHelperTemplate = (): string => {
+  const mockHelperTemplatePath = resolve(__dirname, 'templates', 'mockHelperTemplate.hbs');
+  const mockHelperTemplateContent = readFileSync(mockHelperTemplatePath, 'utf8');
+  Handlebars.registerPartial('mockHelperTemplatet', mockHelperTemplateContent);
+  return mockHelperTemplateContent;
 };
 
 /**
