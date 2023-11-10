@@ -17,7 +17,6 @@ contract CommonE2EBase is Test, MockHelper {
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), _FORK_BLOCK);
     vm.prank(_owner);
-    // abi.encode(1, '2', true, _owner, bytes32('4'))
 
     _contractTest = MockContractTest(
       deployMock('Test', type(MockContractTest).creationCode, abi.encode(1, '2', true, _owner, bytes32('4')))
