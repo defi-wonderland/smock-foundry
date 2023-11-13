@@ -68,6 +68,10 @@ We use changesets to mark packages for new releases. When merging commits to the
 
 To add a changeset, run the command `yarn changeset` in the root of this repo. You will be presented with a small prompt to select the packages to be released, the scope of the release (major, minor, or patch), and the reason for the release. Comments within changeset files will be automatically included in the changelog of the package.
 
+# Licensing
+
+The primary license for Prophet contracts is MIT, see [`LICENSE`](./LICENSE).
+
 # Contributors
 
 Maintained with love by [Wonderland](https://defi.sucks). Made possible by viewers like you.
