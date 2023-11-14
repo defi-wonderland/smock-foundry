@@ -1,66 +1,125 @@
-**Foundry Mock Generator** is the solidity **mock**ing library. It's a plugin for
-[foundry](https://github.com/foundry-rs/foundry) that can be used to create mock Solidity
-contracts able to mock variables and external calls.
+[![Version](https://img.shields.io/npm/v/@defi-wonderland/foundry-mock-generator?label=Version)](https://www.npmjs.com/package/@defi-wonderland/foundry-mock-generator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/defi-wonderland/prophet-sdk/blob/main/LICENSE)
 
-# Features
+# Foundry Mock Generator
+A plugin for [foundry](https://github.com/foundry-rs/foundry) that automatically generates Solidity mocks for every contract in your project.
+
+## Features
 
 - Get rid of your folder of "mock" contracts and **just use
   foundry**.
-- Keep your tests **simple** with a easy mock functions.
-- Mock up external calls and variables in a beautiful and orderly fashion.
+- Keep your tests **simple** with straightforward mock functions.
+- Mock up external calls and internal variables in a beautiful and orderly fashion.
 
 ## Installation
 
-You can install the tool via yarn:
+You can install the plugin via yarn:
 
 ```bash
-yarn add foundry-mock-generator@<latest-canary>
+yarn add @defi-wonderland/foundry-mock-generator --save-dev
 ```
 
 ## Basic Usage
 
+### Creating mocks
+
 To generate the mock contracts all you have to do is run:
 
 ```bash
-yarn foundry-mock-generator --contracts <path/to/contracts> --out <path/to/foundry/out> --genDir <path/to/generate/contracts>
+yarn foundry-mock-generator --contracts path/to/contracts
 ```
 
-Note: --contracts required by the user, tha path to the solidity contracts to mock
-Note: --genDir default path is `solidity/test/mock-contracts`, the path to generate the mock contracts
-Note: --out default path is `out`, the path that has foundry's compiled artifacts
+The `foundry-mock-generator` command accepts the following options:
 
-1. To use the mock contracts in your tests just import them
+Argument | Default | Notes
+---|---|---
+`contracts` | — | The path to the solidity contracts to mock
+`out` | `./out` | The path that has the compiled artifacts
+`genDir` | `./solidity/test/mock-contracts` | The path to the generated mock contracts
+`ignore` | [] | A list of directories to ignore
 
-```JavaScript
-import { MockMyContractName } from '/path/to/mock-contracts/MockMyContractName.sol'
+### Using mocks
+
+Let's say you have a Greeter contract in your project:
+
+```solidity
+contract Greeter {
+  string internal _greeting;
+
+  constructor(string memory greeting) {
+    _greeting = greeting;
+  }
+
+  function greet() public view returns (string memory) {
+    return _greeting;
+  }
+}
 ```
 
-2. Create the mock contract and allow cheatcodes for it
+After running the generator, you will have a mock contract located at `${genDir}/MockGreeter.sol`:
 
-```JavaScript
-/// Deploy mock contract
-mock_myContract = new MockMyContractname(...);
-/// Allow mocks for the contract
-vm.allowCheatcodes(address(mock_myContract));
+```solidity
+contract MockGreeter is Greeter {
+  function mock_call_greet(string memory __greeting) external {
+    // Mocks the greet() function calls
+  }
+
+  function set_greeting(string memory greeting) public {
+    // Sets the value of `greeting`
+  }
+}
 ```
 
-3. Enjoy of easy mock calls
+The next step would be importing the mock contract in your unit tests, deploying it and allowing it to use the cheatcodes, specifically `vm.mockCall`.
 
-```JavaScript
-/// Mock myFuncName function, when called with `arg1`, `arg2` to return `return1`
-mock_myContract.mock_call_myFuncName(arg1, arg2, return1);
-/// Mock myVarName variable, to return `return1`
-mock_myContract.mock_call_myVarName(return1);
+```solidity
+import 'forge-std/Test.sol';
+
+import { MockGreeter } from '/path/to/mock-contracts/MockGreeter.sol';
+import { MockGreeter } from '/path/to/mock-contracts/MockHelper.sol';
+
+contract BaseTest is Test, MockHelpers {
+  MockGreeter public greeter;
+
+  function setUp() public {
+    // The `deployMock` call is equivalent to
+    // greeter = new MockGreeter('Hello');
+    // label(address(greeter, 'Greeter');
+    // vm.allowCheatcodes(address(greeter);
+
+    greeter = deployMock(
+      'Greeter',
+      type(Greeter).creationCode,
+      abi.encode('Hello')
+    );
+  }
+}
 ```
 
-4. You also can change value of any variable (except of `private`)
+Then enjoy the wonders of mocking:
 
-```JavaScript
-/// Change value of a variable
-mock_myContract.set_myVarName(value);
+```solidity
+// Mock the `greet` function to return 'Holá' instead of 'Hello'
+greeter.mock_call_greet('Holá');
+
+// Or you can achieve the same by setting the internal variable
+greeter.set_greeting('Holá');
 ```
+
+### Gotchas
 
 - Please, note that if you want to mock `internal` functions, you **must** make them `virtual`. The tool will not generate mocks for internal functions that are not virtual.
+- Cannot `set` private variables.
+- If you have a contract named `Helper`, you can avoid the name collision like so:
+
+```solidity
+import { MockHelper } from '/path/to/mock-contracts/contracts/MockHelper.sol';
+import { MockHelper as FoundryMockHelper } from '/path/to/mock-contracts/MockHelper.sol';
+
+contract BaseTest is Test, FoundryMockHelper {
+  // You get the idea
+}
+```
 
 ## Release
 
