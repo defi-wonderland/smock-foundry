@@ -1,11 +1,11 @@
 {
   "name": "@defi-wonderland/foundry-mock-generator",
   "version": "1.0.2",
-  "description": "A mock contract generator for Foundry",
-  "homepage": "https://github.com/defi-wonderland/mock-foundry#readme",
+  "description": "Smock-style mocks for Foundry projects",
+  "homepage": "https://github.com/defi-wonderland/foundry-mock-generator#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/defi-wonderland/mock-foundry-private.git"
+    "url": "git+https://github.com/defi-wonderland/foundry-mock-generator.git"
   },
   "license": "AGPL-3.0",
   "author": "Wonderland",
