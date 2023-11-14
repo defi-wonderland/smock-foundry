@@ -31,12 +31,12 @@ yarn foundry-mock-generator --contracts path/to/contracts
 
 The `foundry-mock-generator` command accepts the following options:
 
-Argument | Default | Notes
----|---|---
-`contracts` | — | The path to the solidity contracts to mock
-`out` | `./out` | The path that has the compiled artifacts
-`genDir` | `./solidity/test/mock-contracts` | The path to the generated mock contracts
-`ignore` | [] | A list of directories to ignore
+Option      | Default                           | Notes
+------------|-----------------------------------|-------
+`contracts` | —                                 | The path to the solidity contracts to mock
+`out`       | `./out`                           | The path that has the compiled artifacts
+`genDir`    | `./solidity/test/mock-contracts`  | The path to the generated mock contracts
+`ignore`    | []                                | A list of directories to ignore
 
 ### Using mocks
 
