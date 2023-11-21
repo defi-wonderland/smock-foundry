@@ -36,11 +36,11 @@ Option      | Default                           | Notes
 `contracts` | —                                 | The path to the solidity contracts to mock
 `out`       | `./out`                           | The path that has the compiled artifacts
 `genDir`    | `./solidity/test/mock-contracts`  | The path to the generated mock contracts
-`ignore`    | []                                | A list of directories to ignore
+`ignore`    | []                                | A list of directories to ignore, e.g. `--ignore libraries`
 
 ### Using mocks
 
-Let's say you have a Greeter contract in your project:
+Let's say you have a `Greeter` contract in your project at `contracts/Greeter.sol`:
 
 ```solidity
 contract Greeter {
@@ -56,7 +56,7 @@ contract Greeter {
 }
 ```
 
-After running the generator, you will have a mock contract located at `${genDir}/MockGreeter.sol`:
+After running the generator, you will have a mock contract located at `${genDir}/contracts/MockGreeter.sol`:
 
 ```solidity
 contract MockGreeter is Greeter {
@@ -64,7 +64,7 @@ contract MockGreeter is Greeter {
     // Mocks the greet() function calls
   }
 
-  function set_greeting(string memory greeting) public {
+  function set__greeting(string memory greeting) public {
     // Sets the value of `greeting`
   }
 }
@@ -76,7 +76,7 @@ The next step would be importing the mock contract in your unit tests, deploying
 import 'forge-std/Test.sol';
 
 import { MockGreeter } from '/path/to/mock-contracts/MockGreeter.sol';
-import { MockGreeter } from '/path/to/mock-contracts/MockHelper.sol';
+import { MockHelper } from '/path/to/mock-contracts/MockHelper.sol';
 
 contract BaseTest is Test, MockHelpers {
   MockGreeter public greeter;
@@ -103,13 +103,13 @@ Then enjoy the wonders of mocking:
 greeter.mock_call_greet('Holá');
 
 // Or you can achieve the same by setting the internal variable
-greeter.set_greeting('Holá');
+greeter.set__greeting('Holá');
 ```
 
 ### Gotchas
 
 - Please, note that if you want to mock `internal` functions, you **must** make them `virtual`. The tool will not generate mocks for internal functions that are not virtual.
-- Cannot `set` private variables.
+- Cannot `set` private variables and mock private functions.
 - If you have a contract named `Helper`, you can avoid the name collision like so:
 
 ```solidity
