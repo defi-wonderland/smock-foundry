@@ -70,7 +70,7 @@ To add a changeset, run the command `yarn changeset` in the root of this repo. Y
 
 # Licensing
 
-The primary license for Prophet contracts is MIT, see [`LICENSE`](./LICENSE).
+The primary license for the mock generator is MIT, see [`LICENSE`](./LICENSE).
 
 # Contributors
 
