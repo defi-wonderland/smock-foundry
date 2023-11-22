@@ -7,7 +7,6 @@ const path = require('path');
 const copyTemplates = () => {
   try {
     fs.cpSync('src/templates', 'dist/templates', { recursive: true, overwrite: true });
-    console.log('success!');
   } catch (err) {
     console.error(err);
   }
