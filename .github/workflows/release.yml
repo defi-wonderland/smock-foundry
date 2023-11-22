@@ -10,7 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   release:
     # We want the release to run from the public repo
-    if: github.repository == 'defi-wonderland/foundry-mock-generator'
+    if: github.repository == 'defi-wonderland/smock-foundry'
     name: Release
     runs-on: ubuntu-latest
     steps:

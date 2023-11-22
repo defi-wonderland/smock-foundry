@@ -2,5 +2,5 @@
   "ignore": ["node_modules", ".git", "lib", "**/*.test.ts", "**/*.spec.ts", "**/*.sol"],
   "watch": ["src/**/*"],
   "ext": "ts",
-  "exec": "yarn mock-gen --contractsDir ./solidity/contracts --outDir ./out"
+  "exec": "yarn smock-foundry --contracts ./solidity/contracts"
 }
