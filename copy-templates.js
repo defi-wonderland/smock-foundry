@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Copies the *.hbs files from the src/templates folder to the dist/templates folder
+ * Copies the src/templates folder to the dist/templates folder
  */
 const copyTemplates = () => {
   try {
