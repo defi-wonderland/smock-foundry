@@ -1,5 +1,5 @@
 export * from './get-external-functions';
-export * from './mock-contract-generator';
+export * from './smock-foundry';
 export * from './get-constructor';
 export * from './get-imports';
 export * from './get-internal-functions';

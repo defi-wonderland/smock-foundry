@@ -1,13 +1,13 @@
 {
-  "name": "@defi-wonderland/foundry-mock-generator",
+  "name": "@defi-wonderland/smock-foundry",
   "version": "1.0.2",
   "description": "Smock-style mocks for Foundry projects",
-  "homepage": "https://github.com/defi-wonderland/foundry-mock-generator#readme",
+  "homepage": "https://github.com/defi-wonderland/smock-foundry#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/defi-wonderland/foundry-mock-generator.git"
+    "url": "git+https://github.com/defi-wonderland/smock-foundry.git"
   },
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "author": "Wonderland",
   "main": "dist/run.js",
   "types": "dist/run.d.ts",

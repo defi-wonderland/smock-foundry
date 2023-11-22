@@ -1,4 +1,4 @@
-# foundry-mock-generator
+# Smock Foundry
 
 ## 1.0.1
 

@@ -1,7 +1,7 @@
-[![Version](https://img.shields.io/npm/v/@defi-wonderland/foundry-mock-generator?label=Version)](https://www.npmjs.com/package/@defi-wonderland/foundry-mock-generator)
+[![Version](https://img.shields.io/npm/v/@defi-wonderland/smock-foundry?label=Version)](https://www.npmjs.com/package/@defi-wonderland/smock-foundry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/defi-wonderland/prophet-sdk/blob/main/LICENSE)
 
-# Foundry Mock Generator
+# Smock Foundry
 A plugin for [foundry](https://github.com/foundry-rs/foundry) that automatically generates Solidity mocks for every contract in your project.
 
 ## Features
@@ -16,7 +16,7 @@ A plugin for [foundry](https://github.com/foundry-rs/foundry) that automatically
 You can install the plugin via yarn:
 
 ```bash
-yarn add @defi-wonderland/foundry-mock-generator --save-dev
+yarn add @defi-wonderland/smock-foundry --save-dev
 ```
 
 ## Basic Usage
@@ -26,10 +26,10 @@ yarn add @defi-wonderland/foundry-mock-generator --save-dev
 To generate the mock contracts all you have to do is run:
 
 ```bash
-yarn foundry-mock-generator --contracts path/to/contracts
+yarn smock-foundry --contracts path/to/contracts
 ```
 
-The `foundry-mock-generator` command accepts the following options:
+The `smock-foundry` command accepts the following options:
 
 Option      | Default                           | Notes
 ------------|-----------------------------------|-------
@@ -129,7 +129,7 @@ To add a changeset, run the command `yarn changeset` in the root of this repo. Y
 
 # Licensing
 
-The primary license for the mock generator is MIT, see [`LICENSE`](./LICENSE).
+The primary license for Smock Foundry is MIT, see [`LICENSE`](./LICENSE).
 
 # Contributors
 
