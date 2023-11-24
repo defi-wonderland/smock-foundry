@@ -35,7 +35,7 @@ Option      | Default                           | Notes
 ------------|-----------------------------------|-------
 `contracts` | —                                 | The path to the solidity contracts to mock
 `out`       | `./out`                           | The path that has the compiled artifacts
-`genDir`    | `./solidity/test/mocks`           | The path to the generated mock contracts
+`mocks `    | `./solidity/test/mocks`           | The path to the generated mock contracts
 `ignore`    | []                                | A list of directories to ignore, e.g. `--ignore libraries`
 
 ### Using mocks
