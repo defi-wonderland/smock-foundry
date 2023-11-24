@@ -75,10 +75,10 @@ The next step would be importing the mock contract in your unit tests, deploying
 ```solidity
 import 'forge-std/Test.sol';
 
-import { MockGreeter } from '/path/to/mocks/MockGreeter.sol';
+import { MockGreeter } from '/path/to/mocks/contracts/MockGreeter.sol';
 import { MockHelper } from '/path/to/mocks/MockHelper.sol';
 
-contract BaseTest is Test, MockHelpers {
+contract BaseTest is Test, MockHelper {
   MockGreeter public greeter;
 
   function setUp() public {
@@ -113,7 +113,6 @@ greeter.set__greeting('Holá');
 - If you have a contract named `Helper`, you can avoid the name collision like so:
 
 ```solidity
-import { MockHelper } from '/path/to/mocks/contracts/MockHelper.sol';
 import { MockHelper as FoundryMockHelper } from '/path/to/mocks/MockHelper.sol';
 
 contract BaseTest is Test, FoundryMockHelper {
