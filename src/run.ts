@@ -25,7 +25,7 @@ function getProcessArguments() {
       },
       genDir: {
         describe: `Generated contracts directory`,
-        default: './solidity/test/mock-contracts',
+        default: './solidity/test/mocks',
         type: 'string',
       },
       ignore: {

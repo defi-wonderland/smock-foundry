@@ -22,7 +22,7 @@ out-via-ir
 out/*/*
 
 # Ignore generated mock contracts
-solidity/test/mock-contracts/
+solidity/test/mocks/
 
 # mac
 **/.DS_Store
