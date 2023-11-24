@@ -85,11 +85,11 @@ export const registerHandlebarsTemplates = (): string => {
   return templateContent;
 };
 
-export const registerMockHelperTemplate = (): string => {
-  const mockHelperTemplatePath = resolve(__dirname, 'templates', 'mockHelperTemplate.hbs');
-  const mockHelperTemplateContent = readFileSync(mockHelperTemplatePath, 'utf8');
-  Handlebars.registerPartial('mockHelperTemplatet', mockHelperTemplateContent);
-  return mockHelperTemplateContent;
+export const registerSmockHelperTemplate = (): string => {
+  const smockHelperTemplatePath = resolve(__dirname, 'templates', 'smockHelperTemplate.hbs');
+  const smockHelperTemplateContent = readFileSync(smockHelperTemplatePath, 'utf8');
+  Handlebars.registerPartial('smockHelperTemplate', smockHelperTemplateContent);
+  return smockHelperTemplateContent;
 };
 
 /**
