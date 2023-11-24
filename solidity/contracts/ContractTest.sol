@@ -44,6 +44,8 @@ contract ContractTest is IContractTest {
   mapping(uint256 => mapping(address => bytes32)) public uint256ToAddressToBytes32;
   /// @inheritdoc IContractTest
   mapping(uint256 => MyStruct) public uint256ToMyStruct;
+  /// @inheritdoc IContractTest
+  mapping(uint256 => MyNestingStruct) public uint256ToMyNestingStruct;
 
   /// Constructor
   constructor(

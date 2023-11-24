@@ -9,6 +9,15 @@ interface IContractTest {
     string name;
   }
 
+  struct MyNestedStruct {
+    uint256 nestedField;
+  }
+
+  struct MyNestingStruct {
+    uint256 someField;
+    MyNestedStruct nestedStruct;
+  }
+
   // Enums
   enum MyEnum {
     A,
@@ -34,6 +43,7 @@ interface IContractTest {
   function bytes32ToBytes(bytes32) external view returns (bytes memory);
   function uint256ToAddressToBytes32(uint256, address) external view returns (bytes32);
   function uint256ToMyStruct(uint256) external view returns (uint256, string memory);
+  function uint256ToMyNestingStruct(uint256) external view returns (uint256, MyNestedStruct memory);
   function immutableUintVariable() external view returns (uint256);
   // Logic
   function setVariables(

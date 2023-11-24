@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'isolmate/interfaces/tokens/IERC20.sol';
-import {MockContractTest} from 'test/mock-contracts/contracts/MockContractTest.sol';
+import {MockContractTest, IContractTest} from 'test/mock-contracts/contracts/MockContractTest.sol';
 import {console} from 'forge-std/console.sol';
 import {SmockHelper} from 'test/mock-contracts/SmockHelper.sol';
 
@@ -117,6 +117,21 @@ contract E2EMockContractTest_Set_Mapping_Vars is CommonE2EBase {
   // isn't implemented
   // _contractTest.set_uint256ToAddressToBytes32(1, _owner, bytes32('4'));
   // assertEq(_contractTest.uint256ToAddressToBytes32(1, _owner), bytes32('4'));
+
+  function test_Set_Uint256ToMyStructMappings() public {
+    _contractTest.set_uint256ToMyStruct(1, IContractTest.MyStruct(100, 'hundred'));
+    (uint256 _value, string memory _name) = _contractTest.uint256ToMyStruct(1);
+    assertEq(_value, 100);
+    assertEq(_name, 'hundred');
+  }
+
+  function test_Set_Uint256ToMyNestingStructMappings() public {
+    _contractTest.set_uint256ToMyNestingStruct(1, IContractTest.MyNestingStruct(100, IContractTest.MyNestedStruct(200)));
+    (uint256 _someField, IContractTest.MyNestedStruct memory _myNestedStruct) =
+      _contractTest.uint256ToMyNestingStruct(1);
+    assertEq(_someField, 100);
+    assertEq(_myNestedStruct.nestedField, 200);
+  }
 
   // internal
   function test_SetInternalUint256ToAddressMappings() public {

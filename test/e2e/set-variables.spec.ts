@@ -55,4 +55,13 @@ describe('E2E: getStateVariables', () => {
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('public');
   });
+
+  it('must include setters for nesting struct mappings', async () => {
+    const contractNode = contractNodes['MockContractTest'];
+    const func = contractNode.nodes.find(
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_uint256ToMyNestingStruct',
+    ) as FunctionDefinitionNode;
+    expect(func).to.not.be.undefined;
+    expect(func.visibility).to.equal('public');
+  });
 });
