@@ -4,7 +4,7 @@ import {
   registerHandlebarsTemplates,
   getContractNamesAndFolders,
   compileSolidityFilesFoundry,
-  registerMockHelperTemplate,
+  registerSmockHelperTemplate,
 } from './utils';
 import Handlebars from 'handlebars';
 import { writeFileSync, existsSync, readdirSync } from 'fs';
@@ -135,11 +135,11 @@ export const generateMockContracts = async (
       writeFileSync(`${contractFolder}/Mock${contractName}.sol`, cleanedCode);
     });
 
-    // Generate MockHelper contract
-    const mockHelperTemplateContent: string = registerMockHelperTemplate();
-    const mockHelperTemplate = Handlebars.compile(mockHelperTemplateContent);
-    const mockHelperCode: string = mockHelperTemplate({});
-    writeFileSync(`${generatedContractsDir}/MockHelper.sol`, mockHelperCode);
+    // Generate SmockHelper contract
+    const smockHelperTemplateContent: string = registerSmockHelperTemplate();
+    const smockHelperTemplate = Handlebars.compile(smockHelperTemplateContent);
+    const smockHelperCode: string = smockHelperTemplate({});
+    writeFileSync(`${generatedContractsDir}/SmockHelper.sol`, smockHelperCode);
 
     console.log('Mock contracts generated successfully');
     // Compile the mock contracts

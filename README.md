@@ -76,9 +76,9 @@ The next step would be importing the mock contract in your unit tests, deploying
 import 'forge-std/Test.sol';
 
 import { MockGreeter } from '/path/to/mocks/contracts/MockGreeter.sol';
-import { MockHelper } from '/path/to/mocks/MockHelper.sol';
+import { SmockHelper } from '/path/to/mocks/SmockHelper.sol';
 
-contract BaseTest is Test, MockHelper {
+contract BaseTest is Test, SmockHelper {
   MockGreeter public greeter;
 
   function setUp() public {
@@ -110,15 +110,6 @@ greeter.set__greeting('Holá');
 
 - Please, note that if you want to mock `internal` functions, you **must** make them `virtual`. The tool will not generate mocks for internal functions that are not virtual.
 - Cannot `set` private variables and mock private functions.
-- If you have a contract named `Helper`, you can avoid the name collision like so:
-
-```solidity
-import { MockHelper as FoundryMockHelper } from '/path/to/mocks/MockHelper.sol';
-
-contract BaseTest is Test, FoundryMockHelper {
-  // You get the idea
-}
-```
 
 ## Release
 

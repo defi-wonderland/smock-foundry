@@ -1,7 +1,7 @@
 // Write unit tests for the getExternalFunctions function here like the other tests.
 import { getStateVariables } from '../../src/get-variables-functions';
 import { expect } from 'chai';
-import { ContractDefinitionNode, BasicStateVariableOptions, StateVariablesOptions } from '../../src/types';
+import { ContractDefinitionNode, StateVariablesOptions } from '../../src/types';
 
 // We use the describe function to group together related tests
 describe('getStateVariables', () => {
