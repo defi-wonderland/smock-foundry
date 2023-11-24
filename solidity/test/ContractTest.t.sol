@@ -5,9 +5,9 @@ import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'isolmate/interfaces/tokens/IERC20.sol';
 import {MockContractTest} from 'test/mock-contracts/contracts/MockContractTest.sol';
 import {console} from 'forge-std/console.sol';
-import {MockHelper} from 'test/mock-contracts/MockHelper.sol';
+import {SmockHelper} from 'test/mock-contracts/SmockHelper.sol';
 
-contract CommonE2EBase is Test, MockHelper {
+contract CommonE2EBase is Test, SmockHelper {
   uint256 internal constant _FORK_BLOCK = 15_452_788;
 
   address internal _user = makeAddr('user');

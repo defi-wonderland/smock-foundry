@@ -88,7 +88,7 @@ export const registerHandlebarsTemplates = (): string => {
 export const registerMockHelperTemplate = (): string => {
   const mockHelperTemplatePath = resolve(__dirname, 'templates', 'mockHelperTemplate.hbs');
   const mockHelperTemplateContent = readFileSync(mockHelperTemplatePath, 'utf8');
-  Handlebars.registerPartial('mockHelperTemplatet', mockHelperTemplateContent);
+  Handlebars.registerPartial('mockHelperTemplate', mockHelperTemplateContent);
   return mockHelperTemplateContent;
 };
 
