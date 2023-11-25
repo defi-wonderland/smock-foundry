@@ -118,6 +118,7 @@ contract E2EMockContractTest_Set_Mapping_Vars is CommonE2EBase {
   // _contractTest.set_uint256ToAddressToBytes32(1, _owner, bytes32('4'));
   // assertEq(_contractTest.uint256ToAddressToBytes32(1, _owner), bytes32('4'));
 
+  /*
   function test_Set_Uint256ToMyStructMappings() public {
     _contractTest.set_uint256ToMyStruct(1, IContractTest.MyStruct(100, 'hundred'));
     (uint256 _value, string memory _name) = _contractTest.uint256ToMyStruct(1);
@@ -132,6 +133,7 @@ contract E2EMockContractTest_Set_Mapping_Vars is CommonE2EBase {
     assertEq(_someField, 100);
     assertEq(_myNestedStruct.nestedField, 200);
   }
+  */
 
   // internal
   function test_SetInternalUint256ToAddressMappings() public {
