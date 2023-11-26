@@ -12,7 +12,7 @@ describe('E2E: getInternalMockFunctions', () => {
     // generate mock contracts
     const contractsDir = ['solidity/contracts', 'solidity/interfaces'];
     const compiledArtifactsDir = 'out';
-    const generatedContractsDir = 'solidity/test/mock-contracts';
+    const generatedContractsDir = 'solidity/test/mocks';
     const ignoreDir = [];
     await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir, ignoreDir);
 

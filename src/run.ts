@@ -5,8 +5,8 @@ import { hideBin } from 'yargs/helpers';
 import { generateMockContracts } from './index';
 
 (async () => {
-  const { contracts, out, genDir, ignore } = getProcessArguments();
-  generateMockContracts(contracts, out, genDir, ignore);
+  const { contracts, out, mocks, ignore } = getProcessArguments();
+  generateMockContracts(contracts, out, mocks, ignore);
 })();
 
 function getProcessArguments() {
@@ -23,9 +23,9 @@ function getProcessArguments() {
         default: './out',
         type: 'string',
       },
-      genDir: {
+      mocks: {
         describe: `Generated contracts directory`,
-        default: './solidity/test/mock-contracts',
+        default: './solidity/test/mocks',
         type: 'string',
       },
       ignore: {
