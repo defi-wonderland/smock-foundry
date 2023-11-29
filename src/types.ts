@@ -1,30 +1,29 @@
+export interface TypeNameNode {
+  nodeType?: 'ElementaryTypeName' | 'ArrayTypeName' | 'Mapping' | 'UserDefinedTypeName';
+  typeDescriptions?: {
+    typeString: string;
+  };
+  baseType?: TypeNameNode;
+  keyType?: TypeNameNode;
+  valueType?: TypeNameNode;
+  name?: string;
+  keyName?: string;
+  valueName?: string;
+  stateMutability?: string;
+}
+
 export interface VariableDeclarationNode {
-  constant?: boolean;
-  mutability?: string;
-  visibility?: string;
-  name: string;
   nodeType: 'VariableDeclaration';
-  storageLocation: string;
   typeDescriptions: {
     typeString: string;
   };
-  typeName?: {
-    keyType: {
-      typeDescriptions: {
-        typeString: string;
-      };
-    };
-    valueType: {
-      typeDescriptions: {
-        typeString: string;
-      };
-    };
-    baseType: {
-      typeDescriptions: {
-        typeString: string;
-      };
-    };
-  };
+  typeName?: TypeNameNode;
+  name?: string;
+  constant?: boolean;
+  mutability?: string;
+  visibility?: string;
+  stateVariable?: boolean;
+  storageLocation?: string;
 }
 
 export interface ContractDefinitionNode {
