@@ -110,6 +110,8 @@ greeter.set__greeting('Holá');
 
 - Please, note that if you want to mock `internal` functions, you **must** make them `virtual`. The tool will not generate mocks for internal functions that are not virtual.
 - Cannot `set` private variables and mock private functions.
+- Mocking of nested mappings is not supported.
+- Mocking of structs containing mappings is not supported.
 
 ## Release
 
