@@ -31,12 +31,10 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
     // Get the type of the state variable
     const stateVariableType: string = stateVariableNode.typeDescriptions.typeString;
 
-    // If nested mapping return
-    if (stateVariableType.includes('=> mapping')) return;
-
     // Check if the state variable is an array or a mapping or a basic type
     if (stateVariableType.startsWith('mapping')) {
-      // If value is of type struct we don't mock it
+      // If nested mapping return
+      if (stateVariableType.includes('=> mapping')) return;
       const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode);
       mappingFunctions.push(mappingMockFunction);
     } else if (stateVariableType.includes('[]')) {
