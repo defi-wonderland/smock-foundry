@@ -33,8 +33,6 @@ export const getStateVariables = (contractNode: ContractDefinitionNode): StateVa
 
     // Check if the state variable is an array or a mapping or a basic type
     if (stateVariableType.startsWith('mapping')) {
-      // If nested mapping return
-      if (stateVariableType.includes('=> mapping')) return;
       const mappingMockFunction: MappingStateVariableOptions = getMappingFunction(stateVariableNode);
       mappingFunctions.push(mappingMockFunction);
     } else if (stateVariableType.includes('[]')) {
@@ -106,24 +104,34 @@ function getArrayFunction(arrayNode: VariableDeclarationNode): ArrayStateVariabl
 function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateVariableOptions {
   // Name of the mapping
   const mappingName: string = mappingNode.name;
+
   // Type name
-  const keyType: string = typeFix(mappingNode.typeName.keyType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+  let mappingTypeNameNode = mappingNode.typeName;
+
+  // Key types
+  const keyTypes: string[] = [];
+  
+  do {
+    const keyType: string = typeFix(mappingTypeNameNode.keyType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+    keyTypes.push(keyType);
+    mappingTypeNameNode = mappingTypeNameNode.valueType;
+  } while (mappingTypeNameNode.typeDescriptions.typeString.startsWith('mapping'));
 
   // Value type
-  const valueType: string = typeFix(mappingNode.typeName.valueType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+  const valueType: string = typeFix(mappingTypeNameNode.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+
   // If the mapping is internal we don't create mockCall for it
   const isInternal: boolean = mappingNode.visibility == 'internal';
 
   const mappingStateVariableFunction: MappingStateVariableOptions = {
     setFunction: {
-      functionName: `${mappingName}`,
-      keyType: keyType,
+      functionName: mappingName,
+      keyTypes: keyTypes,
       valueType: valueType,
-      mappingName: mappingName,
     },
     mockFunction: {
       functionName: mappingName,
-      keyType: keyType,
+      keyTypes: keyTypes,
       valueType: valueType,
     },
     isInternal: isInternal,

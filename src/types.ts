@@ -97,13 +97,12 @@ export interface BasicStateVariableOptions {
 export interface MappingStateVariableOptions {
   setFunction: {
     functionName: string;
-    keyType: string;
+    keyTypes: string[];
     valueType: string;
-    mappingName: string;
   };
   mockFunction: {
     functionName: string;
-    keyType: string;
+    keyTypes: string[];
     valueType: string;
   };
   isInternal: boolean;
