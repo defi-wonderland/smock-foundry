@@ -30,7 +30,7 @@ describe('getStateVariables', () => {
     expect(stateVariables).to.deep.equal(expectedData);
   });
 
-  it('should return the correct variable data if the variable is a base struct variable', async () => {
+  it('should return the correct data if the variable is a base struct', async () => {
     contractNode.nodes = [
       {
         constant: false,
@@ -38,7 +38,6 @@ describe('getStateVariables', () => {
         visibility: 'public',
         name: 'myStructVariable',
         nodeType: 'VariableDeclaration',
-        storageLocation: 'default',
         typeDescriptions: {
           typeString: 'struct MyStruct',
         },
@@ -66,7 +65,7 @@ describe('getStateVariables', () => {
     expect(baseStateVariable).to.deep.equal(expectedData);
   });
 
-  it('should return the correct variable data if the variable is a base enum variable', async () => {
+  it('should return the correct data if the variable is a base enum', async () => {
     contractNode.nodes = [
       {
         constant: false,
@@ -74,7 +73,6 @@ describe('getStateVariables', () => {
         visibility: 'public',
         name: 'myEnumVariable',
         nodeType: 'VariableDeclaration',
-        storageLocation: 'default',
         typeDescriptions: {
           typeString: 'enum MyEnum',
         },
@@ -101,7 +99,8 @@ describe('getStateVariables', () => {
     };
     expect(baseStateVariable).to.deep.equal(expectedData);
   });
-  it('should return the correct variable data if the variable is a base contract variable', async () => {
+
+  it('should return the correct data if the variable is a base contract', async () => {
     contractNode.nodes = [
       {
         constant: false,
@@ -109,7 +108,6 @@ describe('getStateVariables', () => {
         visibility: 'public',
         name: 'myContractVariable',
         nodeType: 'VariableDeclaration',
-        storageLocation: 'default',
         typeDescriptions: {
           typeString: 'contract MyContract',
         },
@@ -135,5 +133,63 @@ describe('getStateVariables', () => {
       mappingStateVariables: [],
     };
     expect(baseStateVariable).to.deep.equal(expectedData);
+  });
+
+  it('should return the correct data if the variable is a mapping', async () => {
+    contractNode.nodes = [
+      {
+        constant: false,
+        mutability: 'mutable',
+        visibility: 'public',
+        name: 'uint256ToAddressToBytes32',
+        nodeType: 'VariableDeclaration',
+        typeDescriptions: {
+          typeString: 'mapping(uint256 => mapping(address => bytes32))',
+        },
+        typeName: {
+          keyType: {
+            typeDescriptions: {
+              typeString: 'uint256',
+            },
+          },
+          valueType: {
+            typeDescriptions: {
+              typeString: 'mapping(address => bytes32)',
+            },
+            keyType: {
+              typeDescriptions: {
+                typeString: 'address',
+              },
+            },
+            valueType: {
+              typeDescriptions: {
+                typeString: 'bytes32',
+              },
+            },
+          },
+        },
+      },
+    ];
+    const mappingStateVariable = getStateVariables(contractNode);
+    const expectedData: StateVariablesOptions = {
+      basicStateVariables: [],
+      arrayStateVariables: [],
+      mappingStateVariables: [
+        {
+          setFunction: {
+            functionName: 'uint256ToAddressToBytes32',
+            keyTypes: ['uint256', 'address'],
+            valueType: 'bytes32',
+          },
+          mockFunction: {
+            functionName: 'uint256ToAddressToBytes32',
+            keyTypes: ['uint256', 'address'],
+            valueType: 'bytes32',
+          },
+          isInternal: false,
+        },
+      ],
+    };
+    expect(mappingStateVariable).to.deep.equal(expectedData);
   });
 });

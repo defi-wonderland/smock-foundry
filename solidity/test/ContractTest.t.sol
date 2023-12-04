@@ -114,9 +114,10 @@ contract E2EMockContractTest_Set_Mapping_Vars is CommonE2EBase {
     assertEq(_contractTest.bytes32ToBytes(bytes32('4')), bytes('5'));
   }
 
-  // isn't implemented
-  // _contractTest.set_uint256ToAddressToBytes32(1, _owner, bytes32('4'));
-  // assertEq(_contractTest.uint256ToAddressToBytes32(1, _owner), bytes32('4'));
+  function test_Set_Uint256ToAddressToBytes32Mappings() public {
+    _contractTest.set_uint256ToAddressToBytes32(1, _owner, bytes32('4'));
+    assertEq(_contractTest.uint256ToAddressToBytes32(1, _owner), bytes32('4'));
+  }
 
   function test_Set_Uint256ToMyStructMappings() public {
     _contractTest.set_uint256ToMyStruct(1, IContractTest.MyStruct(100, 'hundred'));
@@ -206,9 +207,10 @@ contract E2EMockContractTest_Mock_call_Mapping_Vars is CommonE2EBase {
     assertEq(_contractTest.bytes32ToBytes(bytes32('40')), bytes('50'));
   }
 
-  // isn't implemented
-  // _contractTest.mock_call_uint256ToAddressToBytes32(10, _owner, bytes32('40'));
-  // assertEq(_contractTest.uint256ToAddressToBytes32(10, _owner), bytes32('40'));
+  function test_MockCall_Uint256ToAddressToBytes32Mappings() public {
+    _contractTest.mock_call_uint256ToAddressToBytes32(10, _owner, bytes32('40'));
+    assertEq(_contractTest.uint256ToAddressToBytes32(10, _owner), bytes32('40'));
+  }
 
   function test_MockCall_InternalUint256ToAddressMappings_Fail() public {
     // no mock calls for internal vars

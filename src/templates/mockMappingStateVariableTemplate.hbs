@@ -1,12 +1,12 @@
-function set_{{setFunction.functionName}}({{setFunction.keyType}} _key, {{setFunction.valueType}} _value) public {
-  {{setFunction.mappingName}}[_key] = _value;
+function set_{{setFunction.functionName}}({{#each setFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{setFunction.valueType}} _value) public {
+  {{setFunction.functionName}}{{#each setFunction.keyTypes}}[_key{{@index}}]{{/each}} = _value;
 }
 
 {{#unless isInternal}}
-function mock_call_{{mockFunction.functionName}}({{mockFunction.keyType}} _key, {{mockFunction.valueType}} _value) public {
+function mock_call_{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{mockFunction.valueType}} _value) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{mockFunction.functionName}}({{mockFunction.keyType}})", _key),
+    abi.encodeWithSignature("{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}}{{#unless @last}},{{/unless}}{{/each}})"{{#each mockFunction.keyTypes}}, _key{{@index}}{{/each}}),
     abi.encode(_value)
   );
 }
