@@ -1,9 +1,9 @@
 import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, ExternalFunctionOptions } from './types';
 
 /**
- * Returns the infomration of the external function for the mock contract
+ * Returns the information of the external function for the mock contract
  * @param contractNode The contract node that has all the nodes for the contract
- * @returns The infomration of the external function for the mock contract
+ * @returns The information of the external function for the mock contract
  */
 export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): ExternalFunctionOptions[] => {
   // Filter the nodes and keep only the FunctionDefinition related ones

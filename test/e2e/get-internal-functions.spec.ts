@@ -84,7 +84,7 @@ describe('E2E: getInternalMockFunctions', () => {
     expect(param4?.storageLocation).to.equal('memory');
   });
 
-  it('MockContractD must include overriden internal func', async () => {
+  it('MockContractD must include overridden internal func', async () => {
     const contractNode = contractNodes['MockContractD'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === '_setInternalUintVar',
