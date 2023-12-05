@@ -1,9 +1,9 @@
 {{#if isInterface}}
-function {{functionName}}({{inputString}}) external{{stateMutabilityString}}returns ({{outputString}}) {}
+function {{functionName}}({{inputString}}) external{{stateMutabilityString}}{{#if outputString}}returns ({{outputString}}){{/if}} {}
 
 {{/if}}
 {{#if abstractAndVirtual}}
-function {{functionName}}({{inputString}}) {{visibility}}{{stateMutabilityString}}override returns ({{outputString}}) {}
+function {{functionName}}({{inputString}}) {{visibility}}{{stateMutabilityString}}override {{#if outputString}}returns ({{outputString}}){{/if}} {}
 
 {{/if}}
 function mock_call_{{functionName}}({{arguments}}) public {
