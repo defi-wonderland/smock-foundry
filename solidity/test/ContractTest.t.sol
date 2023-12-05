@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'isolmate/interfaces/tokens/IERC20.sol';
-import {MockContractTest, IContractTest} from 'test/mocks/contracts/MockContractTest.sol';
+import {MockContractTest, IContractTest} from 'test/smock/contracts/MockContractTest.sol';
 import {console} from 'forge-std/console.sol';
-import {SmockHelper} from 'test/mocks/SmockHelper.sol';
+import {SmockHelper} from 'test/smock/SmockHelper.sol';
 
 contract CommonE2EBase is Test, SmockHelper {
   uint256 internal constant _FORK_BLOCK = 15_452_788;
