@@ -99,11 +99,11 @@ contract BaseTest is Test, SmockHelper {
 Then enjoy the wonders of mocking:
 
 ```solidity
-// Mock the `greet` function to return 'Holá' instead of 'Hello'
-greeter.mock_call_greet('Holá');
+// Mock the `greet` function to return 'Hola' instead of 'Hello'
+greeter.mock_call_greet('Hola');
 
 // Or you can achieve the same by setting the internal variable
-greeter.set__greeting('Holá');
+greeter.set__greeting('Hola');
 ```
 
 ### Gotchas
