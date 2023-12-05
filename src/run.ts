@@ -25,7 +25,7 @@ function getProcessArguments() {
       },
       mocks: {
         describe: `Generated contracts directory`,
-        default: './solidity/test/mocks',
+        default: './solidity/test/smock',
         type: 'string',
       },
       ignore: {

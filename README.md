@@ -35,7 +35,7 @@ Option      | Default                           | Notes
 ------------|-----------------------------------|-------
 `contracts` | —                                 | The path to the solidity contracts to mock
 `out`       | `./out`                           | The path that has the compiled artifacts
-`mocks `    | `./solidity/test/mocks`           | The path to the generated mock contracts
+`mocks `    | `./solidity/test/smock`           | The path to the generated mock contracts
 `ignore`    | []                                | A list of directories to ignore, e.g. `--ignore libraries`
 
 ### Using mocks
@@ -75,8 +75,8 @@ The next step would be importing the mock contract in your unit tests, deploying
 ```solidity
 import 'forge-std/Test.sol';
 
-import { MockGreeter } from '/path/to/mocks/contracts/MockGreeter.sol';
-import { SmockHelper } from '/path/to/mocks/SmockHelper.sol';
+import { MockGreeter } from '/path/to/smock/contracts/MockGreeter.sol';
+import { SmockHelper } from '/path/to/smock/SmockHelper.sol';
 
 contract BaseTest is Test, SmockHelper {
   MockGreeter public greeter;
