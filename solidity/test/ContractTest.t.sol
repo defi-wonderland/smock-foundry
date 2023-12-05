@@ -64,7 +64,6 @@ contract E2EMockContractTest_Set_Array_Vars is CommonE2EBase {
     _addressArray[1] = _owner;
 
     _contractTest.set_addressArray(_addressArray);
-
     assertEq(_contractTest.addressArray(0), _user);
     assertEq(_contractTest.addressArray(1), _owner);
   }
@@ -83,6 +82,7 @@ contract E2EMockContractTest_Set_Array_Vars is CommonE2EBase {
     bytes32[] memory _bytes32Array = new bytes32[](2);
     _bytes32Array[0] = bytes32('4');
     _bytes32Array[1] = bytes32('5');
+
     _contractTest.set_bytes32Array(_bytes32Array);
     assertEq(_contractTest.bytes32Array(0), bytes32('4'));
     assertEq(_contractTest.bytes32Array(1), bytes32('5'));
@@ -93,6 +93,7 @@ contract E2EMockContractTest_Set_Array_Vars is CommonE2EBase {
     address[] memory _addressArray = new address[](2);
     _addressArray[0] = _user;
     _addressArray[1] = _owner;
+
     _contractTest.set_internalAddressArray(_addressArray);
     assertEq(_contractTest.getInternalAddressArray(), _addressArray);
   }
@@ -114,16 +115,26 @@ contract E2EMockContractTest_Set_Mapping_Vars is CommonE2EBase {
     assertEq(_contractTest.bytes32ToBytes(bytes32('4')), bytes('5'));
   }
 
-  function test_Set_Uint256ToAddressToBytes32Mappings() public {
-    _contractTest.set_uint256ToAddressToBytes32(1, _owner, bytes32('4'));
-    assertEq(_contractTest.uint256ToAddressToBytes32(1, _owner), bytes32('4'));
-  }
-
   function test_Set_Uint256ToMyStructMappings() public {
     _contractTest.set_uint256ToMyStruct(1, IContractTest.MyStruct(100, 'hundred'));
     (uint256 _value, string memory _name) = _contractTest.uint256ToMyStruct(1);
     assertEq(_value, 100);
     assertEq(_name, 'hundred');
+  }
+
+  function test_Set_Uint256ToAddressArrayMappings() public {
+    address[] memory _addressArray = new address[](2);
+    _addressArray[0] = _user;
+    _addressArray[1] = _owner;
+
+    _contractTest.set_uint256ToAddressArray(1, _addressArray);
+    assertEq(_contractTest.uint256ToAddressArray(1, 0), _user);
+    assertEq(_contractTest.uint256ToAddressArray(1, 1), _owner);
+  }
+
+  function test_Set_Uint256ToAddressToBytes32Mappings() public {
+    _contractTest.set_uint256ToAddressToBytes32(1, _owner, bytes32('4'));
+    assertEq(_contractTest.uint256ToAddressToBytes32(1, _owner), bytes32('4'));
   }
 
   // internal
@@ -205,6 +216,11 @@ contract E2EMockContractTest_Mock_call_Mapping_Vars is CommonE2EBase {
   function test_MockCall_Bytes32ToBytesMappings() public {
     _contractTest.mock_call_bytes32ToBytes(bytes32('40'), bytes('50'));
     assertEq(_contractTest.bytes32ToBytes(bytes32('40')), bytes('50'));
+  }
+
+  function test_MockCall_Uint256ToAddressArrayMappings() public {
+    _contractTest.mock_call_uint256ToAddressArray(10, 0, _user);
+    assertEq(_contractTest.uint256ToAddressArray(10, 0), _user);
   }
 
   function test_MockCall_Uint256ToAddressToBytes32Mappings() public {

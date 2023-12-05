@@ -104,8 +104,10 @@ export interface MappingStateVariableOptions {
     functionName: string;
     keyTypes: string[];
     valueType: string;
+    baseType: string;
   };
   isInternal: boolean;
+  isArray: boolean;
 }
 
 export interface ArrayStateVariableOptions {

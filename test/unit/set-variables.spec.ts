@@ -141,6 +141,111 @@ describe('getStateVariables', () => {
         constant: false,
         mutability: 'mutable',
         visibility: 'public',
+        name: 'uint256ToAddress',
+        nodeType: 'VariableDeclaration',
+        typeDescriptions: {
+          typeString: 'mapping(uint256 => address)',
+        },
+        typeName: {
+          keyType: {
+            typeDescriptions: {
+              typeString: 'uint256',
+            },
+          },
+          valueType: {
+            typeDescriptions: {
+              typeString: 'address',
+            },
+          },
+        },
+      },
+    ];
+    const mappingStateVariable = getStateVariables(contractNode);
+    const expectedData: StateVariablesOptions = {
+      basicStateVariables: [],
+      arrayStateVariables: [],
+      mappingStateVariables: [
+        {
+          setFunction: {
+            functionName: 'uint256ToAddress',
+            keyTypes: ['uint256'],
+            valueType: 'address',
+          },
+          mockFunction: {
+            functionName: 'uint256ToAddress',
+            keyTypes: ['uint256'],
+            valueType: 'address',
+            baseType: 'address',
+          },
+          isInternal: false,
+          isArray: false,
+        },
+      ],
+    };
+    expect(mappingStateVariable).to.deep.equal(expectedData);
+  });
+
+  it('should return the correct data if the variable is an array mapping', async () => {
+    contractNode.nodes = [
+      {
+        constant: false,
+        mutability: 'mutable',
+        visibility: 'public',
+        name: 'uint256ToAddressArray',
+        nodeType: 'VariableDeclaration',
+        typeDescriptions: {
+          typeString: 'mapping(uint256 => address[])',
+        },
+        typeName: {
+          keyType: {
+            typeDescriptions: {
+              typeString: 'uint256',
+            },
+          },
+          valueType: {
+            typeDescriptions: {
+              typeString: 'address[]',
+            },
+            baseType: {
+              typeDescriptions: {
+                typeString: 'address',
+              },
+            },
+          },
+        },
+      },
+    ];
+    const mappingStateVariable = getStateVariables(contractNode);
+    const expectedData: StateVariablesOptions = {
+      basicStateVariables: [],
+      arrayStateVariables: [],
+      mappingStateVariables: [
+        {
+          setFunction: {
+            functionName: 'uint256ToAddressArray',
+            keyTypes: ['uint256'],
+            valueType: 'address[] memory',
+          },
+          mockFunction: {
+            functionName: 'uint256ToAddressArray',
+            keyTypes: ['uint256'],
+            valueType: 'address[] memory',
+            baseType: 'address',
+          },
+          isInternal: false,
+          isArray: true,
+        },
+      ],
+    };
+    expect(mappingStateVariable).to.deep.equal(expectedData);
+  });
+
+  it('should return the correct data if the variable is a nested mapping', async () => {
+    contractNode.nodes = [
+      {
+        constant: false,
+        mutability: 'mutable',
+        visibility: 'public',
         name: 'uint256ToAddressToBytes32',
         nodeType: 'VariableDeclaration',
         typeDescriptions: {
@@ -185,8 +290,10 @@ describe('getStateVariables', () => {
             functionName: 'uint256ToAddressToBytes32',
             keyTypes: ['uint256', 'address'],
             valueType: 'bytes32',
+            baseType: 'bytes32',
           },
           isInternal: false,
+          isArray: false,
         },
       ],
     };
