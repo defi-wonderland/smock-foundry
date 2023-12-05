@@ -9,4 +9,8 @@ contract ContractB is IContractB {
     stringVariable = _stringVariable;
     _result = true;
   }
+
+  function _internalNoReturn() internal {
+    stringVariable = 'internalNoReturn';
+  }
 }

@@ -13,4 +13,5 @@ abstract contract ContractAbstract {
   }
 
   function undefinedFunc(string memory _someText) public virtual returns (bool _result);
+  function undefinedFuncNoReturn(string memory _someText) public virtual;
 }
