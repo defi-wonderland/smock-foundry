@@ -1,9 +1,9 @@
 import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, InternalFunctionOptions } from './types';
 
 /**
- * Returns the infomration of the internal function for the mock contract
+ * Returns the information of the internal function for the mock contract
  * @param contractNode The contract node that has all the nodes for the contract
- * @returns The infomration of the internal function for the mock contract
+ * @returns The information of the internal function for the mock contract
  */
 export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): InternalFunctionOptions[] => {
   // Filter the nodes and keep only the FunctionDefinition related ones
