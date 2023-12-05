@@ -17,12 +17,10 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json && node copy-templates.js",
-    "postinstall": "husky install",
     "lint:check": "yarn lint:ts-logic && forge fmt check",
     "lint:fix": "sort-package-json && forge fmt && yarn lint:ts-logic --fix",
     "lint:ts-logic": "eslint ./src/**/*.ts",
     "mock-gen": "ts-node src/run.ts mock-gen",
-    "prepare": "husky install",
     "release": "yarn build && yarn changeset publish",
     "test": "forge build --skip test && cross-env mocha 'test/**/*.spec.ts' && forge test",
     "test:mocha": "cross-env mocha 'test/**/*.spec.ts'"
