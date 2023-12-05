@@ -3,10 +3,10 @@ function set_{{setFunction.functionName}}({{#each setFunction.keyTypes}}{{this}}
 }
 
 {{#unless isInternal}}
-function mock_call_{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{mockFunction.valueType}} _value) public {
+function mock_call_{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{#if isArray}}uint256 _index, {{mockFunction.baseType}}{{else}}{{mockFunction.valueType}}{{/if}} _value) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}}{{#unless @last}},{{/unless}}{{/each}})"{{#each mockFunction.keyTypes}}, _key{{@index}}{{/each}}),
+    abi.encodeWithSignature("{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}}{{#unless @last}},{{/unless}}{{/each}}{{#if isArray}},uint256{{/if}})"{{#each mockFunction.keyTypes}}, _key{{@index}}{{/each}}{{#if isArray}}, _index{{/if}}),
     abi.encode(_value)
   );
 }

@@ -32,8 +32,9 @@ interface IContractTest {
   function uint256ToAddress(uint256) external view returns (address);
   function addressToUint(address) external view returns (uint256);
   function bytes32ToBytes(bytes32) external view returns (bytes memory);
-  function uint256ToAddressToBytes32(uint256, address) external view returns (bytes32);
   function uint256ToMyStruct(uint256) external view returns (uint256, string memory);
+  function uint256ToAddressArray(uint256, uint256) external view returns (address);
+  function uint256ToAddressToBytes32(uint256, address) external view returns (bytes32);
   function immutableUintVariable() external view returns (uint256);
   // Logic
   function setVariables(
