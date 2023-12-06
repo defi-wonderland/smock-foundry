@@ -113,12 +113,12 @@ export interface MappingStateVariableOptions {
 export interface ArrayStateVariableOptions {
   setFunction: {
     functionName: string;
-    paramType: string;
+    arrayType: string;
     paramName: string;
   };
   mockFunction: {
     functionName: string;
-    paramType: string;
+    arrayType: string;
     baseType: string;
   };
   isInternal: boolean;

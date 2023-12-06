@@ -135,6 +135,94 @@ describe('getStateVariables', () => {
     expect(baseStateVariable).to.deep.equal(expectedData);
   });
 
+  it('should return the correct data if the variable is an array', async () => {
+    contractNode.nodes = [
+      {
+        constant: false,
+        mutability: 'mutable',
+        visibility: 'public',
+        name: 'addressArray',
+        nodeType: 'VariableDeclaration',
+        typeDescriptions: {
+          typeString: 'address[]',
+        },
+        typeName: {
+          baseType: {
+            typeDescriptions: {
+              typeString: 'address',
+            },
+          },
+        },
+      },
+    ];
+    const arrayStateVariable = getStateVariables(contractNode);
+    const expectedData: StateVariablesOptions = {
+      basicStateVariables: [],
+      arrayStateVariables: [
+        {
+          setFunction: {
+            functionName: 'addressArray',
+            arrayType: 'address[] memory',
+            paramName: 'addressArray',
+          },
+          mockFunction: {
+            functionName: 'addressArray',
+            arrayType: 'address[] memory',
+            baseType: 'address',
+          },
+          isInternal: false,
+          isStruct: false,
+        },
+      ],
+      mappingStateVariables: [],
+    };
+    expect(arrayStateVariable).to.deep.equal(expectedData);
+  });
+
+  it('should return the correct data if the variable is a struct array', async () => {
+    contractNode.nodes = [
+      {
+        constant: false,
+        mutability: 'mutable',
+        visibility: 'public',
+        name: 'myStructArray',
+        nodeType: 'VariableDeclaration',
+        typeDescriptions: {
+          typeString: 'struct MyStruct[]',
+        },
+        typeName: {
+          baseType: {
+            typeDescriptions: {
+              typeString: 'struct MyStruct',
+            },
+          },
+        },
+      },
+    ];
+    const arrayStateVariable = getStateVariables(contractNode);
+    const expectedData: StateVariablesOptions = {
+      basicStateVariables: [],
+      arrayStateVariables: [
+        {
+          setFunction: {
+            functionName: 'myStructArray',
+            arrayType: 'MyStruct[] memory',
+            paramName: 'myStructArray',
+          },
+          mockFunction: {
+            functionName: 'myStructArray',
+            arrayType: 'MyStruct[] memory',
+            baseType: 'MyStruct memory',
+          },
+          isInternal: false,
+          isStruct: true,
+        },
+      ],
+      mappingStateVariables: [],
+    };
+    expect(arrayStateVariable).to.deep.equal(expectedData);
+  });
+
   it('should return the correct data if the variable is a mapping', async () => {
     contractNode.nodes = [
       {
