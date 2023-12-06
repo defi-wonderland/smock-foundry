@@ -108,17 +108,18 @@ export interface MappingStateVariableOptions {
   };
   isInternal: boolean;
   isArray: boolean;
+  isStructArray: boolean;
 }
 
 export interface ArrayStateVariableOptions {
   setFunction: {
     functionName: string;
-    paramType: string;
+    arrayType: string;
     paramName: string;
   };
   mockFunction: {
     functionName: string;
-    paramType: string;
+    arrayType: string;
     baseType: string;
   };
   isInternal: boolean;

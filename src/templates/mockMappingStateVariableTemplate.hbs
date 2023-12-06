@@ -1,5 +1,11 @@
 function set_{{setFunction.functionName}}({{#each setFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{setFunction.valueType}} _value) public {
+  {{#if isStructArray}}
+  for (uint256 _i; _i < _value.length; ++_i) {
+    {{setFunction.functionName}}{{#each setFunction.keyTypes}}[_key{{@index}}]{{/each}}.push(_value[_i]);
+  }
+  {{else}}
   {{setFunction.functionName}}{{#each setFunction.keyTypes}}[_key{{@index}}]{{/each}} = _value;
+  {{/if}}
 }
 
 {{#unless isInternal}}

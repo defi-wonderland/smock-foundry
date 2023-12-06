@@ -45,6 +45,8 @@ contract ContractTest is IContractTest {
   /// @inheritdoc IContractTest
   mapping(uint256 => address[]) public uint256ToAddressArray;
   /// @inheritdoc IContractTest
+  mapping(uint256 => MyStruct[]) public uint256ToMyStructArray;
+  /// @inheritdoc IContractTest
   mapping(uint256 => mapping(address => bytes32)) public uint256ToAddressToBytes32;
 
   /// Constructor

@@ -64,14 +64,14 @@ function getArrayFunction(arrayNode: VariableDeclarationNode): ArrayStateVariabl
   // Name of the array
   const arrayName: string = arrayNode.name;
 
-  // compile param type
-  const paramType: string = typeFix(arrayNode.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+  // Array type
+  const arrayType: string = typeFix(arrayNode.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
 
-  // struct flag
-  const isStruct: boolean = arrayNode.typeName.baseType.typeDescriptions.typeString.includes('struct ');
-
-  // compile base type
+  // Base type
   const baseType: string = typeFix(arrayNode.typeName.baseType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+
+  // Struct flag
+  const isStruct: boolean = arrayNode.typeDescriptions.typeString.includes('struct ');
 
   // If the array is internal we don't create mockCall for it
   const isInternal: boolean = arrayNode.visibility == 'internal';
@@ -79,12 +79,12 @@ function getArrayFunction(arrayNode: VariableDeclarationNode): ArrayStateVariabl
   const arrayStateVariableFunctions: ArrayStateVariableOptions = {
     setFunction: {
       functionName: arrayName,
-      paramType: paramType,
+      arrayType: arrayType,
       paramName: arrayName,
     },
     mockFunction: {
       functionName: arrayName,
-      paramType: paramType,
+      arrayType: arrayType,
       baseType: baseType,
     },
     isInternal: isInternal,
@@ -126,6 +126,9 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
   // Base type
   const baseType: string = isArray ? typeFix(mappingTypeNameNode.baseType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '') : valueType;
 
+  // Struct array flag
+  const isStructArray: boolean = isArray && mappingTypeNameNode.typeDescriptions.typeString.includes('struct ');
+
   // If the mapping is internal we don't create mockCall for it
   const isInternal: boolean = mappingNode.visibility == 'internal';
 
@@ -143,8 +146,10 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
     },
     isInternal: isInternal,
     isArray: isArray,
+    isStructArray: isStructArray,
   };
 
+  // Return the mapping function
   return mappingStateVariableFunction;
 }
 
