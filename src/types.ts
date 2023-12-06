@@ -108,6 +108,7 @@ export interface MappingStateVariableOptions {
   };
   isInternal: boolean;
   isArray: boolean;
+  isStructArray: boolean;
 }
 
 export interface ArrayStateVariableOptions {

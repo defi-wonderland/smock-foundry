@@ -126,6 +126,9 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
   // Base type
   const baseType: string = isArray ? typeFix(mappingTypeNameNode.baseType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '') : valueType;
 
+  // Struct array flag
+  const isStructArray: boolean = isArray && mappingTypeNameNode.typeDescriptions.typeString.includes('struct ');
+
   // If the mapping is internal we don't create mockCall for it
   const isInternal: boolean = mappingNode.visibility == 'internal';
 
@@ -143,6 +146,7 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
     },
     isInternal: isInternal,
     isArray: isArray,
+    isStructArray: isStructArray,
   };
 
   // Return the mapping function

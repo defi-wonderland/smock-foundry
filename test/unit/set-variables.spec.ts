@@ -267,6 +267,7 @@ describe('getStateVariables', () => {
           },
           isInternal: false,
           isArray: false,
+          isStructArray: false,
         },
       ],
     };
@@ -322,6 +323,63 @@ describe('getStateVariables', () => {
           },
           isInternal: false,
           isArray: true,
+          isStructArray: false,
+        },
+      ],
+    };
+    expect(mappingStateVariable).to.deep.equal(expectedData);
+  });
+
+  it('should return the correct data if the variable is a struct array mapping', async () => {
+    contractNode.nodes = [
+      {
+        constant: false,
+        mutability: 'mutable',
+        visibility: 'public',
+        name: 'uint256ToMyStructArray',
+        nodeType: 'VariableDeclaration',
+        typeDescriptions: {
+          typeString: 'mapping(uint256 => struct MyStruct[])',
+        },
+        typeName: {
+          keyType: {
+            typeDescriptions: {
+              typeString: 'uint256',
+            },
+          },
+          valueType: {
+            typeDescriptions: {
+              typeString: 'struct MyStruct[]',
+            },
+            baseType: {
+              typeDescriptions: {
+                typeString: 'struct MyStruct',
+              },
+            },
+          },
+        },
+      },
+    ];
+    const mappingStateVariable = getStateVariables(contractNode);
+    const expectedData: StateVariablesOptions = {
+      basicStateVariables: [],
+      arrayStateVariables: [],
+      mappingStateVariables: [
+        {
+          setFunction: {
+            functionName: 'uint256ToMyStructArray',
+            keyTypes: ['uint256'],
+            valueType: 'MyStruct[] memory',
+          },
+          mockFunction: {
+            functionName: 'uint256ToMyStructArray',
+            keyTypes: ['uint256'],
+            valueType: 'MyStruct[] memory',
+            baseType: 'MyStruct memory',
+          },
+          isInternal: false,
+          isArray: true,
+          isStructArray: true,
         },
       ],
     };
@@ -382,6 +440,7 @@ describe('getStateVariables', () => {
           },
           isInternal: false,
           isArray: false,
+          isStructArray: false,
         },
       ],
     };
