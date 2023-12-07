@@ -1,6 +1,6 @@
 {
   "name": "@defi-wonderland/smock-foundry",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Smock-style mocks for Foundry projects",
   "homepage": "https://github.com/defi-wonderland/smock-foundry#readme",
   "repository": {
