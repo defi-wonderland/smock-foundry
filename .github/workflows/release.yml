@@ -1,35 +1,28 @@
 name: Release
 
-on:
-  push:
-    branches:
-      - dev
-
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+on: workflow_dispatch
 
 jobs:
   release:
-    # We want the release to run from the public repo
-    if: github.repository == 'defi-wonderland/smock-foundry'
     name: Release
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Setup Node.js 16.x
+      - name: Install Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          cache: 'yarn'
 
       - name: Install Dependencies
-        run: yarn
+        run: yarn --frozen-lockfile --network-concurrency 1
 
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: yarn release
+      - name: Build
+        run: yarn build
+
+      - name: Publish
+        run: npm publish --access public
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
