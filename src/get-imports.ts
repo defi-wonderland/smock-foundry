@@ -1,9 +1,9 @@
 import { Ast, ImportDirectiveNode } from './types';
 
 /**
- * Returns an array with all the import signautres of the contract
+ * Returns an array with all the import signatures of the contract
  * @param ast The ast of the contract from foundry's compiled artifacts
- * @returns An array with all the import signautres of the contract
+ * @returns An array with all the import signatures of the contract
  */
 export const getImports = (ast: Ast): string[] => {
   // Filter the nodes and keep only the ImportDirective related ones

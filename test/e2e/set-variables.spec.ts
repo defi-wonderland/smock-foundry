@@ -9,7 +9,7 @@ describe('E2E: getStateVariables', () => {
     // generate mock contracts
     const contractsDir = ['solidity/contracts', 'solidity/interfaces'];
     const compiledArtifactsDir = 'out';
-    const generatedContractsDir = 'solidity/test/mocks';
+    const generatedContractsDir = 'solidity/test/smock';
     const ignoreDir = [];
     await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir, ignoreDir);
 
@@ -51,6 +51,15 @@ describe('E2E: getStateVariables', () => {
     const contractNode = contractNodes['MockContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_uint256ToMyStruct',
+    ) as FunctionDefinitionNode;
+    expect(func).to.not.be.undefined;
+    expect(func.visibility).to.equal('public');
+  });
+
+  it('must include setters for struct array mappings', async () => {
+    const contractNode = contractNodes['MockContractTest'];
+    const func = contractNode.nodes.find(
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_uint256ToMyStructArray',
     ) as FunctionDefinitionNode;
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('public');

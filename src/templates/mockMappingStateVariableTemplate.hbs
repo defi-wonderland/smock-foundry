@@ -1,12 +1,18 @@
 function set_{{setFunction.functionName}}({{#each setFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{setFunction.valueType}} _value) public {
+  {{#if isStructArray}}
+  for (uint256 _i; _i < _value.length; ++_i) {
+    {{setFunction.functionName}}{{#each setFunction.keyTypes}}[_key{{@index}}]{{/each}}.push(_value[_i]);
+  }
+  {{else}}
   {{setFunction.functionName}}{{#each setFunction.keyTypes}}[_key{{@index}}]{{/each}} = _value;
+  {{/if}}
 }
 
 {{#unless isInternal}}
-function mock_call_{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{mockFunction.valueType}} _value) public {
+function mock_call_{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}} _key{{@index}}, {{/each}}{{#if isArray}}uint256 _index, {{mockFunction.baseType}}{{else}}{{mockFunction.valueType}}{{/if}} _value) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}}{{#unless @last}},{{/unless}}{{/each}})"{{#each mockFunction.keyTypes}}, _key{{@index}}{{/each}}),
+    abi.encodeWithSignature("{{mockFunction.functionName}}({{#each mockFunction.keyTypes}}{{this}}{{#unless @last}},{{/unless}}{{/each}}{{#if isArray}},uint256{{/if}})"{{#each mockFunction.keyTypes}}, _key{{@index}}{{/each}}{{#if isArray}}, _index{{/if}}),
     abi.encode(_value)
   );
 }

@@ -1,12 +1,10 @@
-function set_{{setFunction.functionName}}({{setFunction.paramType}} _{{setFunction.paramName}}) public {
+function set_{{setFunction.functionName}}({{setFunction.arrayType}} _{{setFunction.paramName}}) public {
   {{#if isStruct}}
-  uint256 _i;
-  for (; _i < {{setFunction.paramName}}.length;) {
-    {{setFunction.paramName}}[_i] = _{{setFunction.paramName}}[_i];
-    _i++;
+  for (uint256 _i; _i < _{{setFunction.paramName}}.length; ++_i) {
+    {{setFunction.functionName}}.push(_{{setFunction.paramName}}[_i]);
   }
   {{else}}
-  {{setFunction.paramName}} = _{{setFunction.paramName}};
+  {{setFunction.functionName}} = _{{setFunction.paramName}};
   {{/if}}
 }
 

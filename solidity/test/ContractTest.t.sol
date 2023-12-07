@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'isolmate/interfaces/tokens/IERC20.sol';
-import {MockContractTest, IContractTest} from 'test/mocks/contracts/MockContractTest.sol';
+import {MockContractTest, IContractTest} from 'test/smock/contracts/MockContractTest.sol';
 import {console} from 'forge-std/console.sol';
-import {SmockHelper} from 'test/mocks/SmockHelper.sol';
+import {SmockHelper} from 'test/smock/SmockHelper.sol';
 
 contract CommonE2EBase is Test, SmockHelper {
   uint256 internal constant _FORK_BLOCK = 15_452_788;
@@ -50,6 +50,13 @@ contract E2EMockContractTest_Set_Simple_Vars is CommonE2EBase {
     assertEq(_contractTest.bytes32Variable(), bytes32('4'));
   }
 
+  function test_Set_MyStructVar() public {
+    _contractTest.set_myStructVariable(IContractTest.MyStruct(10, 'ten'));
+    (uint256 _value, string memory _name) = _contractTest.myStructVariable();
+    assertEq(_value, 10);
+    assertEq(_name, 'ten');
+  }
+
   // internal
   function test_Set_InternalUintVar() public {
     _contractTest.set_internalUint256(1);
@@ -64,7 +71,6 @@ contract E2EMockContractTest_Set_Array_Vars is CommonE2EBase {
     _addressArray[1] = _owner;
 
     _contractTest.set_addressArray(_addressArray);
-
     assertEq(_contractTest.addressArray(0), _user);
     assertEq(_contractTest.addressArray(1), _owner);
   }
@@ -79,13 +85,28 @@ contract E2EMockContractTest_Set_Array_Vars is CommonE2EBase {
     assertEq(_contractTest.uint256Array(1), 2);
   }
 
-  function test_Set_BytesArray() public {
+  function test_Set_Bytes32Array() public {
     bytes32[] memory _bytes32Array = new bytes32[](2);
     _bytes32Array[0] = bytes32('4');
     _bytes32Array[1] = bytes32('5');
+
     _contractTest.set_bytes32Array(_bytes32Array);
     assertEq(_contractTest.bytes32Array(0), bytes32('4'));
     assertEq(_contractTest.bytes32Array(1), bytes32('5'));
+  }
+
+  function test_Set_MyStructArray() public {
+    IContractTest.MyStruct[] memory _myStructArray = new IContractTest.MyStruct[](2);
+    _myStructArray[0] = IContractTest.MyStruct(10, 'ten');
+    _myStructArray[1] = IContractTest.MyStruct(20, 'twenty');
+
+    _contractTest.set_myStructArray(_myStructArray);
+    (uint256 _value, string memory _name) = _contractTest.myStructArray(0);
+    assertEq(_value, 10);
+    assertEq(_name, 'ten');
+    (_value, _name) = _contractTest.myStructArray(1);
+    assertEq(_value, 20);
+    assertEq(_name, 'twenty');
   }
 
   // internal
@@ -93,6 +114,7 @@ contract E2EMockContractTest_Set_Array_Vars is CommonE2EBase {
     address[] memory _addressArray = new address[](2);
     _addressArray[0] = _user;
     _addressArray[1] = _owner;
+
     _contractTest.set_internalAddressArray(_addressArray);
     assertEq(_contractTest.getInternalAddressArray(), _addressArray);
   }
@@ -114,16 +136,40 @@ contract E2EMockContractTest_Set_Mapping_Vars is CommonE2EBase {
     assertEq(_contractTest.bytes32ToBytes(bytes32('4')), bytes('5'));
   }
 
+  function test_Set_Uint256ToMyStructMappings() public {
+    _contractTest.set_uint256ToMyStruct(1, IContractTest.MyStruct(10, 'ten'));
+    (uint256 _value, string memory _name) = _contractTest.uint256ToMyStruct(1);
+    assertEq(_value, 10);
+    assertEq(_name, 'ten');
+  }
+
+  function test_Set_Uint256ToAddressArrayMappings() public {
+    address[] memory _addressArray = new address[](2);
+    _addressArray[0] = _user;
+    _addressArray[1] = _owner;
+
+    _contractTest.set_uint256ToAddressArray(1, _addressArray);
+    assertEq(_contractTest.uint256ToAddressArray(1, 0), _user);
+    assertEq(_contractTest.uint256ToAddressArray(1, 1), _owner);
+  }
+
+  function test_Set_Uint256ToMyStructArray() public {
+    IContractTest.MyStruct[] memory _myStructArray = new IContractTest.MyStruct[](2);
+    _myStructArray[0] = IContractTest.MyStruct(10, 'ten');
+    _myStructArray[1] = IContractTest.MyStruct(20, 'twenty');
+
+    _contractTest.set_uint256ToMyStructArray(1, _myStructArray);
+    (uint256 _value, string memory _name) = _contractTest.uint256ToMyStructArray(1, 0);
+    assertEq(_value, 10);
+    assertEq(_name, 'ten');
+    (_value, _name) = _contractTest.uint256ToMyStructArray(1, 1);
+    assertEq(_value, 20);
+    assertEq(_name, 'twenty');
+  }
+
   function test_Set_Uint256ToAddressToBytes32Mappings() public {
     _contractTest.set_uint256ToAddressToBytes32(1, _owner, bytes32('4'));
     assertEq(_contractTest.uint256ToAddressToBytes32(1, _owner), bytes32('4'));
-  }
-
-  function test_Set_Uint256ToMyStructMappings() public {
-    _contractTest.set_uint256ToMyStruct(1, IContractTest.MyStruct(100, 'hundred'));
-    (uint256 _value, string memory _name) = _contractTest.uint256ToMyStruct(1);
-    assertEq(_value, 100);
-    assertEq(_name, 'hundred');
   }
 
   // internal
@@ -159,6 +205,13 @@ contract E2EMockContractTest_Mock_call_Simple_Vars is CommonE2EBase {
     assertEq(_contractTest.bytes32Variable(), bytes32('40'));
   }
 
+  // function test_MockCall_MyStructVar() public {
+  //   _contractTest.mock_call_myStructVariable(IContractTest.MyStruct(100, 'hundred'));
+  //   (uint256 _value, string memory _name) = _contractTest.myStructVariable();
+  //   assertEq(_value, 100);
+  //   assertEq(_name, 'hundred');
+  // }
+
   function test_MockCall_InternalUintVar_Fail() public {
     // no mock calls for internal vars
     (bool _success,) =
@@ -178,10 +231,17 @@ contract E2EMockContractTest_Mock_call_Array_Vars is CommonE2EBase {
     assertEq(_contractTest.uint256Array(0), 10);
   }
 
-  function test_MockCall_BytesArray() public {
+  function test_MockCall_Bytes32Array() public {
     _contractTest.mock_call_bytes32Array(0, bytes32('40'));
     assertEq(_contractTest.bytes32Array(0), bytes32('40'));
   }
+
+  // function test_MockCall_MyStructArray() public {
+  //   _contractTest.mock_call_myStructArray(0, IContractTest.MyStruct(100, 'hundred'));
+  //   (uint256 _value, string memory _name) = _contractTest.myStructArray(0);
+  //   assertEq(_value, 100);
+  //   assertEq(_name, 'hundred');
+  // }
 
   function test_MockCall_InternalAddressArray_Fail() public {
     // no mock calls for internal vars
@@ -206,6 +266,25 @@ contract E2EMockContractTest_Mock_call_Mapping_Vars is CommonE2EBase {
     _contractTest.mock_call_bytes32ToBytes(bytes32('40'), bytes('50'));
     assertEq(_contractTest.bytes32ToBytes(bytes32('40')), bytes('50'));
   }
+
+  // function test_MockCall_Uint256ToMyStructMappings() public {
+  //   _contractTest.mock_call_uint256ToMyStruct(10, IContractTest.MyStruct(100, 'hundred'));
+  //   (uint256 _value, string memory _name) = _contractTest.uint256ToMyStruct(10);
+  //   assertEq(_value, 100);
+  //   assertEq(_name, 'hundred');
+  // }
+
+  function test_MockCall_Uint256ToAddressArrayMappings() public {
+    _contractTest.mock_call_uint256ToAddressArray(10, 0, _user);
+    assertEq(_contractTest.uint256ToAddressArray(10, 0), _user);
+  }
+
+  // function test_MockCall_Uint256ToMyStructArrayMappings() public {
+  //   _contractTest.mock_call_uint256ToMyStructArray(10, 0, IContractTest.MyStruct(100, 'hundred'));
+  //   (uint256 _value, string memory _name) = _contractTest.uint256ToMyStructArray(10, 0);
+  //   assertEq(_value, 100);
+  //   assertEq(_name, 'hundred');
+  // }
 
   function test_MockCall_Uint256ToAddressToBytes32Mappings() public {
     _contractTest.mock_call_uint256ToAddressToBytes32(10, _owner, bytes32('40'));
@@ -242,7 +321,7 @@ contract E2EMockContractTest_Mock_call_External_Func is CommonE2EBase {
 }
 
 contract E2EMockContractTest_Mock_call_Internal_Func is CommonE2EBase {
-  function test_MockCallI_internalVirtualFunction() public {
+  function test_MockCall_InternalVirtualFunction() public {
     _contractTest.mock_call_internalVirtualFunction(10, false, 12, 'TEST');
     (bool _res1, uint256 _res2, string memory _res3) = _contractTest.callInternalVirtualFunction(10);
     assertEq(_res1, false);

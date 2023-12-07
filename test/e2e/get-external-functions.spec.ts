@@ -12,7 +12,7 @@ describe('E2E: getExternalMockFunctions', () => {
     // generate mock contracts
     const contractsDir = ['solidity/contracts', 'solidity/interfaces'];
     const compiledArtifactsDir = 'out';
-    const generatedContractsDir = 'solidity/test/mocks';
+    const generatedContractsDir = 'solidity/test/smock';
     const ignoreDir = [];
     await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir, ignoreDir);
 
