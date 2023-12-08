@@ -107,6 +107,17 @@ contract ContractTest is IContractTest {
     _string = 'test';
   }
 
+  function internalViewVirtualFunction(uint256 _newValue)
+    internal
+    view
+    virtual
+    returns (bool _result, uint256 _value, string memory _string)
+  {
+    _result = true;
+    _value = 1;
+    _string = 'test';
+  }
+
   function internalNonVirtualFunction(
     uint256 _newValue,
     bool
@@ -142,5 +153,13 @@ contract ContractTest is IContractTest {
     returns (bool _result, uint256 _value, string memory _string)
   {
     (_result, _value, _string) = internalVirtualFunction(_newValue);
+  }
+
+  function callInternalViewVirtualFunction(uint256 _newValue)
+    public
+    view
+    returns (bool _result, uint256 _value, string memory _string)
+  {
+    (_result, _value, _string) = internalViewVirtualFunction(_newValue);
   }
 }
