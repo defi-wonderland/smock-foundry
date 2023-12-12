@@ -148,13 +148,15 @@ export interface ExternalFunctionOptions {
 
 export interface InternalFunctionOptions {
   functionName: string;
-  arguments: string;
   signature: string;
-  inputsStringNames: string;
-  outputsStringNames: string;
-  outputsTypesString: string;
-  inputsString: string;
-  outputsString: string;
+  parameters: string;
+  inputs: string;
+  outputs: string;
+  inputTypes: string[];
+  outputTypes: string[];
+  inputNames: string[];
+  outputNames: string[];
+  isView: boolean;
 }
 
 export const memoryTypes = ['string', 'bytes', 'mapping'];
