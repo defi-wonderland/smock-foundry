@@ -1,13 +1,46 @@
-function mock_call_{{functionName}}({{arguments}}) public {
-  vm.mockCall(
-    address(this),
-    abi.encodeWithSignature("{{signature}}", {{inputsStringNames}}),
-    abi.encode({{outputsStringNames}})
-  );
+{{#if isView}}
+struct {{functionName}}Output {
+  {{#each outputTypes}}
+  {{this}} {{lookup ../outputNames @index}};
+  {{/each}}
 }
 
-function {{functionName}}({{inputsString}}) internal override {{#if outputsString}}returns ({{outputsString}}){{/if}} {
-    (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature("{{signature}}", {{inputsStringNames}}));
-    ({{outputsStringNames}}) = _success ? abi.decode(_data, ({{outputsTypesString}})) : super.{{functionName}}({{inputsStringNames}});
+mapping(bytes32 => {{functionName}}Output) private {{functionName}}Outputs;
+bytes32[] private {{functionName}}InputHashes;
+{{/if}}
+
+function mock_call_{{functionName}}({{parameters}}) public {
+  {{#if isView}}
+  bytes32 _key = keccak256(abi.encode({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}));
+  {{functionName}}Outputs[_key] = {{functionName}}Output({{#each outputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
+  for (uint256 _i; _i < {{functionName}}InputHashes.length; ++_i) {
+    if (_key == {{functionName}}InputHashes[_i]) {
+      return;
+    }
+  }
+  {{functionName}}InputHashes.push(_key);
+  {{else}}
+  vm.mockCall(
+    address(this),
+    abi.encodeWithSignature("{{signature}}", {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}),
+    abi.encode({{#each outputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}})
+  );
+  {{/if}}
+}
+
+function {{functionName}}({{inputs}}) internal {{#if isView}}view {{/if}}override {{#if outputs}}returns ({{outputs}}){{/if}} {
+  {{#if isView}}
+  bytes32 _key = keccak256(abi.encode({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}));
+  for (uint256 _i; _i < {{functionName}}InputHashes.length; ++_i) {
+    if (_key == {{functionName}}InputHashes[_i]) {
+      {{functionName}}Output memory _output = {{functionName}}Outputs[_key];
+      return ({{#each outputNames}}_output.{{this}}{{#unless @last}}, {{/unless}}{{/each}});
+    }
+  }
+  return super.{{functionName}}({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
+  {{else}}
+  (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature("{{signature}}", {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}));
+  ({{#each outputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}) = _success ? abi.decode(_data, ({{#each outputTypes}}{{this}}{{#unless @last}}, {{/unless}}{{/each}})) : super.{{functionName}}({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
+  {{/if}}
 }
 {{nl}}

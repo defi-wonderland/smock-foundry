@@ -17,92 +17,92 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
     // Check if the function is internal virtual
     if (funcNode.visibility != 'internal' || !funcNode.virtual) return;
 
+    // Check if the function is view
+    const isView = funcNode.stateMutability === 'view';
+
     // Get the parameters of the function, if there are no parameters then we use an empty array
     const parameters: VariableDeclarationNode[] = funcNode.parameters.parameters ? funcNode.parameters.parameters : [];
 
     // We save the parameters in an array with their types and storage location
     const functionParameters: string[] = [];
-    // We save the parameters names in an other array
-    const parameterNames: string[] = [];
     // We save the types in an array to use them in order to create the signature
     const parameterTypes: string[] = [];
+    // We save the parameters names in another array
+    const parameterNames: string[] = [];
+    
     let parameterIndex = 0;
     parameters.forEach((parameter: VariableDeclarationNode) => {
+      // We remove the 'contract ' string from the type name if it exists
+      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
+      const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
+
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
         parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
-
-      // We remove the 'contract ' string from the type name if it exists
-      // We remove '[]' at the end of array types
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
-
-      const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
-      parameterTypes.push(typeName);
       functionParameters.push(parameterString);
+      parameterTypes.push(typeName);
       parameterNames.push(paramName);
       parameterIndex++;
     });
 
     const signature = parameterTypes ? `${funcNode.name}(${parameterTypes.join(',')})` : `${funcNode.name}()`;
 
+    // Get the return parameters of the function, if there are no return parameters then we use an empty array
     const returnParameters: VariableDeclarationNode[] = funcNode.returnParameters.parameters ? funcNode.returnParameters.parameters : [];
 
     // We save the return parameters in an array with their types and storage location
     const functionReturnParameters: string[] = [];
-    // We save the return parameters names in an other array
-    const returnParameterNames: string[] = [];
     // We save the types of output params
     const returnParameterTypes: string[] = [];
+    // We save the return parameters names in another array
+    const returnParameterNames: string[] = [];
 
     parameterIndex = 0;
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
+      // We remove the 'contract ' string from the type name if it exists
+      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
+      const paramName: string = parameter.name == '' ? `_returnParam${parameterIndex}` : parameter.name;
+
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
         parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
-
-      // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
-
-      const returnName: string = parameter.name == '' ? `_return${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
-      const parameterString = `${typeName} ${storageLocation}${returnName}`;
+      const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
       functionReturnParameters.push(parameterString);
-      returnParameterNames.push(returnName);
       returnParameterTypes.push(typeName);
+      returnParameterNames.push(paramName);
       parameterIndex++;
     });
 
     // We create the string that will be used in the mock function signature
-    const inputsString: string = functionParameters.length ? functionParameters.join(', ') : '';
-    const outputsString: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
+    const inputs: string = functionParameters.length ? functionParameters.join(', ') : '';
+    const outputs: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
 
-    // We create the strings that will be used in the mock call arguments and returns
-    const inputsStringNames: string = parameterNames.length ? `${parameterNames.join(', ')}` : '';
-    const outputsStringNames: string = returnParameterNames.length ? returnParameterNames.join(', ') : '';
-    let args: string;
-
-    if (!inputsString) {
-      args = outputsString;
-    } else if (!outputsString) {
-      args = inputsString;
+    let params: string;
+    if (!inputs) {
+      params = outputs;
+    } else if (!outputs) {
+      params = inputs;
     } else {
-      args = `${inputsString}, ${outputsString}`;
+      params = `${inputs}, ${outputs}`;
     }
 
     // Save the internal function information
     const internalMockFunction: InternalFunctionOptions = {
       functionName: funcNode.name,
-      arguments: args,
       signature: signature,
-      inputsStringNames: inputsStringNames,
-      inputsString: inputsString,
-      outputsString: outputsString,
-      outputsStringNames: outputsStringNames,
-      outputsTypesString: returnParameterTypes.join(', '),
+      parameters: params,
+      inputs: inputs,
+      outputs: outputs,
+      inputTypes: parameterTypes,
+      outputTypes: returnParameterTypes,
+      inputNames: parameterNames,
+      outputNames: returnParameterNames,
+      isView: isView,
     };
     internalFunctions.push(internalMockFunction);
   });

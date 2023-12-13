@@ -11,4 +11,8 @@ contract ContractD {
     _internalUintVar = _uintVariable;
     return (true, 111, 'test');
   }
+
+  function _getVariables(uint256 _uintVariable) internal view virtual returns (bool, uint256, string memory) {
+    return (true, 111, 'test');
+  }
 }
