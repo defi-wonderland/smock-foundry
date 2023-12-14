@@ -16,12 +16,11 @@ contract ContractD {
     return (true, 111, 'test');
   }
 
-  function _internalNoInput() internal virtual returns (bool, uint256, string memory) {
+  function _internalNoInputNoOutput() internal virtual {
     _internalUintVar = 11;
-    return (true, 111, 'test');
   }
 
-  function _internalViewNoInput() internal view virtual returns (bool, uint256, string memory) {
-    return (true, 111, 'test');
+  function _internalViewNoInputNoOutput() internal view virtual {
+    uint256 __internalUintVar = _internalUintVar;
   }
 }
