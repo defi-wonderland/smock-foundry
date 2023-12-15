@@ -97,18 +97,18 @@ describe('E2E: getInternalMockFunctions', () => {
     expect(param1).to.not.be.undefined;
     expect(param1?.typeDescriptions.typeString).to.equal('uint256');
 
-    const return0 = func.returnParameters.parameters.find((param) => param.name === '_returnParam0');
-    expect(return0).to.not.be.undefined;
-    expect(return0?.typeDescriptions.typeString).to.equal('bool');
+    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_returnParam0');
+    expect(returnParam1).to.not.be.undefined;
+    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
 
-    const return1 = func.returnParameters.parameters.find((param) => param.name === '_returnParam1');
-    expect(return1).to.not.be.undefined;
-    expect(return1?.typeDescriptions.typeString).to.equal('uint256');
+    const returnParam2 = func.returnParameters.parameters.find((param) => param.name === '_returnParam1');
+    expect(returnParam2).to.not.be.undefined;
+    expect(returnParam2?.typeDescriptions.typeString).to.equal('uint256');
 
-    const return2 = func.returnParameters.parameters.find((param) => param.name === '_returnParam2');
-    expect(return2).to.not.be.undefined;
-    expect(return2?.typeDescriptions.typeString).to.equal('string');
-    expect(return2?.storageLocation).to.equal('memory');
+    const returnParam3 = func.returnParameters.parameters.find((param) => param.name === '_returnParam2');
+    expect(returnParam3).to.not.be.undefined;
+    expect(returnParam3?.typeDescriptions.typeString).to.equal('string');
+    expect(returnParam3?.storageLocation).to.equal('memory');
   });
 
   it('MockContractD must include internal view function mock call', async () => {
@@ -150,17 +150,17 @@ describe('E2E: getInternalMockFunctions', () => {
     expect(param1).to.not.be.undefined;
     expect(param1?.typeDescriptions.typeString).to.equal('uint256');
 
-    const return0 = func.returnParameters.parameters.find((param) => param.name === '_returnParam0');
-    expect(return0).to.not.be.undefined;
-    expect(return0?.typeDescriptions.typeString).to.equal('bool');
+    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_returnParam0');
+    expect(returnParam1).to.not.be.undefined;
+    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
 
-    const return1 = func.returnParameters.parameters.find((param) => param.name === '_returnParam1');
-    expect(return1).to.not.be.undefined;
-    expect(return1?.typeDescriptions.typeString).to.equal('uint256');
+    const returnParam2 = func.returnParameters.parameters.find((param) => param.name === '_returnParam1');
+    expect(returnParam2).to.not.be.undefined;
+    expect(returnParam2?.typeDescriptions.typeString).to.equal('uint256');
 
-    const return2 = func.returnParameters.parameters.find((param) => param.name === '_returnParam2');
-    expect(return2).to.not.be.undefined;
-    expect(return2?.typeDescriptions.typeString).to.equal('string');
-    expect(return2?.storageLocation).to.equal('memory');
+    const returnParam3 = func.returnParameters.parameters.find((param) => param.name === '_returnParam2');
+    expect(returnParam3).to.not.be.undefined;
+    expect(returnParam3?.typeDescriptions.typeString).to.equal('string');
+    expect(returnParam3?.storageLocation).to.equal('memory');
   });
 });
