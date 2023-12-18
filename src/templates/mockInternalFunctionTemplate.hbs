@@ -26,7 +26,7 @@ function mock_call_{{functionName}}({{parameters}}) public {
   {{else}}
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{signature}}"{{#if inputs}}, {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}),
+    abi.encodeWithSignature('{{signature}}'{{#if inputs}}, {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}),
     abi.encode({{#each outputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}})
   );
   {{/if}}
@@ -45,7 +45,7 @@ function {{functionName}}({{inputs}}) internal {{#if isView}}view {{/if}}overrid
   }
   return super.{{functionName}}({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
   {{else}}
-  (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature("{{signature}}"{{#if inputs}}, {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}));
+  (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature('{{signature}}'{{#if inputs}}, {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}));
   if (_success) return abi.decode(_data, ({{#each outputTypes}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}));
   else return super.{{functionName}}({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
   {{/if}}
