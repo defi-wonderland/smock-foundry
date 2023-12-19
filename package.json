@@ -1,6 +1,6 @@
 {
   "name": "@defi-wonderland/smock-foundry",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Smock-style mocks for Foundry projects",
   "homepage": "https://github.com/defi-wonderland/smock-foundry#readme",
   "repository": {
@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json && node copy-templates.js",
-    "lint:check": "yarn lint:ts-logic && forge fmt check",
+    "lint:check": "yarn lint:ts-logic && forge fmt --check",
     "lint:fix": "sort-package-json && forge fmt && yarn lint:ts-logic --fix",
     "lint:ts-logic": "eslint ./src/**/*.ts",
     "test": "forge build --skip test && cross-env mocha 'test/**/*.spec.ts' && forge test",
@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "handlebars": "4.7.7",
-    "prettier": "^3.0.3",
     "yargs": "17.7.2"
   },
   "devDependencies": {
@@ -41,21 +40,19 @@
     "@types/fs-extra": "11.0.1",
     "@types/mocha": "10.0.1",
     "@types/node": "20.2.3",
-    "@types/yargs": "^17.0.24",
+    "@types/yargs": "17.0.24",
     "@typescript-eslint/eslint-plugin": "5.59.6",
     "@typescript-eslint/parser": "5.59.6",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "cross-env": "7.0.3",
     "eslint": "8.40.0",
-    "husky": "^8.0.3",
+    "husky": "8.0.3",
     "lint-staged": "10",
     "mocha": "10.2.0",
-    "nodemon": "2.0.22",
-    "sinon": "15.1.0",
+    "prettier": "3.0.3",
     "sort-package-json": "2.4.1",
     "ts-node": "10.9.1",
-    "tsconfig-paths": "4.2.0",
     "typescript": "5.0.4"
   }
 }
