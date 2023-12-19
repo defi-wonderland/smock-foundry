@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "handlebars": "4.7.7",
-    "prettier": "^3.0.3",
     "yargs": "17.7.2"
   },
   "devDependencies": {
@@ -51,6 +50,7 @@
     "husky": "^8.0.3",
     "lint-staged": "10",
     "mocha": "10.2.0",
+    "prettier": "^3.0.3",
     "sort-package-json": "2.4.1",
     "ts-node": "10.9.1",
     "typescript": "5.0.4"
