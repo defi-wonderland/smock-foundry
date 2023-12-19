@@ -7,8 +7,8 @@ function set_{{setFunction.functionName}}({{setFunction.arrayType}} _{{setFuncti
   {{setFunction.functionName}} = _{{setFunction.paramName}};
   {{/if}}
 }
-
 {{#unless isInternal}}
+
 function mock_call_{{mockFunction.functionName}}(uint256 _index, {{mockFunction.baseType}} _value) public {
   vm.mockCall(
     address(this),
@@ -17,4 +17,3 @@ function mock_call_{{mockFunction.functionName}}(uint256 _index, {{mockFunction.
   );
 }
 {{/unless}}
-{{nl}}

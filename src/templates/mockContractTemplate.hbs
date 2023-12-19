@@ -8,25 +8,31 @@ import { {{~exportedSymbols~}} } from '{{contractImport}}';
 {{/each}}
 
 contract Mock{{contractName}} is {{contractName}}, Test {
-
+{{#if constructor}}
   {{constructor}}
+{{/if}}
+{{#if mockStateVariables}}{{nl}}
   /// Mocked State Variables
-  {{#each mockStateVariables}}
+  {{#each mockStateVariables}}{{nl}}
   {{> mockStateVariable}}
   {{/each}}
-  {{#each mockArrayStateVariables}}
+  {{#each mockArrayStateVariables}}{{nl}}
   {{> mockArrayStateVariable}}
   {{/each}}
-  {{#each mockMappingStateVariables}}
+  {{#each mockMappingStateVariables}}{{nl}}
   {{> mockMappingStateVariable}}
   {{/each}}
+{{/if}}
+{{#if mockExternalFunctions}}{{nl}}
   /// Mocked External Functions
-  {{#each mockExternalFunctions}}
+  {{#each mockExternalFunctions}}{{nl}}
   {{> mockExternalFunction}}
   {{/each}}
+{{/if}}
+{{#if mockInternalFunctions}}{{nl}}
   /// Mocked Internal Functions
-  {{#each mockInternalFunctions}}
+  {{#each mockInternalFunctions}}{{nl}}
   {{> mockInternalFunction}}
   {{/each}}
-
+{{/if}}
 }

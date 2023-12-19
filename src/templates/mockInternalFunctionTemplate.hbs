@@ -9,8 +9,8 @@ struct {{functionName}}Output {
 mapping(bytes32 => {{functionName}}Output) private {{functionName}}Outputs;
 {{/if}}
 bytes32[] private {{functionName}}InputHashes;
-{{/if}}
 
+{{/if}}
 function mock_call_{{functionName}}({{parameters}}) public {
   {{#if isView}}
   bytes32 _key = keccak256(abi.encode({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}));
@@ -50,4 +50,3 @@ function {{functionName}}({{inputs}}) internal {{#if isView}}view {{/if}}overrid
   else return super.{{functionName}}({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
   {{/if}}
 }
-{{nl}}
