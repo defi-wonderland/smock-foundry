@@ -51,11 +51,8 @@
     "husky": "^8.0.3",
     "lint-staged": "10",
     "mocha": "10.2.0",
-    "nodemon": "2.0.22",
-    "sinon": "15.1.0",
     "sort-package-json": "2.4.1",
     "ts-node": "10.9.1",
-    "tsconfig-paths": "4.2.0",
     "typescript": "5.0.4"
   }
 }
