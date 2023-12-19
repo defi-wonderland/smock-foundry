@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json && node copy-templates.js",
-    "lint:check": "yarn lint:ts-logic && forge fmt check",
+    "lint:check": "yarn lint:ts-logic && forge fmt --check",
     "lint:fix": "sort-package-json && forge fmt && yarn lint:ts-logic --fix",
     "lint:ts-logic": "eslint ./src/**/*.ts",
     "test": "forge build --skip test && cross-env mocha 'test/**/*.spec.ts' && forge test",
