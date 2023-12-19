@@ -29,5 +29,5 @@ fuzz_runs = 5000
 src = 'solidity/test'
 
 [rpc_endpoints]
-mainnet = "${MAINNET_RPC}"
-goerli = "${GOERLI_RPC}"
+mainnet = '${MAINNET_RPC}'
+goerli = '${GOERLI_RPC}'

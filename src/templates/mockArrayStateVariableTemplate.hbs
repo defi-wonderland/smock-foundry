@@ -12,7 +12,7 @@ function set_{{setFunction.functionName}}({{setFunction.arrayType}} _{{setFuncti
 function mock_call_{{mockFunction.functionName}}(uint256 _index, {{mockFunction.baseType}} _value) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{mockFunction.functionName}}(uint256)", _index),
+    abi.encodeWithSignature('{{mockFunction.functionName}}(uint256)', _index),
     abi.encode(_value)
   );
 }

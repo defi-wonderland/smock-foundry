@@ -9,7 +9,7 @@ function {{functionName}}({{inputString}}) {{visibility}}{{stateMutabilityString
 function mock_call_{{functionName}}({{arguments}}) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{signature}}"{{inputsStringNames}}),
+    abi.encodeWithSignature('{{signature}}'{{inputsStringNames}}),
     abi.encode({{outputsStringNames}})
   );
 }

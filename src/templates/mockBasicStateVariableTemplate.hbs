@@ -6,7 +6,7 @@ function set_{{setFunction.functionName}}({{setFunction.paramType}} _{{setFuncti
 function mock_call_{{mockFunction.functionName}}({{mockFunction.paramType}} _{{mockFunction.functionName}}) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature("{{mockFunction.functionName}}()"),
+    abi.encodeWithSignature('{{mockFunction.functionName}}()'),
     abi.encode(_{{mockFunction.functionName}})
   );
 }
