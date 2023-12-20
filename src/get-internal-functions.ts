@@ -39,6 +39,7 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
         parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
+
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
@@ -69,6 +70,7 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
         parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
+
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
@@ -103,7 +105,9 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
       inputNames: parameterNames,
       outputNames: returnParameterNames,
       isView: isView,
+      implemented: funcNode.implemented,
     };
+
     internalFunctions.push(internalMockFunction);
   });
 

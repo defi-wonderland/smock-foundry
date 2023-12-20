@@ -13,5 +13,14 @@ abstract contract ContractAbstract {
   }
 
   function undefinedFunc(string memory _someText) public virtual returns (bool _result);
-  function undefinedFuncNoReturn(string memory _someText) public virtual;
+  function undefinedFuncNoInputNoOutput() public virtual;
+
+  function undefinedViewFunc(string memory _someText) public view virtual returns (bool _result);
+  function undefinedViewFuncNoInputNoOutput() public view virtual;
+
+  function _undefinedInternalFunc(string memory _someText) internal virtual returns (bool _result);
+  function _undefinedInternalFuncNoInputNoOutput() internal virtual;
+
+  function _undefinedInternalViewFunc(string memory _someText) internal view virtual returns (bool _result);
+  function _undefinedInternalViewFuncNoInputNoOutput() internal view virtual;
 }

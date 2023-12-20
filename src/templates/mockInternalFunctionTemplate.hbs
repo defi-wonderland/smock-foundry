@@ -18,9 +18,7 @@ function mock_call_{{functionName}}({{parameters}}) public {
   {{functionName}}Outputs[_key] = {{functionName}}Output({{#each outputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
   {{/if}}
   for (uint256 _i; _i < {{functionName}}InputHashes.length; ++_i) {
-    if (_key == {{functionName}}InputHashes[_i]) {
-      return;
-    }
+    if (_key == {{functionName}}InputHashes[_i]) return;
   }
   {{functionName}}InputHashes.push(_key);
   {{else}}
@@ -43,10 +41,14 @@ function {{functionName}}({{inputs}}) internal {{#if isView}}view {{/if}}overrid
       return ({{#each outputNames}}_output.{{this}}{{#unless @last}}, {{/unless}}{{/each}});
     }
   }
+  {{#if implemented}}
   return super.{{functionName}}({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
+  {{/if}}
   {{else}}
   (bool _success, bytes memory _data) = address(this).call(abi.encodeWithSignature('{{signature}}'{{#if inputs}}, {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}));
   if (_success) return abi.decode(_data, ({{#each outputTypes}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}));
+  {{#if implemented}}
   else return super.{{functionName}}({{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}});
+  {{/if}}
   {{/if}}
 }

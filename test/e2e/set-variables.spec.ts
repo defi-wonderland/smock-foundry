@@ -13,7 +13,7 @@ describe('E2E: getStateVariables', () => {
     const ignoreDir = [];
     await generateMockContracts(contractsDir, compiledArtifactsDir, generatedContractsDir, ignoreDir);
 
-    const contractsNames = ['ContractTest'];
+    const contractsNames = ['ContractTest', 'ContractD'];
 
     contractsNames.forEach((contractName: string) => {
       const mockName = `Mock${contractName}`;
@@ -29,7 +29,7 @@ describe('E2E: getStateVariables', () => {
     });
   });
 
-  it('must include setters for struct variables', async () => {
+  it('MockContractTest must include setters for struct variables', async () => {
     const contractNode = contractNodes['MockContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_myStructVariable',
@@ -38,7 +38,7 @@ describe('E2E: getStateVariables', () => {
     expect(func.visibility).to.equal('public');
   });
 
-  it('must include setters for struct arrays', async () => {
+  it('MockContractTest must include setters for struct arrays', async () => {
     const contractNode = contractNodes['MockContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_myStructArray',
@@ -47,7 +47,7 @@ describe('E2E: getStateVariables', () => {
     expect(func.visibility).to.equal('public');
   });
 
-  it('must include setters for struct mappings', async () => {
+  it('MockContractTest must include setters for struct mappings', async () => {
     const contractNode = contractNodes['MockContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_uint256ToMyStruct',
@@ -56,7 +56,7 @@ describe('E2E: getStateVariables', () => {
     expect(func.visibility).to.equal('public');
   });
 
-  it('must include setters for struct array mappings', async () => {
+  it('MockContractTest must include setters for struct array mappings', async () => {
     const contractNode = contractNodes['MockContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_uint256ToMyStructArray',
@@ -65,12 +65,25 @@ describe('E2E: getStateVariables', () => {
     expect(func.visibility).to.equal('public');
   });
 
-  it('must include setters for nested mappings', async () => {
+  it('MockContractTest must include setters for nested mappings', async () => {
     const contractNode = contractNodes['MockContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set_uint256ToAddressToBytes32',
     ) as FunctionDefinitionNode;
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('public');
+  });
+
+  it('MockContractD must include setters for internal variables', async () => {
+    const contractNode = contractNodes['MockContractD'];
+    const func = contractNode.nodes.find(
+      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'set__internalUintVar',
+    ) as FunctionDefinitionNode;
+    expect(func).to.not.be.undefined;
+    expect(func.visibility).to.equal('public');
+
+    const param1 = func.parameters.parameters.find((param) => param.name === '__internalUintVar');
+    expect(param1).to.not.be.undefined;
+    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
   });
 });

@@ -1,15 +1,11 @@
-{{#if isInterface}}
-function {{functionName}}({{inputString}}) external{{stateMutabilityString}}{{#if outputString}}returns ({{outputString}}){{/if}} {}
+{{#unless implemented}}
+function {{functionName}}({{inputs}}) {{visibility}}{{stateMutability}}override {{#if outputs}}returns ({{outputs}}){{/if}} {}
 
-{{/if}}
-{{#if abstractAndVirtual}}
-function {{functionName}}({{inputString}}) {{visibility}}{{stateMutabilityString}}override {{#if outputString}}returns ({{outputString}}){{/if}} {}
-
-{{/if}}
-function mock_call_{{functionName}}({{arguments}}) public {
+{{/unless}}
+function mock_call_{{functionName}}({{parameters}}) public {
   vm.mockCall(
     address(this),
-    abi.encodeWithSignature('{{signature}}'{{inputsStringNames}}),
-    abi.encode({{outputsStringNames}})
+    abi.encodeWithSignature('{{signature}}'{{#if inputs}}, {{#each inputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}),
+    abi.encode({{#each outputNames}}{{this}}{{#unless @last}}, {{/unless}}{{/each}})
   );
 }
