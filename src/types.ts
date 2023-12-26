@@ -51,12 +51,12 @@ export interface FunctionDefinitionNode {
 }
 
 export interface Ast {
-  absolutePath: string;
+  nodeType: 'SourceUnit';
   id?: number;
-  nodeType: string;
   src: string;
   nodes: AstNode[];
   license: string;
+  absolutePath: string;
   exportedSymbols: { [key: string]: number[] };
 }
 

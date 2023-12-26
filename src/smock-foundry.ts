@@ -80,7 +80,10 @@ export const generateMockContracts = async (
       // Check if the abi and ast exist
       if (!ast) return;
 
-      // Get the absolute path from the ast
+      // Get the license from the ast
+      const license: string = ast.license;
+
+      // Get the absolute path
       const contractImport: string = ast.absolutePath;
       if (!contractImport) return;
 
@@ -97,10 +100,11 @@ export const generateMockContracts = async (
       if (!contractNode || contractNode.contractKind === 'library') return;
 
       const functions: StateVariablesOptions = getStateVariables(contractNode);
-      // All data which will be use for create the template
 
+      // All data which will be used for creating the template
       const data = {
         contractName: contractName,
+        license: license,
         contractImport: contractImport,
         exportedSymbols: exportedSymbols.join(', '),
         import: getImports(ast),

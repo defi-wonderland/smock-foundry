@@ -15,6 +15,7 @@ describe('getImports', () => {
       exportedSymbols: {},
     };
   });
+  
   it('should return an empty array if there are no import directives', async () => {
     const importStatements = getImports(ast);
     expect(importStatements).to.be.an('array').that.is.empty;
