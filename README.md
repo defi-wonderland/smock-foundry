@@ -83,14 +83,13 @@ contract BaseTest is Test, SmockHelper {
 
   function setUp() public {
     // The `deployMock` call is equivalent to
-    // greeter = new MockGreeter('Hello');
-    // label(address(greeter, 'Greeter');
-    // vm.allowCheatcodes(address(greeter);
+    // address _greeterAddress = address(new MockGreeter('Hello'));
+    // vm.label(_greeterAddress, 'Greeter');
+    // vm.allowCheatcodes(_greeterAddress);
+    // return _greeterAddress;
 
-    greeter = deployMock(
-      'Greeter',
-      type(Greeter).creationCode,
-      abi.encode('Hello')
+    greeter = MockGreeter(
+      deployMock('Greeter', type(Greeter).creationCode, abi.encode('Hello'))
     );
   }
 }
