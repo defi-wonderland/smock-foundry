@@ -1,4 +1,4 @@
-import { arrayRegex, memoryTypes, structRegex } from './types';
+import { userDefinedTypes, explicitTypes } from './types';
 import { resolve, join, relative, dirname } from 'path';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
@@ -40,17 +40,26 @@ export const lowercaseFirstLetter = (str: string): string => {
 };
 
 /**
- * Returns the string with the type fixed, for example if the type is string it will return `string memory`
- * @param str The string to fix the type
- * @returns Returns the string with the type fixed
+ * Fixes user-defined types
+ * @param type The string of the type to fix
+ * @returns The string with the type fixed
  */
-export const typeFix = (str: string): string => {
-  if (memoryTypes.includes(str) || arrayRegex.exec(str)) {
-    return `${str} memory`;
-  } else if (structRegex.exec(str)) {
-    return `${str} memory`;
+export const typeFix = (type: string): string => {
+  const regExp = new RegExp(`^(${userDefinedTypes.join('|')}) `);
+  return type.replace(regExp, '');
+};
+
+/**
+ * Explicits a type's storage location, if required
+ * @param type The string of the type to explicit
+ * @returns The string with the type explicit
+ */
+export const explicitTypeStorageLocation = (type: string): string => {
+  const regExp = new RegExp(`^(${explicitTypes.join('|')})\\b`);
+  if (regExp.test(type) || type.includes('[]')) {
+    return `${type} memory`;
   } else {
-    return str;
+    return type;
   }
 };
 

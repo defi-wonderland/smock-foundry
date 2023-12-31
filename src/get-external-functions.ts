@@ -1,4 +1,5 @@
 import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, ExternalFunctionOptions } from './types';
+import { typeFix } from './utils';
 
 /**
  * Returns the information of the external function for the mock contract
@@ -29,25 +30,27 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
 
     // We save the parameters in an array with their types and storage location
     const functionParameters: string[] = [];
-    // We save the parameters names in an other array
-    const parameterNames: string[] = [];
     // We save the types in an array to use them in order to create the signature
     const parameterTypes: string[] = [];
+    // We save the parameters names in another array
+    const parameterNames: string[] = [];
+
     let parameterIndex = 0;
     parameters.forEach((parameter: VariableDeclarationNode) => {
+      // We remove the 'contract ' string from the type name if it exists
+      const typeName: string = typeFix(parameter.typeDescriptions.typeString);
+      const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
+
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
         parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
 
-      // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
-
-      const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
-      parameterTypes.push(typeName);
+      // We save the strings in the arrays
       functionParameters.push(parameterString);
+      parameterTypes.push(typeName);
       parameterNames.push(paramName);
       parameterIndex++;
     });
@@ -60,16 +63,17 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     const functionReturnParameters: string[] = [];
     // We save the return parameters names in an other array
     const returnParameterNames: string[] = [];
+
     parameterIndex = 0;
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
+      // We remove the 'contract ' string from the type name if it exists
+      const typeName: string = typeFix(parameter.typeDescriptions.typeString);
+      const returnName: string = parameter.name == '' ? `_return${parameterIndex}` : parameter.name;
+      
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
         parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
 
-      // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
-
-      const returnName: string = parameter.name == '' ? `_return${parameterIndex}` : parameter.name;
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${returnName}`;
 
