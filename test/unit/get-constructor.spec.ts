@@ -15,6 +15,7 @@ describe('getConstructor', () => {
       name: 'MyContract',
     };
   });
+  
   it('should return undefined if there are no functions', async () => {
     const constructorSignature = getConstructor(contractNode);
     expect(constructorSignature).to.be.undefined;
@@ -32,9 +33,10 @@ describe('getConstructor', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -62,9 +64,10 @@ describe('getConstructor', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -92,9 +95,10 @@ describe('getConstructor', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -122,9 +126,10 @@ describe('getConstructor', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -152,9 +157,10 @@ describe('getConstructor', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const constructorSignature = getConstructor(contractNode);
@@ -182,9 +188,10 @@ describe('getConstructor', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const constructorSignature = getConstructor(contractNode);

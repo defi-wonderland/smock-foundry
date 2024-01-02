@@ -36,8 +36,8 @@ export interface ContractDefinitionNode {
 }
 
 export interface FunctionDefinitionNode {
-  name: string;
   nodeType: 'FunctionDefinition';
+  name: string;
   kind: string;
   parameters: {
     parameters: VariableDeclarationNode[];
@@ -45,9 +45,10 @@ export interface FunctionDefinitionNode {
   returnParameters: {
     parameters: VariableDeclarationNode[];
   };
-  virtual: boolean;
   visibility: string;
   stateMutability: string;
+  virtual: boolean;
+  implemented: boolean;
 }
 
 export interface Ast {
@@ -134,16 +135,15 @@ export interface StateVariablesOptions {
 
 export interface ExternalFunctionOptions {
   functionName: string;
-  arguments: string;
   signature: string;
-  inputsStringNames: string;
-  outputsStringNames: string;
-  inputString: string;
-  outputString: string;
-  isInterface: boolean;
-  stateMutabilityString: string;
-  abstractAndVirtual: boolean;
+  parameters: string;
+  inputs: string;
+  outputs: string;
+  inputNames: string[];
+  outputNames: string[];
   visibility: string;
+  stateMutability: string;
+  implemented: boolean;
 }
 
 export interface InternalFunctionOptions {
@@ -157,6 +157,7 @@ export interface InternalFunctionOptions {
   inputNames: string[];
   outputNames: string[];
   isView: boolean;
+  implemented: boolean;
 }
 
 export const memoryTypes = ['string', 'bytes', 'mapping'];
