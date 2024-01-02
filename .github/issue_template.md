@@ -8,7 +8,7 @@ If it's a bug, specify the version you're using and attach screenshots, logs, et
 3. [and so on...]
 
 ## Expected behavior
-[What you expected to happen]
+What you expected to happen
 
 ## Actual behavior
-[What actually happened]
+What actually happened
