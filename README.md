@@ -38,6 +38,8 @@ Option      | Default                           | Notes
 `mocks `    | `./solidity/test/smock`           | The path to the generated mock contracts
 `ignore`    | []                                | A list of directories to ignore, e.g. `--ignore libraries`
 
+Be sure to `gitignore` the generated smock directory.
+
 ### Using mocks
 
 Let's say you have a `Greeter` contract in your project at `contracts/Greeter.sol`:
@@ -108,7 +110,7 @@ greeter.set__greeting('Hola');
 ### Gotchas
 
 - Please, note that if you want to mock `internal` functions, you **must** make them `virtual`. The tool will not generate mocks for internal functions that are not virtual.
-- Cannot `set` private variables and mock private functions.
+- Cannot set `private` variables and mock `private` functions.
 - Mocking of structs containing mappings is not supported.
 
 # Licensing
