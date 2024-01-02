@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import {IContractTest, MyContract} from '../interfaces/IContractTest.sol';
