@@ -45,7 +45,7 @@ describe('E2E: getExternalMockFunctions', () => {
     expect(param1?.typeDescriptions.typeString).to.equal('uint256');
   });
 
-  it('MockContractTest must include mock call', async () => {
+  it('MockContractTest must include external function mock call', async () => {
     const contractNode = contractNodes['MockContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_setVariables' && node.parameters.parameters.length === 2,
@@ -62,7 +62,7 @@ describe('E2E: getExternalMockFunctions', () => {
     expect(param2?.typeDescriptions.typeString).to.equal('bool');
   });
 
-  it('MockIContractTest must include interface functions', async () => {
+  it('MockIContractTest must include interface function', async () => {
     const contractNode = contractNodes['MockIContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'setVariables' && node.parameters.parameters.length === 8,
@@ -104,9 +104,13 @@ describe('E2E: getExternalMockFunctions', () => {
     expect(param8).to.not.be.undefined;
     expect(param8?.typeDescriptions.typeString).to.equal('bytes32[]');
     expect(param8?.storageLocation).to.equal('memory');
+
+    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_result');
+    expect(returnParam1).to.not.be.undefined;
+    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
   });
 
-  it('MockIContractTest must include mock call', async () => {
+  it('MockIContractTest must include external function mock call', async () => {
     const contractNode = contractNodes['MockIContractTest'];
     const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_setVariables' && node.parameters.parameters.length === 3,
@@ -114,46 +118,60 @@ describe('E2E: getExternalMockFunctions', () => {
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('public');
 
-    const param0 = func.parameters.parameters.find((param) => param.name === '_param0');
-    expect(param0).to.not.be.undefined;
-    expect(param0?.typeDescriptions.typeString).to.equal('uint256');
-
-    const param1 = func.parameters.parameters.find((param) => param.name === '_param1');
+    const param1 = func.parameters.parameters.find((param) => param.name === '_param0');
     expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('bool');
+    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
 
-    const param2 = func.parameters.parameters.find((param) => param.name === '_return0');
+    const param2 = func.parameters.parameters.find((param) => param.name === '_param1');
     expect(param2).to.not.be.undefined;
     expect(param2?.typeDescriptions.typeString).to.equal('bool');
+
+    const param3 = func.parameters.parameters.find((param) => param.name === '_returnParam0');
+    expect(param3).to.not.be.undefined;
+    expect(param3?.typeDescriptions.typeString).to.equal('bool');
   });
 
-  it('Should create mocks for abstract contracts', async () => {
-    let func: FunctionDefinitionNode;
+  it('MockContractAbstract must include constructor', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-
-    func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_uintVariable',
+    const constructor = contractNode.nodes.find(
+      (node) => node.nodeType === 'FunctionDefinition' && node.kind === 'constructor',
     ) as FunctionDefinitionNode;
+    expect(constructor).to.not.be.undefined;
+
+    const param1 = constructor.parameters.parameters.find((param) => param.name === '_uintVariable');
+    expect(param1).to.not.be.undefined;
+    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
+  });
+
+  it('MockContractAbstract must include unimplemented external function', async () => {
+    const contractNode = contractNodes['MockContractAbstract'];
+    const func = contractNode.nodes.find((node) => node.nodeType === 'FunctionDefinition' && node.name === 'undefinedFunc') as FunctionDefinitionNode;
     expect(func).to.not.be.undefined;
 
-    func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_setVariablesA',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+    const param1 = func.parameters.parameters.find((param) => param.name === '_someText');
+    expect(param1).to.not.be.undefined;
+    expect(param1?.typeDescriptions.typeString).to.equal('string');
+    expect(param1?.storageLocation).to.equal('memory');
 
-    func = contractNode.nodes.find(
+    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_result');
+    expect(returnParam1).to.not.be.undefined;
+    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
+  });
+
+  it('MockContractAbstract must include unimplemented external function mock call', async () => {
+    const contractNode = contractNodes['MockContractAbstract'];
+    const func = contractNode.nodes.find(
       (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_undefinedFunc',
     ) as FunctionDefinitionNode;
     expect(func).to.not.be.undefined;
+    expect(func.visibility).to.equal('public');
 
-    func = contractNode.nodes.find((node) => node.nodeType === 'FunctionDefinition' && node.name === 'undefinedFunc') as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+    const param1 = func.parameters.parameters.find((param) => param.name === '_someText');
+    expect(param1).to.not.be.undefined;
+    expect(param1?.typeDescriptions.typeString).to.equal('string');
+    expect(param1?.storageLocation).to.equal('memory');
 
-    const param0 = func.parameters.parameters.find((param) => param.name === '_someText');
-    expect(param0).to.not.be.undefined;
-    expect(param0?.typeDescriptions.typeString).to.equal('string');
-
-    const param2 = func.returnParameters.parameters.find((param) => param.name === '_result');
+    const param2 = func.parameters.parameters.find((param) => param.name === '_result');
     expect(param2).to.not.be.undefined;
     expect(param2?.typeDescriptions.typeString).to.equal('bool');
   });

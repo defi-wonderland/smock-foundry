@@ -107,7 +107,9 @@ export const getInternalMockFunctions = (contractNode: ContractDefinitionNode): 
       inputNames: parameterNames,
       outputNames: returnParameterNames,
       isView: isView,
+      implemented: funcNode.implemented,
     };
+
     internalFunctions.push(internalMockFunction);
   });
 

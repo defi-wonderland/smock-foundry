@@ -68,9 +68,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -89,9 +90,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'external',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
       {
         name: 'myFunction2',
@@ -103,9 +105,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'private',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -124,9 +127,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'internal',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -145,9 +149,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: true,
         visibility: 'internal',
         stateMutability: 'nonpayable',
+        virtual: true,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -163,6 +168,7 @@ describe('getInternalMockFunctions', () => {
         inputNames: ['_param1', '_param2'],
         outputNames: [],
         isView: false,
+        implemented: true,
       },
     ];
     expect(internalFunctions).to.be.an('array').that.is.not.empty;
@@ -181,9 +187,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: true,
         visibility: 'internal',
         stateMutability: 'nonpayable',
+        virtual: true,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -199,6 +206,7 @@ describe('getInternalMockFunctions', () => {
         inputNames: ['_param1', '_param2', '_param3'],
         outputNames: [],
         isView: false,
+        implemented: true,
       },
     ];
     expect(internalFunctions).to.be.an('array').that.is.not.empty;
@@ -217,9 +225,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [FakeParameter(1, 'string', 'memory'), FakeParameter(2, 'string', 'calldata')],
         },
-        virtual: true,
         visibility: 'internal',
         stateMutability: 'nonpayable',
+        virtual: true,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -235,6 +244,7 @@ describe('getInternalMockFunctions', () => {
         inputNames: [],
         outputNames: ['_param1', '_param2'],
         isView: false,
+        implemented: true,
       },
     ];
     expect(internalFunctions).to.be.an('array').that.is.not.empty;
@@ -253,9 +263,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [FakeParameter(1, 'contract IERC20', ''), FakeParameter(2, 'struct MyStruct', ''), FakeParameter(3, 'enum MyEnum', '')],
         },
-        virtual: true,
         visibility: 'internal',
         stateMutability: 'nonpayable',
+        virtual: true,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -271,6 +282,7 @@ describe('getInternalMockFunctions', () => {
         inputNames: [],
         outputNames: ['_param1', '_param2', '_param3'],
         isView: false,
+        implemented: true,
       },
     ];
     expect(internalFunctions).to.be.an('array').that.is.not.empty;
@@ -289,9 +301,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [FakeParameter(2, 'string', 'memory')],
         },
-        virtual: true,
         visibility: 'internal',
         stateMutability: 'nonpayable',
+        virtual: true,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -307,6 +320,7 @@ describe('getInternalMockFunctions', () => {
         inputNames: ['_param1'],
         outputNames: ['_param2'],
         isView: false,
+        implemented: true,
       },
     ];
     expect(internalFunctions).to.be.an('array').that.is.not.empty;
@@ -325,9 +339,10 @@ describe('getInternalMockFunctions', () => {
         returnParameters: {
           parameters: [FakeParameter(2, 'string', 'memory')],
         },
-        virtual: true,
         visibility: 'internal',
         stateMutability: 'view',
+        virtual: true,
+        implemented: true,
       },
     ];
     const internalFunctions = getInternalMockFunctions(contractNode);
@@ -343,6 +358,54 @@ describe('getInternalMockFunctions', () => {
         inputNames: ['_param1'],
         outputNames: ['_param2'],
         isView: true,
+        implemented: true,
+      },
+    ];
+    expect(internalFunctions).to.be.an('array').that.is.not.empty;
+    expect(internalFunctions).to.deep.equal(expectedData);
+  });
+
+  it('should return the correct function data if the contract is abstract', async () => {
+    contractNode = {
+      nodeType: 'ContractDefinition',
+      canonicalName: 'MyContract',
+      nodes: [],
+      abstract: true,
+      contractKind: 'contract',
+      name: 'MyContract',
+    };
+
+    contractNode.nodes = [
+      {
+        name: 'myFunction',
+        nodeType: 'FunctionDefinition',
+        kind: 'function',
+        parameters: {
+          parameters: [FakeParameter(1, 'string', 'memory')],
+        },
+        returnParameters: {
+          parameters: [FakeParameter(2, 'string', 'memory')],
+        },
+        visibility: 'internal',
+        stateMutability: 'nonpayable',
+        virtual: true,
+        implemented: false,
+      },
+    ];
+    const internalFunctions = getInternalMockFunctions(contractNode);
+    const expectedData: InternalFunctionOptions[] = [
+      {
+        functionName: 'myFunction',
+        signature: 'myFunction(string)',
+        parameters: 'string memory _param1, string memory _param2',
+        inputs: 'string memory _param1',
+        outputs: 'string memory _param2',
+        inputTypes: ['string'],
+        outputTypes: ['string'],
+        inputNames: ['_param1'],
+        outputNames: ['_param2'],
+        isView: false,
+        implemented: false,
       },
     ];
     expect(internalFunctions).to.be.an('array').that.is.not.empty;

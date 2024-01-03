@@ -37,9 +37,10 @@ describe('getExternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'internal',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
       {
         name: 'myFunction2',
@@ -51,9 +52,10 @@ describe('getExternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'private',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
@@ -72,9 +74,10 @@ describe('getExternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
@@ -110,25 +113,25 @@ describe('getExternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'view',
+        virtual: false,
+        implemented: true,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
         functionName: 'myFunction',
-        arguments: 'string memory _param, string calldata _param2',
         signature: 'myFunction(string,string)',
-        inputsStringNames: ', _param, _param2',
-        outputsStringNames: '',
-        inputString: 'string memory _param, string calldata _param2',
-        outputString: '',
-        isInterface: false,
-        stateMutabilityString: ' view ',
-        abstractAndVirtual: false,
+        parameters: 'string memory _param, string calldata _param2',
+        inputs: 'string memory _param, string calldata _param2',
+        outputs: '',
+        inputNames: ['_param', '_param2'],
+        outputNames: [],
         visibility: 'public',
+        stateMutability: ' view ',
+        implemented: true,
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -172,25 +175,25 @@ describe('getExternalMockFunctions', () => {
         returnParameters: {
           parameters: [],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
         functionName: 'myFunction',
-        arguments: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
         signature: 'myFunction(IERC20,MyStruct,MyEnum)',
-        inputsStringNames: ', _param, _param2, _param3',
-        outputsStringNames: '',
-        inputString: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
-        outputString: '',
-        isInterface: false,
-        stateMutabilityString: ' ',
-        abstractAndVirtual: false,
+        parameters: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
+        inputs: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
+        outputs: '',
+        inputNames: ['_param', '_param2', '_param3'],
+        outputNames: [],
         visibility: 'public',
+        stateMutability: ' ',
+        implemented: true,
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -226,25 +229,25 @@ describe('getExternalMockFunctions', () => {
             },
           ],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
         functionName: 'myFunction',
-        arguments: 'string memory _param, string calldata _param2',
         signature: 'myFunction()',
-        inputsStringNames: '',
-        outputsStringNames: '_param, _param2',
-        inputString: '',
-        outputString: 'string memory _param, string calldata _param2',
-        isInterface: false,
-        stateMutabilityString: ' ',
-        abstractAndVirtual: false,
+        parameters: 'string memory _param, string calldata _param2',
+        inputs: '',
+        outputs: 'string memory _param, string calldata _param2',
+        inputNames: [],
+        outputNames: ['_param', '_param2'],
         visibility: 'public',
+        stateMutability: ' ',
+        implemented: true,
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -288,25 +291,25 @@ describe('getExternalMockFunctions', () => {
             },
           ],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
         functionName: 'myFunction',
-        arguments: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
         signature: 'myFunction()',
-        inputsStringNames: '',
-        outputsStringNames: '_param, _param2, _param3',
-        inputString: '',
-        outputString: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
-        isInterface: false,
-        stateMutabilityString: ' ',
-        abstractAndVirtual: false,
+        parameters: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
+        inputs: '',
+        outputs: 'IERC20 _param, MyStruct _param2, MyEnum _param3',
+        inputNames: [],
+        outputNames: ['_param', '_param2', '_param3'],
         visibility: 'public',
+        stateMutability: ' ',
+        implemented: true,
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -343,25 +346,25 @@ describe('getExternalMockFunctions', () => {
             },
           ],
         },
-        virtual: false,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: true,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
         functionName: 'myFunction',
-        arguments: 'string memory _param, string memory _output',
         signature: 'myFunction(string)',
-        inputsStringNames: ', _param',
-        outputsStringNames: '_output',
-        inputString: 'string memory _param',
-        outputString: 'string memory _output',
-        isInterface: false,
-        stateMutabilityString: ' ',
-        abstractAndVirtual: false,
+        parameters: 'string memory _param, string memory _output',
+        inputs: 'string memory _param',
+        outputs: 'string memory _output',
+        inputNames: ['_param'],
+        outputNames: ['_output'],
         visibility: 'public',
+        stateMutability: ' ',
+        implemented: true,
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
@@ -407,38 +410,38 @@ describe('getExternalMockFunctions', () => {
             },
           ],
         },
-        virtual: false,
-        visibility: 'public',
+        visibility: 'external',
         stateMutability: 'nonpayable',
+        virtual: false,
+        implemented: false,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
         functionName: 'myFunction',
-        arguments: 'string memory _param, string memory _output',
         signature: 'myFunction(string)',
-        inputsStringNames: ', _param',
-        outputsStringNames: '_output',
-        inputString: 'string memory _param',
-        outputString: 'string memory _output',
-        isInterface: true,
-        stateMutabilityString: ' ',
-        abstractAndVirtual: false,
-        visibility: 'public',
+        parameters: 'string memory _param, string memory _output',
+        inputs: 'string memory _param',
+        outputs: 'string memory _output',
+        inputNames: ['_param'],
+        outputNames: ['_output'],
+        visibility: 'external',
+        stateMutability: ' ',
+        implemented: false,
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
     expect(externalFunctions).to.deep.equal(expectedData);
   });
 
-  it('should rewrite abstract contracts virtual functions', async () => {
+  it('should return the correct function data if the contract is abstract', async () => {
     contractNode = {
       nodeType: 'ContractDefinition',
       canonicalName: 'MyContract',
       nodes: [],
       abstract: true,
-      contractKind: 'function',
+      contractKind: 'contract',
       name: 'MyContract',
     };
 
@@ -471,25 +474,25 @@ describe('getExternalMockFunctions', () => {
             },
           ],
         },
-        virtual: true,
         visibility: 'public',
         stateMutability: 'nonpayable',
+        virtual: true,
+        implemented: false,
       },
     ];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
         functionName: 'myFunction',
-        arguments: 'string memory _param, string memory _output',
         signature: 'myFunction(string)',
-        inputsStringNames: ', _param',
-        outputsStringNames: '_output',
-        inputString: 'string memory _param',
-        outputString: 'string memory _output',
-        isInterface: false,
-        stateMutabilityString: ' ',
-        abstractAndVirtual: true,
+        parameters: 'string memory _param, string memory _output',
+        inputs: 'string memory _param',
+        outputs: 'string memory _output',
+        inputNames: ['_param'],
+        outputNames: ['_output'],
         visibility: 'public',
+        stateMutability: ' ',
+        implemented: false,
       },
     ];
     expect(externalFunctions).to.be.an('array').that.is.not.empty;
