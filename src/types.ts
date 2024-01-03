@@ -160,7 +160,5 @@ export interface InternalFunctionOptions {
   implemented: boolean;
 }
 
-export const memoryTypes = ['string', 'bytes', 'mapping'];
-
-export const arrayRegex = /(\w+)\[\]/;
-export const structRegex = /struct (\w+)/;
+export const userDefinedTypes = ['contract', 'enum', 'struct'];
+export const explicitTypes = ['string', 'bytes', 'mapping', 'struct'];

@@ -1,4 +1,5 @@
 import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, ExternalFunctionOptions } from './types';
+import { typeFix } from './utils';
 
 /**
  * Returns the information of the external function for the mock contract
@@ -33,7 +34,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     let parameterIndex = 0;
     parameters.forEach((parameter: VariableDeclarationNode) => {
       // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
+      const typeName: string = typeFix(parameter.typeDescriptions.typeString);
       const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
 
       // If the storage location is memory or calldata then we keep it
@@ -43,6 +44,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
       // We create the string that will be used in the constructor signature
       const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
+      // We save the strings in the arrays
       functionParameters.push(parameterString);
       parameterTypes.push(typeName);
       parameterNames.push(paramName);
@@ -62,9 +64,9 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     parameterIndex = 0;
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
       // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
+      const typeName: string = typeFix(parameter.typeDescriptions.typeString);
       const paramName: string = parameter.name == '' ? `_returnParam${parameterIndex}` : parameter.name;
-
+      
       // If the storage location is memory or calldata then we keep it
       const storageLocation =
         parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
