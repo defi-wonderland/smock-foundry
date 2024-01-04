@@ -42,7 +42,7 @@ export const lowercaseFirstLetter = (str: string): string => {
 /**
  * Returns the string with the type fixed, for example if the type is string it will return `string memory`
  * @param str The string to fix the type
- * @returns Returns the string with the type fixed
+ * @returns The string with the type fixed
  */
 export const typeFix = (str: string): string => {
   if (memoryTypes.includes(str) || arrayRegex.exec(str)) {

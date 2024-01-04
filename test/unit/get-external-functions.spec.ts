@@ -1,7 +1,8 @@
 // Write unit tests for the getExternalFunctions function here like the other tests.
 import { getExternalMockFunctions } from '../../src/get-external-functions';
-import { expect } from 'chai';
 import { ContractDefinitionNode, ExternalFunctionOptions } from '../../src/types';
+import { expect } from 'chai';
+import { FakeFunction, FakeParameter } from '../test-utils';
 
 // We use the describe function to group together related tests
 describe('getExternalMockFunctions', () => {
@@ -26,99 +27,19 @@ describe('getExternalMockFunctions', () => {
   });
 
   it('should return an empty array if there are no external functions', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'internal',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-      {
-        name: 'myFunction2',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'private',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'internal', 'nonpayable', false, true, [], []), FakeFunction('myFunction2', 'function', 'private', 'nonpayable', false, true, [], [])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     expect(externalFunctions).to.be.an('array').that.is.empty;
   });
 
   it('should return an empty array if the function is not a function kind', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'constructor',
-        parameters: {
-          parameters: [],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'constructor', 'public', 'nonpayable', false, true, [], [])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     expect(externalFunctions).to.be.an('array').that.is.empty;
   });
 
   it('should return the correct function data when storage location param is memory or calldata', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [
-            {
-              name: '_param',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-            {
-              name: '_param2',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'calldata',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'view',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'public', 'view', false, true, [FakeParameter('_param', 'string', 'memory'), FakeParameter('_param2', 'string', 'calldata')], [])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
@@ -139,48 +60,7 @@ describe('getExternalMockFunctions', () => {
   });
 
   it('should return the correct function data when param type is contract/struct/enum', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [
-            {
-              name: '_param',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'contract IERC20',
-              },
-              storageLocation: '',
-            },
-            {
-              name: '_param2',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'struct MyStruct',
-              },
-              storageLocation: '',
-            },
-            {
-              name: '_param3',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'enum MyEnum',
-              },
-              storageLocation: '',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'public', 'nonpayable', false, true, [FakeParameter('_param', 'contract IERC20'), FakeParameter('_param2', 'struct MyStruct'), FakeParameter('_param3', 'enum MyEnum')], [])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
@@ -201,40 +81,7 @@ describe('getExternalMockFunctions', () => {
   });
 
   it('should return the correct function data when the output storage location is memory or calldata', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [],
-        },
-        returnParameters: {
-          parameters: [
-            {
-              name: '_param',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-            {
-              name: '_param2',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'calldata',
-            },
-          ],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'public', 'nonpayable', false, true, [], [FakeParameter('_param', 'string', 'memory'), FakeParameter('_param2', 'string', 'calldata')])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
@@ -255,48 +102,7 @@ describe('getExternalMockFunctions', () => {
   });
 
   it('should return the correct function data when the output type is contract/struct/enum', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [],
-        },
-        returnParameters: {
-          parameters: [
-            {
-              name: '_param',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'contract IERC20',
-              },
-              storageLocation: '',
-            },
-            {
-              name: '_param2',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'struct MyStruct',
-              },
-              storageLocation: '',
-            },
-            {
-              name: '_param3',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'enum MyEnum',
-              },
-              storageLocation: '',
-            },
-          ],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'public', 'nonpayable', false, true, [], [FakeParameter('_param', 'contract IERC20'), FakeParameter('_param2', 'struct MyStruct'), FakeParameter('_param3', 'enum MyEnum')])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
@@ -317,41 +123,7 @@ describe('getExternalMockFunctions', () => {
   });
 
   it('should return the correct function data when there are both params and outputs', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [
-            {
-              name: '_param',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [
-            {
-              name: '_output',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'public', 'nonpayable', false, true, [FakeParameter('_param', 'string', 'memory')], [FakeParameter('_output', 'string', 'memory')])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
@@ -381,41 +153,7 @@ describe('getExternalMockFunctions', () => {
       name: 'MyContract',
     };
 
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [
-            {
-              name: '_param',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [
-            {
-              name: '_output',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        visibility: 'external',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: false,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'external', 'nonpayable', false, false, [FakeParameter('_param', 'string', 'memory')], [FakeParameter('_output', 'string', 'memory')])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {
@@ -445,41 +183,7 @@ describe('getExternalMockFunctions', () => {
       name: 'MyContract',
     };
 
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [
-            {
-              name: '_param',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [
-            {
-              name: '_output',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: true,
-        implemented: false,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'public', 'nonpayable', true, false, [FakeParameter('_param', 'string', 'memory')], [FakeParameter('_output', 'string', 'memory')])];
     const externalFunctions = getExternalMockFunctions(contractNode);
     const expectedData: ExternalFunctionOptions[] = [
       {

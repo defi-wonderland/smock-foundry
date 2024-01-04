@@ -1,6 +1,6 @@
-import { expect } from 'chai';
-import { Ast, ImportDirectiveNode } from '../../src/types';
 import { getImports } from '../../src/get-imports';
+import { Ast, ImportDirectiveNode } from '../../src/types';
+import { expect } from 'chai';
 
 describe('getImports', () => {
   let ast: Ast;
