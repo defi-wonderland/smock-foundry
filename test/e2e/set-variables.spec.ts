@@ -1,6 +1,7 @@
-import { expect } from 'chai';
-import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types';
 import { generateMockContracts } from '../../src/index';
+import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types';
+import { expect } from 'chai';
+import { expectParameter } from '../test-utils';
 import { resolve } from 'path';
 
 describe('E2E: getStateVariables', () => {
@@ -82,8 +83,6 @@ describe('E2E: getStateVariables', () => {
     expect(func).to.not.be.undefined;
     expect(func.visibility).to.equal('public');
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '__internalUintVar');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
+    expectParameter(func, '__internalUintVar', 'uint256');
   });
 });

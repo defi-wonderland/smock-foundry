@@ -1,4 +1,5 @@
 import { FunctionDefinitionNode, VariableDeclarationNode } from '../src/types';
+import { expect } from 'chai';
 
 /**
  * Fakes a function definition node
@@ -144,3 +145,31 @@ export function FakeMappingVariable(variableName: string, keyType: string, value
     storageLocation: 'default',
   };
 }
+
+/**
+ * Expects a function parameter to be defined
+ * @param func The function to expect the parameter in
+ * @param paramName The name of the parameter to expect
+ * @param type The type of the parameter to expect
+ * @param storageLocation The storage location of the parameter to expect
+ */
+export const expectParameter = (func: FunctionDefinitionNode, paramName: string, type: string, storageLocation?: string) => {
+  const param = func.parameters.parameters.find((param) => param.name === paramName);
+  expect(param).to.not.be.undefined;
+  expect(param?.typeDescriptions.typeString).to.equal(type);
+  expect(param?.storageLocation).to.equal(storageLocation ? storageLocation : 'default');
+};
+
+/**
+ * Expects a function return parameter to be defined
+ * @param func The function to expect the return parameter in
+ * @param paramName The name of the return parameter to expect
+ * @param type The type of the return parameter to expect
+ * @param storageLocation The storage location of the return parameter to expect
+ */
+export const expectReturnParameter = (func: FunctionDefinitionNode, paramName: string, type: string, storageLocation?: string) => {
+  const returnParam = func.returnParameters.parameters.find((param) => param.name === paramName);
+  expect(returnParam).to.not.be.undefined;
+  expect(returnParam?.typeDescriptions.typeString).to.equal(type);
+  expect(returnParam?.storageLocation).to.equal(storageLocation ? storageLocation : 'default');
+};
