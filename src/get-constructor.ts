@@ -1,4 +1,5 @@
 import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode } from './types';
+import { typeFix } from './utils';
 
 /**
  * Return the constructor of the contract
@@ -21,31 +22,34 @@ export const getConstructor = (contractNode: ContractDefinitionNode): string => 
   const parameters: VariableDeclarationNode[] = constructorNode.parameters.parameters ? constructorNode.parameters.parameters : [];
 
   // We save the parameters in an array with their types and storage location
-  const mockConstructorParameters: string[] = [];
-  // We save the parameters names in an other array
+  const constructorParameters: string[] = [];
+  // We save the parameters names in another array
   const parameterNames: string[] = [];
 
+  let parameterIndex = 0;
   parameters.forEach((parameter) => {
+    // We remove the 'contract ' string from the type name if it exists
+    const typeName: string = typeFix(parameter.typeDescriptions.typeString);
+    const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
+
     // If the storage location is memory or calldata then we keep it
     const storageLocation =
       parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
 
-    // We remove the 'contract ' string from the type name if it exists
-    const typeName: string = parameter.typeDescriptions.typeString.replace(/contract |struct |enum /g, '');
-
     // We create the string that will be used in the constructor signature
-    const parameterString = `${typeName} ${storageLocation}${parameter.name}`;
+    const parameterString = `${typeName} ${storageLocation}${paramName}`;
 
     // We save the strings in the arrays
-    mockConstructorParameters.push(parameterString);
-    parameterNames.push(parameter.name);
+    constructorParameters.push(parameterString);
+    parameterNames.push(paramName);
+    parameterIndex++;
   });
 
   // We join the arrays with a comma and a space between them
-  const mockConstructorParametersString = mockConstructorParameters.join(', ');
+  const constructorParametersString = constructorParameters.join(', ');
   const parameterNamesString = parameterNames.join(', ');
 
   // Create the constructor signature and return it
-  const constructorSignature = `constructor(${mockConstructorParametersString}) ${contractName}(${parameterNamesString}) {}`;
+  const constructorSignature = `constructor(${constructorParametersString}) ${contractName}(${parameterNamesString}) {}`;
   return constructorSignature;
 };

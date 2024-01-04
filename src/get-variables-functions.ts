@@ -6,7 +6,7 @@ import {
   MappingStateVariableOptions,
   StateVariablesOptions,
 } from './types';
-import { typeFix } from './utils';
+import { typeFix, explicitTypeStorageLocation } from './utils';
 
 /**
  * Returns all the mock functions information for state variables
@@ -65,13 +65,13 @@ function getArrayFunction(arrayNode: VariableDeclarationNode): ArrayStateVariabl
   const arrayName: string = arrayNode.name;
 
   // Array type
-  const arrayType: string = typeFix(arrayNode.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+  const arrayType: string = typeFix(explicitTypeStorageLocation(arrayNode.typeDescriptions.typeString));
 
   // Base type
-  const baseType: string = typeFix(arrayNode.typeName.baseType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+  const baseType: string = typeFix(explicitTypeStorageLocation(arrayNode.typeName.baseType.typeDescriptions.typeString));
 
   // Struct flag
-  const isStruct: boolean = arrayNode.typeDescriptions.typeString.includes('struct ');
+  const isStruct: boolean = arrayNode.typeDescriptions.typeString.startsWith('struct ');
 
   // If the array is internal we don't create mockCall for it
   const isInternal: boolean = arrayNode.visibility == 'internal';
@@ -112,22 +112,22 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
   const keyTypes: string[] = [];
   
   do {
-    const keyType: string = typeFix(mappingTypeNameNode.keyType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+    const keyType: string = typeFix(explicitTypeStorageLocation(mappingTypeNameNode.keyType.typeDescriptions.typeString));
     keyTypes.push(keyType);
     mappingTypeNameNode = mappingTypeNameNode.valueType;
   } while (mappingTypeNameNode.typeDescriptions.typeString.startsWith('mapping'));
 
   // Value type
-  const valueType: string = typeFix(mappingTypeNameNode.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+  const valueType: string = typeFix(explicitTypeStorageLocation(mappingTypeNameNode.typeDescriptions.typeString));
 
   // Array flag
   const isArray: boolean = valueType.includes('[]');
 
   // Base type
-  const baseType: string = isArray ? typeFix(mappingTypeNameNode.baseType.typeDescriptions.typeString).replace(/contract |struct |enum /g, '') : valueType;
+  const baseType: string = isArray ? typeFix(explicitTypeStorageLocation(mappingTypeNameNode.baseType.typeDescriptions.typeString)) : valueType;
 
   // Struct array flag
-  const isStructArray: boolean = isArray && mappingTypeNameNode.typeDescriptions.typeString.includes('struct ');
+  const isStructArray: boolean = isArray && mappingTypeNameNode.typeDescriptions.typeString.startsWith('struct ');
 
   // If the mapping is internal we don't create mockCall for it
   const isInternal: boolean = mappingNode.visibility == 'internal';
@@ -164,7 +164,7 @@ function getBasicStateVariableFunction(variableNode: VariableDeclarationNode): B
   const variableName: string = variableNode.name;
 
   // remove spec type leading string
-  const variableType: string = typeFix(variableNode.typeDescriptions.typeString).replace(/contract |struct |enum /g, '');
+  const variableType: string = typeFix(explicitTypeStorageLocation(variableNode.typeDescriptions.typeString));
 
   // If the variable is internal we don't create mockCall for it
   const isInternal: boolean = variableNode.visibility == 'internal';
