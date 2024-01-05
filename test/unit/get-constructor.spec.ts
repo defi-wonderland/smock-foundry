@@ -1,6 +1,7 @@
 import { getConstructor } from '../../src/get-constructor';
-import { expect } from 'chai';
 import { ContractDefinitionNode } from '../../src/types';
+import { expect } from 'chai';
+import { FakeFunction, FakeParameter } from '../test-utils';
 
 describe('getConstructor', () => {
   let contractNode: ContractDefinitionNode;
@@ -22,178 +23,37 @@ describe('getConstructor', () => {
   });
 
   it('should return undefined if there is no constructor', async () => {
-    contractNode.nodes = [
-      {
-        name: 'myFunction',
-        nodeType: 'FunctionDefinition',
-        kind: 'function',
-        parameters: {
-          parameters: [],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('myFunction', 'function', 'public', 'nonpayable', false, true, [], [])];
     const constructorSignature = getConstructor(contractNode);
     expect(constructorSignature).to.be.undefined;
   });
 
   it('should return the correct signature when storage location param is memory', async () => {
-    contractNode.nodes = [
-      {
-        name: '',
-        nodeType: 'FunctionDefinition',
-        kind: 'constructor',
-        parameters: {
-          parameters: [
-            {
-              name: '_greeting',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('', 'constructor', 'public', 'nonpayable', false, true, [FakeParameter('_greeting', 'string', 'memory')], [])];
     const constructorSignature = getConstructor(contractNode);
     expect(constructorSignature).to.equal('constructor(string memory _greeting) MyContract(_greeting) {}');
   });
 
   it('should return the correct signature when storage location param is calldata', async () => {
-    contractNode.nodes = [
-      {
-        name: '',
-        nodeType: 'FunctionDefinition',
-        kind: 'constructor',
-        parameters: {
-          parameters: [
-            {
-              name: '_greeting',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'string',
-              },
-              storageLocation: 'calldata',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('', 'constructor', 'public', 'nonpayable', false, true, [FakeParameter('_greeting', 'string', 'calldata')], [])];
     const constructorSignature = getConstructor(contractNode);
     expect(constructorSignature).to.equal('constructor(string calldata _greeting) MyContract(_greeting) {}');
   });
 
   it('should return the correct signature when param is a contract', async () => {
-    contractNode.nodes = [
-      {
-        name: '',
-        nodeType: 'FunctionDefinition',
-        kind: 'constructor',
-        parameters: {
-          parameters: [
-            {
-              name: '_token',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'contract IERC20',
-              },
-              storageLocation: '',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('', 'constructor', 'public', 'nonpayable', false, true, [FakeParameter('_token', 'contract IERC20')], [])];
     const constructorSignature = getConstructor(contractNode);
     expect(constructorSignature).to.equal('constructor(IERC20 _token) MyContract(_token) {}');
   });
 
   it('should return the correct signature when param is a struct', async () => {
-    contractNode.nodes = [
-      {
-        name: '',
-        nodeType: 'FunctionDefinition',
-        kind: 'constructor',
-        parameters: {
-          parameters: [
-            {
-              name: '_myStruct',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'struct MyStruct',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('', 'constructor', 'public', 'nonpayable', false, true, [FakeParameter('_myStruct', 'struct MyStruct', 'memory')], [])];
     const constructorSignature = getConstructor(contractNode);
     expect(constructorSignature).to.equal('constructor(MyStruct memory _myStruct) MyContract(_myStruct) {}');
   });
 
   it('should return the correct signature when param is an enum', async () => {
-    contractNode.nodes = [
-      {
-        name: '',
-        nodeType: 'FunctionDefinition',
-        kind: 'constructor',
-        parameters: {
-          parameters: [
-            {
-              name: '_myEnum',
-              nodeType: 'VariableDeclaration',
-              typeDescriptions: {
-                typeString: 'enum MyEnum',
-              },
-              storageLocation: 'memory',
-            },
-          ],
-        },
-        returnParameters: {
-          parameters: [],
-        },
-        visibility: 'public',
-        stateMutability: 'nonpayable',
-        virtual: false,
-        implemented: true,
-      },
-    ];
+    contractNode.nodes = [FakeFunction('', 'constructor', 'public', 'nonpayable', false, true, [FakeParameter('_myEnum', 'enum MyEnum', 'memory')], [])];
     const constructorSignature = getConstructor(contractNode);
     expect(constructorSignature).to.equal('constructor(MyEnum memory _myEnum) MyContract(_myEnum) {}');
   });

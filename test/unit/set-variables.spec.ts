@@ -1,7 +1,8 @@
 // Write unit tests for the getExternalFunctions function here like the other tests.
 import { getStateVariables } from '../../src/get-variables-functions';
+import { ContractDefinitionNode, VariableDeclarationNode, StateVariablesOptions } from '../../src/types';
 import { expect } from 'chai';
-import { ContractDefinitionNode, StateVariablesOptions } from '../../src/types';
+import { FakeElementaryVariable, FakeArrayVariable, FakeMappingVariable } from '../test-utils';
 
 // We use the describe function to group together related tests
 describe('getStateVariables', () => {
@@ -31,18 +32,7 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is a base struct', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'myStructVariable',
-        nodeType: 'VariableDeclaration',
-        typeDescriptions: {
-          typeString: 'struct MyStruct',
-        },
-      },
-    ];
+    contractNode.nodes = [FakeElementaryVariable('myStructVariable', 'struct MyStruct', false, 'mutable', 'public')];
     const baseStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [
@@ -66,18 +56,7 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is a base enum', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'myEnumVariable',
-        nodeType: 'VariableDeclaration',
-        typeDescriptions: {
-          typeString: 'enum MyEnum',
-        },
-      },
-    ];
+    contractNode.nodes = [FakeElementaryVariable('myEnumVariable', 'enum MyEnum', false, 'mutable', 'public')];
     const baseStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [
@@ -101,18 +80,7 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is a base contract', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'myContractVariable',
-        nodeType: 'VariableDeclaration',
-        typeDescriptions: {
-          typeString: 'contract MyContract',
-        },
-      },
-    ];
+    contractNode.nodes = [FakeElementaryVariable('myContractVariable', 'contract MyContract', false, 'mutable', 'public')];
     const baseStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [
@@ -136,25 +104,7 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is an array', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'addressArray',
-        nodeType: 'VariableDeclaration',
-        typeDescriptions: {
-          typeString: 'address[]',
-        },
-        typeName: {
-          baseType: {
-            typeDescriptions: {
-              typeString: 'address',
-            },
-          },
-        },
-      },
-    ];
+    contractNode.nodes = [FakeArrayVariable('addressArray', 'address', 'public')];
     const arrayStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [],
@@ -180,25 +130,7 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is a struct array', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'myStructArray',
-        nodeType: 'VariableDeclaration',
-        typeDescriptions: {
-          typeString: 'struct MyStruct[]',
-        },
-        typeName: {
-          baseType: {
-            typeDescriptions: {
-              typeString: 'struct MyStruct',
-            },
-          },
-        },
-      },
-    ];
+    contractNode.nodes = [FakeArrayVariable('myStructArray', 'struct MyStruct', 'public')];
     const arrayStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [],
@@ -224,30 +156,7 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is a mapping', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'uint256ToAddress',
-        nodeType: 'VariableDeclaration',
-        typeDescriptions: {
-          typeString: 'mapping(uint256 => address)',
-        },
-        typeName: {
-          keyType: {
-            typeDescriptions: {
-              typeString: 'uint256',
-            },
-          },
-          valueType: {
-            typeDescriptions: {
-              typeString: 'address',
-            },
-          },
-        },
-      },
-    ];
+    contractNode.nodes = [FakeMappingVariable('uint256ToAddress', 'uint256', 'address', 'public')];
     const mappingStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [],
@@ -275,35 +184,17 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is an array mapping', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'uint256ToAddressArray',
-        nodeType: 'VariableDeclaration',
+    contractNode.nodes = [FakeMappingVariable('uint256ToAddressArray', 'uint256', 'address[]', 'public')];
+    (contractNode.nodes[0] as VariableDeclarationNode).typeName!.valueType = {
+      typeDescriptions: {
+        typeString: 'address[]',
+      },
+      baseType: {
         typeDescriptions: {
-          typeString: 'mapping(uint256 => address[])',
-        },
-        typeName: {
-          keyType: {
-            typeDescriptions: {
-              typeString: 'uint256',
-            },
-          },
-          valueType: {
-            typeDescriptions: {
-              typeString: 'address[]',
-            },
-            baseType: {
-              typeDescriptions: {
-                typeString: 'address',
-              },
-            },
-          },
+          typeString: 'address',
         },
       },
-    ];
+    };
     const mappingStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [],
@@ -331,35 +222,17 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is a struct array mapping', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'uint256ToMyStructArray',
-        nodeType: 'VariableDeclaration',
+    contractNode.nodes = [FakeMappingVariable('uint256ToMyStructArray', 'uint256', 'struct MyStruct[]', 'public')];
+    (contractNode.nodes[0] as VariableDeclarationNode).typeName!.valueType = {
+      typeDescriptions: {
+        typeString: 'struct MyStruct[]',
+      },
+      baseType: {
         typeDescriptions: {
-          typeString: 'mapping(uint256 => struct MyStruct[])',
-        },
-        typeName: {
-          keyType: {
-            typeDescriptions: {
-              typeString: 'uint256',
-            },
-          },
-          valueType: {
-            typeDescriptions: {
-              typeString: 'struct MyStruct[]',
-            },
-            baseType: {
-              typeDescriptions: {
-                typeString: 'struct MyStruct',
-              },
-            },
-          },
+          typeString: 'struct MyStruct',
         },
       },
-    ];
+    };
     const mappingStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [],
@@ -387,40 +260,22 @@ describe('getStateVariables', () => {
   });
 
   it('should return the correct data if the variable is a nested mapping', async () => {
-    contractNode.nodes = [
-      {
-        constant: false,
-        mutability: 'mutable',
-        visibility: 'public',
-        name: 'uint256ToAddressToBytes32',
-        nodeType: 'VariableDeclaration',
+    contractNode.nodes = [FakeMappingVariable('uint256ToAddressToBytes32', 'uint256', 'mapping(address => bytes32)', 'public')];
+    (contractNode.nodes[0] as VariableDeclarationNode).typeName!.valueType = {
+      typeDescriptions: {
+        typeString: 'mapping(address => bytes32)',
+      },
+      keyType: {
         typeDescriptions: {
-          typeString: 'mapping(uint256 => mapping(address => bytes32))',
-        },
-        typeName: {
-          keyType: {
-            typeDescriptions: {
-              typeString: 'uint256',
-            },
-          },
-          valueType: {
-            typeDescriptions: {
-              typeString: 'mapping(address => bytes32)',
-            },
-            keyType: {
-              typeDescriptions: {
-                typeString: 'address',
-              },
-            },
-            valueType: {
-              typeDescriptions: {
-                typeString: 'bytes32',
-              },
-            },
-          },
+          typeString: 'address',
         },
       },
-    ];
+      valueType: {
+        typeDescriptions: {
+          typeString: 'bytes32',
+        },
+      },
+    };
     const mappingStateVariable = getStateVariables(contractNode);
     const expectedData: StateVariablesOptions = {
       basicStateVariables: [],

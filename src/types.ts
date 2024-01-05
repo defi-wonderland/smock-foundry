@@ -26,15 +26,6 @@ export interface VariableDeclarationNode {
   storageLocation?: string;
 }
 
-export interface ContractDefinitionNode {
-  nodeType: 'ContractDefinition';
-  canonicalName: string;
-  nodes: AstNode[];
-  abstract: boolean;
-  contractKind: string;
-  name: string;
-}
-
 export interface FunctionDefinitionNode {
   nodeType: 'FunctionDefinition';
   name: string;
@@ -51,14 +42,13 @@ export interface FunctionDefinitionNode {
   implemented: boolean;
 }
 
-export interface Ast {
-  nodeType: 'SourceUnit';
-  id?: number;
-  src: string;
+export interface ContractDefinitionNode {
+  nodeType: 'ContractDefinition';
+  canonicalName: string;
   nodes: AstNode[];
-  license: string;
-  absolutePath: string;
-  exportedSymbols: { [key: string]: number[] };
+  abstract: boolean;
+  contractKind: string;
+  name: string;
 }
 
 export interface ImportDirectiveNode {
@@ -73,14 +63,17 @@ export interface ImportDirectiveNode {
   }[];
 }
 
-export interface OutputType {
-  name: string;
-  type: string;
-  baseType: string;
-  indexed?: boolean;
-}
+export type AstNode = ImportDirectiveNode | ContractDefinitionNode | FunctionDefinitionNode | VariableDeclarationNode;
 
-export type AstNode = ImportDirectiveNode | FunctionDefinitionNode | ContractDefinitionNode | VariableDeclarationNode;
+export interface Ast {
+  nodeType: 'SourceUnit';
+  id?: number;
+  src: string;
+  nodes: AstNode[];
+  license: string;
+  absolutePath: string;
+  exportedSymbols: { [key: string]: number[] };
+}
 
 export interface BasicStateVariableOptions {
   setFunction: {
@@ -93,6 +86,21 @@ export interface BasicStateVariableOptions {
     paramType: string;
   };
   isInternal: boolean;
+}
+
+export interface ArrayStateVariableOptions {
+  setFunction: {
+    functionName: string;
+    arrayType: string;
+    paramName: string;
+  };
+  mockFunction: {
+    functionName: string;
+    arrayType: string;
+    baseType: string;
+  };
+  isInternal: boolean;
+  isStruct: boolean;
 }
 
 export interface MappingStateVariableOptions {
@@ -110,21 +118,6 @@ export interface MappingStateVariableOptions {
   isInternal: boolean;
   isArray: boolean;
   isStructArray: boolean;
-}
-
-export interface ArrayStateVariableOptions {
-  setFunction: {
-    functionName: string;
-    arrayType: string;
-    paramName: string;
-  };
-  mockFunction: {
-    functionName: string;
-    arrayType: string;
-    baseType: string;
-  };
-  isInternal: boolean;
-  isStruct: boolean;
 }
 
 export interface StateVariablesOptions {
@@ -158,6 +151,13 @@ export interface InternalFunctionOptions {
   outputNames: string[];
   isView: boolean;
   implemented: boolean;
+}
+
+export interface OutputType {
+  name: string;
+  type: string;
+  baseType: string;
+  indexed?: boolean;
 }
 
 export const userDefinedTypes = ['contract', 'enum', 'struct'];

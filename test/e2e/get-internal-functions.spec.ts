@@ -1,7 +1,7 @@
 // Write e2e tests for the getInternalFunctions function here like the other tests.
-import { expect } from 'chai';
-import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types';
 import { generateMockContracts } from '../../src/index';
+import { Ast, ContractDefinitionNode } from '../../src/types';
+import { expectContract, expectFunction, expectParameter, expectReturnParameter } from '../test-utils';
 import { resolve } from 'path';
 
 // We use the describe function to group together related tests
@@ -20,13 +20,12 @@ describe('E2E: getInternalMockFunctions', () => {
 
     contractsNames.forEach((contractName: string) => {
       const mockName = `Mock${contractName}`;
+      
       const compiledArtifactsPath = resolve(compiledArtifactsDir, `${mockName}.sol`, `${mockName}.json`);
-      const ast = require(compiledArtifactsPath).ast;
+      const ast = require(compiledArtifactsPath).ast as Ast;
       if (!ast) throw new Error(`AST for ${mockName} not found`);
-      const contractNode = ast.nodes.find(
-        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === mockName,
-      ) as ContractDefinitionNode;
-      if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') throw new Error(`Contract ${mockName} not found`);
+
+      const contractNode = expectContract(ast, mockName, 'contract', false);
 
       contractNodes = { ...contractNodes, [mockName]: contractNode };
     });
@@ -35,173 +34,85 @@ describe('E2E: getInternalMockFunctions', () => {
   // We use the it function to create a test
   it('MockContractD must include internal function mock call', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__setInternalUintVar',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_uintVariable');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
+    const func = expectFunction(contractNode, 'mock_call__setInternalUintVar', 'function', 'public', 4);
 
-    const param2 = func.parameters.parameters.find((param) => param.name === '_returnParam0');
-    expect(param2).to.not.be.undefined;
-    expect(param2?.typeDescriptions.typeString).to.equal('bool');
-
-    const param3 = func.parameters.parameters.find((param) => param.name === '_returnParam1');
-    expect(param3).to.not.be.undefined;
-    expect(param3?.typeDescriptions.typeString).to.equal('uint256');
-
-    const param4 = func.parameters.parameters.find((param) => param.name === '_returnParam2');
-    expect(param4).to.not.be.undefined;
-    expect(param4?.typeDescriptions.typeString).to.equal('string');
-    expect(param4?.storageLocation).to.equal('memory');
+    expectParameter(func, '_uintVariable', 'uint256');
+    expectParameter(func, '_returnParam0', 'bool');
+    expectParameter(func, '_returnParam1', 'uint256');
+    expectParameter(func, '_returnParam2', 'string', 'memory');
   });
 
   it('MockContractD must include internal function override', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_setInternalUintVar',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_uintVariable');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
+    const func = expectFunction(contractNode, '_setInternalUintVar', 'function', 'internal', 1);
 
-    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_returnParam0');
-    expect(returnParam1).to.not.be.undefined;
-    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
+    expectParameter(func, '_uintVariable', 'uint256');
 
-    const returnParam2 = func.returnParameters.parameters.find((param) => param.name === '_returnParam1');
-    expect(returnParam2).to.not.be.undefined;
-    expect(returnParam2?.typeDescriptions.typeString).to.equal('uint256');
-
-    const returnParam3 = func.returnParameters.parameters.find((param) => param.name === '_returnParam2');
-    expect(returnParam3).to.not.be.undefined;
-    expect(returnParam3?.typeDescriptions.typeString).to.equal('string');
-    expect(returnParam3?.storageLocation).to.equal('memory');
+    expectReturnParameter(func, '_returnParam0', 'bool');
+    expectReturnParameter(func, '_returnParam1', 'uint256');
+    expectReturnParameter(func, '_returnParam2', 'string', 'memory');
   });
 
   it('MockContractD must include internal view function mock call', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__getVariables',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_uintVariable');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
+    const func = expectFunction(contractNode, 'mock_call__getVariables', 'function', 'public', 4);
 
-    const param2 = func.parameters.parameters.find((param) => param.name === '_returnParam0');
-    expect(param2).to.not.be.undefined;
-    expect(param2?.typeDescriptions.typeString).to.equal('bool');
-
-    const param3 = func.parameters.parameters.find((param) => param.name === '_returnParam1');
-    expect(param3).to.not.be.undefined;
-    expect(param3?.typeDescriptions.typeString).to.equal('uint256');
-
-    const param4 = func.parameters.parameters.find((param) => param.name === '_returnParam2');
-    expect(param4).to.not.be.undefined;
-    expect(param4?.typeDescriptions.typeString).to.equal('string');
-    expect(param4?.storageLocation).to.equal('memory');
+    expectParameter(func, '_uintVariable', 'uint256');
+    expectParameter(func, '_returnParam0', 'bool');
+    expectParameter(func, '_returnParam1', 'uint256');
+    expectParameter(func, '_returnParam2', 'string', 'memory');
   });
 
   it('MockContractD must include internal view function override', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_getVariables',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_uintVariable');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('uint256');
+    const func = expectFunction(contractNode, '_getVariables', 'function', 'internal', 1);
 
-    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_returnParam0');
-    expect(returnParam1).to.not.be.undefined;
-    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
+    expectParameter(func, '_uintVariable', 'uint256');
 
-    const returnParam2 = func.returnParameters.parameters.find((param) => param.name === '_returnParam1');
-    expect(returnParam2).to.not.be.undefined;
-    expect(returnParam2?.typeDescriptions.typeString).to.equal('uint256');
-
-    const returnParam3 = func.returnParameters.parameters.find((param) => param.name === '_returnParam2');
-    expect(returnParam3).to.not.be.undefined;
-    expect(returnParam3?.typeDescriptions.typeString).to.equal('string');
-    expect(returnParam3?.storageLocation).to.equal('memory');
+    expectReturnParameter(func, '_returnParam0', 'bool');
+    expectReturnParameter(func, '_returnParam1', 'uint256');
+    expectReturnParameter(func, '_returnParam2', 'string', 'memory');
   });
 
   it('MockContractAbstract must include unimplemented internal function mock call', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__undefinedInternalFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_someText');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('string');
-    expect(param1?.storageLocation).to.equal('memory');
+    const func = expectFunction(contractNode, 'mock_call__undefinedInternalFunc', 'function', 'public', 2);
 
-    const param2 = func.parameters.parameters.find((param) => param.name === '_result');
-    expect(param2).to.not.be.undefined;
-    expect(param2?.typeDescriptions.typeString).to.equal('bool');
+    expectParameter(func, '_someText', 'string', 'memory');
+    expectParameter(func, '_result', 'bool');
   });
 
   it('MockContractAbstract must include unimplemented internal function override', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_undefinedInternalFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_someText');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('string');
-    expect(param1?.storageLocation).to.equal('memory');
+    const func = expectFunction(contractNode, '_undefinedInternalFunc', 'function', 'internal', 1);
 
-    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_result');
-    expect(returnParam1).to.not.be.undefined;
-    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
+    expectParameter(func, '_someText', 'string', 'memory');
+
+    expectReturnParameter(func, '_result', 'bool');
   });
 
   it('MockContractAbstract must include unimplemented internal view function mock call', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__undefinedInternalViewFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_someText');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('string');
-    expect(param1?.storageLocation).to.equal('memory');
+    const func = expectFunction(contractNode, 'mock_call__undefinedInternalViewFunc', 'function', 'public', 2);
 
-    const param2 = func.parameters.parameters.find((param) => param.name === '_result');
-    expect(param2).to.not.be.undefined;
-    expect(param2?.typeDescriptions.typeString).to.equal('bool');
+    expectParameter(func, '_someText', 'string', 'memory');
+    expectParameter(func, '_result', 'bool');
   });
 
   it('MockContractAbstract must include unimplemented internal view function override', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_undefinedInternalViewFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+    
+    const func = expectFunction(contractNode, '_undefinedInternalViewFunc', 'function', 'internal', 1);
 
-    const param1 = func.parameters.parameters.find((param) => param.name === '_someText');
-    expect(param1).to.not.be.undefined;
-    expect(param1?.typeDescriptions.typeString).to.equal('string');
-    expect(param1?.storageLocation).to.equal('memory');
+    expectParameter(func, '_someText', 'string', 'memory');
 
-    const returnParam1 = func.returnParameters.parameters.find((param) => param.name === '_result');
-    expect(returnParam1).to.not.be.undefined;
-    expect(returnParam1?.typeDescriptions.typeString).to.equal('bool');
+    expectReturnParameter(func, '_result', 'bool');
   });
 });
