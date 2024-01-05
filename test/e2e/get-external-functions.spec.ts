@@ -1,8 +1,7 @@
 // Write e2e tests for the getExternalFunctions function here like the other tests.
 import { generateMockContracts } from '../../src/index';
-import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types';
-import { expect } from 'chai';
-import { expectParameter, expectReturnParameter } from '../test-utils';
+import { Ast, ContractDefinitionNode } from '../../src/types';
+import { expectContract, expectFunction, expectParameter, expectReturnParameter } from '../test-utils';
 import { resolve } from 'path';
 
 // We use the describe function to group together related tests
@@ -21,13 +20,12 @@ describe('E2E: getExternalMockFunctions', () => {
 
     contractsNames.forEach((contractName: string) => {
       const mockName = `Mock${contractName}`;
+      
       const compiledArtifactsPath = resolve(compiledArtifactsDir, `${mockName}.sol`, `${mockName}.json`);
-      const ast = require(compiledArtifactsPath).ast;
+      const ast = require(compiledArtifactsPath).ast as Ast;
       if (!ast) throw new Error(`AST for ${mockName} not found`);
-      const contractNode = ast.nodes.find(
-        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === mockName,
-      ) as ContractDefinitionNode;
-      if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') throw new Error(`Contract ${mockName} not found`);
+
+      const contractNode = expectContract(ast, mockName, 'contract', false);
 
       contractNodes = { ...contractNodes, [mockName]: contractNode };
     });
@@ -36,21 +34,16 @@ describe('E2E: getExternalMockFunctions', () => {
   // We use the it function to create a test
   it('MockContractTest must include constructor', async () => {
     const contractNode = contractNodes['MockContractTest'];
-    const constructor = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.kind === 'constructor',
-    ) as FunctionDefinitionNode;
-    expect(constructor).to.not.be.undefined;
+
+    const constructor = expectFunction(contractNode, '', 'constructor', 'public', 5);
 
     expectParameter(constructor, '_uintVariable', 'uint256');
   });
 
   it('MockContractTest must include external function mock call', async () => {
     const contractNode = contractNodes['MockContractTest'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_setVariables' && node.parameters.parameters.length === 2,
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
+
+    const func = expectFunction(contractNode, 'mock_call_setVariables', 'function', 'public', 2);
 
     expectParameter(func, '_newValue', 'uint256');
     expectParameter(func, '_result', 'bool');
@@ -58,10 +51,8 @@ describe('E2E: getExternalMockFunctions', () => {
 
   it('MockIContractTest must include interface function', async () => {
     const contractNode = contractNodes['MockIContractTest'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'setVariables' && node.parameters.parameters.length === 8,
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+
+    const func = expectFunction(contractNode, 'setVariables', 'function', 'external', 8);
 
     expectParameter(func, '_newValue', 'uint256');
     expectParameter(func, '_newString', 'string', 'memory');
@@ -77,11 +68,8 @@ describe('E2E: getExternalMockFunctions', () => {
 
   it('MockIContractTest must include external function mock call', async () => {
     const contractNode = contractNodes['MockIContractTest'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_setVariables' && node.parameters.parameters.length === 3,
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
+
+    const func = expectFunction(contractNode, 'mock_call_setVariables', 'function', 'public', 3);
 
     expectParameter(func, '_param0', 'uint256');
     expectParameter(func, '_param1', 'bool');
@@ -90,18 +78,16 @@ describe('E2E: getExternalMockFunctions', () => {
 
   it('MockContractAbstract must include constructor', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const constructor = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.kind === 'constructor',
-    ) as FunctionDefinitionNode;
-    expect(constructor).to.not.be.undefined;
+
+    const constructor = expectFunction(contractNode, '', 'constructor', 'public', 1);
 
     expectParameter(constructor, '_uintVariable', 'uint256');
   });
 
   it('MockContractAbstract must include unimplemented external function', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find((node) => node.nodeType === 'FunctionDefinition' && node.name === 'undefinedFunc') as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+
+    const func = expectFunction(contractNode, 'undefinedFunc', 'function', 'public', 1);
 
     expectParameter(func, '_someText', 'string', 'memory');
 
@@ -110,11 +96,8 @@ describe('E2E: getExternalMockFunctions', () => {
 
   it('MockContractAbstract must include unimplemented external function mock call', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call_undefinedFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
+
+    const func = expectFunction(contractNode, 'mock_call_undefinedFunc', 'function', 'public', 2);
 
     expectParameter(func, '_someText', 'string', 'memory');
     expectParameter(func, '_result', 'bool');

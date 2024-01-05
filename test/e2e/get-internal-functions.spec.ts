@@ -1,8 +1,7 @@
 // Write e2e tests for the getInternalFunctions function here like the other tests.
 import { generateMockContracts } from '../../src/index';
-import { ContractDefinitionNode, FunctionDefinitionNode } from '../../src/types';
-import { expect } from 'chai';
-import { expectParameter, expectReturnParameter } from '../test-utils';
+import { Ast, ContractDefinitionNode } from '../../src/types';
+import { expectContract, expectFunction, expectParameter, expectReturnParameter } from '../test-utils';
 import { resolve } from 'path';
 
 // We use the describe function to group together related tests
@@ -21,13 +20,12 @@ describe('E2E: getInternalMockFunctions', () => {
 
     contractsNames.forEach((contractName: string) => {
       const mockName = `Mock${contractName}`;
+      
       const compiledArtifactsPath = resolve(compiledArtifactsDir, `${mockName}.sol`, `${mockName}.json`);
-      const ast = require(compiledArtifactsPath).ast;
+      const ast = require(compiledArtifactsPath).ast as Ast;
       if (!ast) throw new Error(`AST for ${mockName} not found`);
-      const contractNode = ast.nodes.find(
-        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === mockName,
-      ) as ContractDefinitionNode;
-      if (!contractNode || contractNode.abstract || contractNode.contractKind === 'library') throw new Error(`Contract ${mockName} not found`);
+
+      const contractNode = expectContract(ast, mockName, 'contract', false);
 
       contractNodes = { ...contractNodes, [mockName]: contractNode };
     });
@@ -36,11 +34,8 @@ describe('E2E: getInternalMockFunctions', () => {
   // We use the it function to create a test
   it('MockContractD must include internal function mock call', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__setInternalUintVar',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
+
+    const func = expectFunction(contractNode, 'mock_call__setInternalUintVar', 'function', 'public', 4);
 
     expectParameter(func, '_uintVariable', 'uint256');
     expectParameter(func, '_returnParam0', 'bool');
@@ -50,10 +45,8 @@ describe('E2E: getInternalMockFunctions', () => {
 
   it('MockContractD must include internal function override', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_setInternalUintVar',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+
+    const func = expectFunction(contractNode, '_setInternalUintVar', 'function', 'internal', 1);
 
     expectParameter(func, '_uintVariable', 'uint256');
 
@@ -64,11 +57,8 @@ describe('E2E: getInternalMockFunctions', () => {
 
   it('MockContractD must include internal view function mock call', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__getVariables',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
+
+    const func = expectFunction(contractNode, 'mock_call__getVariables', 'function', 'public', 4);
 
     expectParameter(func, '_uintVariable', 'uint256');
     expectParameter(func, '_returnParam0', 'bool');
@@ -78,10 +68,8 @@ describe('E2E: getInternalMockFunctions', () => {
 
   it('MockContractD must include internal view function override', async () => {
     const contractNode = contractNodes['MockContractD'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_getVariables',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+
+    const func = expectFunction(contractNode, '_getVariables', 'function', 'internal', 1);
 
     expectParameter(func, '_uintVariable', 'uint256');
 
@@ -92,11 +80,8 @@ describe('E2E: getInternalMockFunctions', () => {
 
   it('MockContractAbstract must include unimplemented internal function mock call', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__undefinedInternalFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
+
+    const func = expectFunction(contractNode, 'mock_call__undefinedInternalFunc', 'function', 'public', 2);
 
     expectParameter(func, '_someText', 'string', 'memory');
     expectParameter(func, '_result', 'bool');
@@ -104,10 +89,8 @@ describe('E2E: getInternalMockFunctions', () => {
 
   it('MockContractAbstract must include unimplemented internal function override', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_undefinedInternalFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+
+    const func = expectFunction(contractNode, '_undefinedInternalFunc', 'function', 'internal', 1);
 
     expectParameter(func, '_someText', 'string', 'memory');
 
@@ -116,11 +99,8 @@ describe('E2E: getInternalMockFunctions', () => {
 
   it('MockContractAbstract must include unimplemented internal view function mock call', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === 'mock_call__undefinedInternalViewFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
-    expect(func.visibility).to.equal('public');
+
+    const func = expectFunction(contractNode, 'mock_call__undefinedInternalViewFunc', 'function', 'public', 2);
 
     expectParameter(func, '_someText', 'string', 'memory');
     expectParameter(func, '_result', 'bool');
@@ -128,10 +108,8 @@ describe('E2E: getInternalMockFunctions', () => {
 
   it('MockContractAbstract must include unimplemented internal view function override', async () => {
     const contractNode = contractNodes['MockContractAbstract'];
-    const func = contractNode.nodes.find(
-      (node) => node.nodeType === 'FunctionDefinition' && node.name === '_undefinedInternalViewFunc',
-    ) as FunctionDefinitionNode;
-    expect(func).to.not.be.undefined;
+    
+    const func = expectFunction(contractNode, '_undefinedInternalViewFunc', 'function', 'internal', 1);
 
     expectParameter(func, '_someText', 'string', 'memory');
 
