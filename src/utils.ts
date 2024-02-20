@@ -69,17 +69,17 @@ export const explicitTypeStorageLocation = (type: string): string => {
  * @returns The content of the template
  */
 export const registerHandlebarsTemplates = (): string => {
-  [
-    'state-variable',
-    'array-state-variable',
-    'mapping-state-variable',
-    'external-function',
-    'internal-function',
-  ].forEach((partialName: string) => {
-    const partialPath = resolve(__dirname, 'templates', 'partials', `${partialName}.hbs`);
-    const partialContent = readFileSync(partialPath, 'utf8');
-    Handlebars.registerPartial(partialName, partialContent);
-  });
+  // [
+  //   'state-variable',
+  //   'array-state-variable',
+  //   'mapping-state-variable',
+  //   'external-or-public-function',
+  //   'internal-function',
+  // ].forEach((partialName: string) => {
+  //   const partialPath = resolve(__dirname, 'templates', 'partials', `${partialName}.hbs`);
+  //   const partialContent = readFileSync(partialPath, 'utf8');
+  //   Handlebars.registerPartial(partialName, partialContent);
+  // });
 
   // TODO: Do we need to register templates? This one is never registered
   const templatePath = resolve(__dirname, 'templates', 'contract-template.hbs');

@@ -7,6 +7,7 @@ import {
   readPartial,
   sanitizeParameterType
 } from './utils';
+import { ExternalFunctionContext, ConstructorContext } from './types';
 import Handlebars from 'handlebars';
 import { writeFileSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
@@ -56,23 +57,24 @@ export async function generateMockContracts(mocksDirectory: string) {
       for(const contract of contracts) {
         for(const node of contract.children) {
           if (node instanceof VariableDeclaration) {
-            const partialContent = await readPartial('state-variable');
-            const partial = Handlebars.compile(partialContent);
-            mockContent += partial({});
+            // const partialContent = await readPartial('state-variable');
+            // const partial = Handlebars.compile(partialContent);
+            // mockContent += partial({});
           } else if (node instanceof FunctionDefinition) {
             if(node.kind === 'constructor') {
               const constructorContent = constructorContext(node);
               const partialContent = await readPartial('constructor');
               const partial = Handlebars.compile(partialContent);
               mockContent += partial({...constructorContent, contractName: contractName});
-            } else if (node.visibility === 'external') {
-              const partialContent = await readPartial('external-function');
+            } else if (node.visibility === 'external' || node.visibility === 'public') {
+              const functionContext = externalOrPublicFunctionContext(node);
+              const partialContent = await readPartial('external-or-public-function');
               const partial = Handlebars.compile(partialContent);
-              mockContent += partial({});
+              mockContent += partial(functionContext);
             } else {
-              const partialContent = await readPartial('internal-function');
-              const partial = Handlebars.compile(partialContent);
-              mockContent += partial({});
+              // const partialContent = await readPartial('internal-function');
+              // const partial = Handlebars.compile(partialContent);
+              // mockContent += partial({});
             }
           }
         }
@@ -83,7 +85,12 @@ export async function generateMockContracts(mocksDirectory: string) {
           contractName: contractName,
           contractAbsolutePath: scope.absolutePath,
           exportedSymbols: Array.from(scope.exportedSymbols.keys())
-        });
+        })
+        // TODO: check if there are other symbols we should account for, or if there is a better way to handle this
+        // TODO: Check if there is a better way to handle the HTML encoded characters, for instance with `compile` options
+        .replace(/&#x27;/g, "'")
+        .replace(/&#x3D;/g, '=')
+        .replace(/;;/g, ';');
 
         writeFileSync(`${mocksDirectory}/Mock${contractName}.sol`, contractCode);
       }
@@ -97,7 +104,7 @@ export async function generateMockContracts(mocksDirectory: string) {
       console.log('Mock contracts generated successfully');
 
       // TODO: Compile the mock contracts
-      await compileSolidityFilesFoundry(mocksDirectory);
+      // await compileSolidityFilesFoundry(mocksDirectory);
     } catch(error) {
       console.error(error);
     }
@@ -106,7 +113,98 @@ export async function generateMockContracts(mocksDirectory: string) {
   }
 }
 
-export function constructorContext(node: FunctionDefinition): { parameters: string, parametersNames: string } {
+export function externalOrPublicFunctionContext(node: FunctionDefinition): ExternalFunctionContext {
+  // Check if the function is external or public
+  if (node.visibility != 'external' && node.visibility != 'public') throw new Error('The function is not external or public');
+
+  // Save state mutability
+  const stateMutability = node.stateMutability === 'nonpayable' ? ' ' : ` ${node.stateMutability} `;
+
+  // Get the parameters of the function, if there are no parameters then we use an empty array
+  const parameters: VariableDeclaration[] = node.vParameters.vParameters ? node.vParameters.vParameters : [];
+
+  // Save the parameters in an array with their types and storage location
+  const functionParameters: string[] = [];
+  // Save the types in an array to use them in order to create the signature
+  const parameterTypes: string[] = [];
+  // Save the parameters names in another array
+  const parameterNames: string[] = [];
+
+  parameters.forEach((parameter: VariableDeclaration, index: number) => {
+    // We remove the 'contract ' string from the type name if it exists
+    const typeName: string = sanitizeParameterType(parameter.typeString);
+    const paramName: string = parameter.name == '' ? `_param${index}` : parameter.name;
+
+    // If the storage location is memory or calldata then we keep it
+    const storageLocation =
+      parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
+
+    // We create the string that will be used in the constructor signature
+    const parameterString = `${typeName} ${storageLocation}${paramName}`;
+
+    // Save the strings in the arrays
+    functionParameters.push(parameterString);
+    parameterTypes.push(typeName);
+    parameterNames.push(paramName);
+    index++;
+  });
+
+  const signature = parameterTypes ? `${node.name}(${parameterTypes.join(',')})` : `${node.name}()`;
+
+  // Get the return parameters of the function, if there are no return parameters then we use an empty array
+  const returnParameters: VariableDeclaration[] = node.vReturnParameters.vParameters ? node.vReturnParameters.vParameters : [];
+
+  // Save the return parameters in an array with their types and storage location
+  const functionReturnParameters: string[] = [];
+  // Save the return parameters names in another array
+  const returnParameterNames: string[] = [];
+
+  returnParameters.forEach((parameter: VariableDeclaration, index: number) => {
+    // We remove the 'contract ' string from the type name if it exists
+    const typeName: string = sanitizeParameterType(parameter.typeString);
+    const paramName: string = parameter.name == '' ? `_returnParam${index}` : parameter.name;
+    
+    // If the storage location is memory or calldata then we keep it
+    const storageLocation =
+      parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
+
+    // We create the string that will be used in the constructor signature
+    const parameterString = `${typeName} ${storageLocation}${paramName}`;
+
+    functionReturnParameters.push(parameterString);
+    returnParameterNames.push(paramName);
+    index++;
+  });
+
+  // We create the string that will be used in the mock function signature
+  const inputs: string = functionParameters.length ? functionParameters.join(', ') : '';
+  const outputs: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
+
+  let params: string;
+  if (!inputs) {
+    params = outputs;
+  } else if (!outputs) {
+    params = inputs;
+  } else {
+    params = `${inputs}, ${outputs}`;
+  }
+
+  // Save the external function information
+  return {
+    functionName: node.name,
+    signature: signature,
+    parameters: params,
+    inputs: inputs,
+    outputs: outputs,
+    inputNames: parameterNames,
+    outputNames: returnParameterNames,
+    visibility: node.visibility,
+    stateMutability: stateMutability,
+    implemented: node.implemented,
+  };
+}
+
+export function constructorContext(node: FunctionDefinition): ConstructorContext {
   if(node.kind !== 'constructor') throw new Error('The node is not a constructor');
 
   // Get the parameters of the constructor, if there are no parameters then we use an empty array
@@ -115,9 +213,9 @@ export function constructorContext(node: FunctionDefinition): { parameters: stri
   // Save the parameters in an array with their types and storage location
   const constructorParameters: string[] = [];
   // Save the parameters names in another array
-  const parametersNames: string[] = [];
+  const parameterNames: string[] = [];
 
-  parameters.forEach((parameter, index) => {
+  parameters.forEach((parameter: VariableDeclaration, index: number) => {
     // Remove the 'contract ' string from the type name
     const typeName: string = sanitizeParameterType(parameter.typeString);
     const paramName: string = parameter.name === '' ? `_param${index}` : parameter.name;
@@ -131,12 +229,12 @@ export function constructorContext(node: FunctionDefinition): { parameters: stri
 
     // Save the strings in the arrays
     constructorParameters.push(parameterString);
-    parametersNames.push(paramName);
+    parameterNames.push(paramName);
     index++;
   });
 
   return {
     parameters: constructorParameters.join(', '),
-    parametersNames: parametersNames.join(', ')
+    parameterNames: parameterNames.join(', ')
   }
 }

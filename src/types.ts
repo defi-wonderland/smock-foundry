@@ -162,3 +162,24 @@ export interface OutputType {
 
 export const userDefinedTypes = ['contract', 'enum', 'struct'];
 export const explicitTypes = ['string', 'bytes', 'mapping', 'struct'];
+
+
+
+// Contexts to pass to Handlebars templates
+export interface ConstructorContext {
+  parameters: string;
+  parameterNames: string;
+}
+
+export interface ExternalFunctionContext {
+  functionName: string;
+  signature: string;
+  parameters: string;
+  inputs: string;
+  outputs: string;
+  inputNames: string[];
+  outputNames: string[];
+  visibility: string;
+  stateMutability: string;
+  implemented: boolean;
+}
