@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars';
 import { writeFileSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
-import { ASTKind, ASTReader, compileSol, FunctionDefinition, VariableDeclaration } from 'solc-typed-ast';
+import { ASTKind, ASTReader, compileSol, SourceUnit, FunctionDefinition, VariableDeclaration, Identifier, ImportDirective } from 'solc-typed-ast';
 import {
   registerHandlebarsTemplates,
   registerSmockHelperTemplate,
@@ -9,7 +9,7 @@ import {
   readPartial,
   sanitizeParameterType
 } from './utils';
-import { ExternalFunctionContext, ConstructorContext, InternalFunctionContext } from './types';
+import { ExternalFunctionContext, ConstructorContext, InternalFunctionContext, ImportContext } from './types';
 
 /**
  * Generates the mock contracts
@@ -50,50 +50,61 @@ export async function generateMockContracts(mocksDirectory: string) {
 
       const sourceUnits = new ASTReader().read(compiledFiles.data, ASTKind.Any, compiledFiles.files).filter((sourceUnit) => includedPaths.includes(sourceUnit.absolutePath));
 
-      const contracts = sourceUnits.flatMap(s => s.vContracts);
-      let mockContent = '';
-      for(const contract of contracts) {
-        for(const node of contract.children) {
-          if (node instanceof VariableDeclaration) {
-            // const partialContent = await readPartial('state-variable');
-            // const partial = Handlebars.compile(partialContent);
-            // mockContent += partial({});
-          } else if (node instanceof FunctionDefinition) {
-            if(node.isConstructor) {
-              const constructorContent = constructorContext(node);
-              const partialContent = await readPartial('constructor');
-              const partial = Handlebars.compile(partialContent);
-              mockContent += partial({...constructorContent, contractName: contractName});
-            } else if (node.visibility === 'external' || node.visibility === 'public') {
-              const functionContext = externalOrPublicFunctionContext(node);
-              const partialContent = await readPartial('external-or-public-function');
-              const partial = Handlebars.compile(partialContent);
-              mockContent += partial(functionContext);
-            } else if(node.visibility === 'internal' && node.virtual) {
-              const functionContext = internalFunctionContext(node);
-              const partialContent = await readPartial('internal-function');
-              const partial = Handlebars.compile(partialContent);
-              mockContent += partial(functionContext);
+      for(const sourceUnit of sourceUnits) {
+        let importsContent = '';
+        // First process the imports, they will be on top of each mock contract
+        for(const importDirective of sourceUnit.vImportDirectives) {
+          const context = importContext(importDirective);
+          const partialContent = await readPartial('import');
+          const partial = Handlebars.compile(partialContent);
+          importsContent += partial(context);
+        }
+        
+        let mockContent = '';
+        for(const contract of sourceUnit.vContracts) {
+          for(const node of contract.children) {
+            if (node instanceof VariableDeclaration) {
+              // const partialContent = await readPartial('state-variable');
+              // const partial = Handlebars.compile(partialContent);
+              // mockContent += partial({});
+            } else if (node instanceof FunctionDefinition) {
+              if(node.isConstructor) {
+                const context = constructorContext(node);
+                const partialContent = await readPartial('constructor');
+                const partial = Handlebars.compile(partialContent);
+                mockContent += partial({...context, contractName: contractName});
+              } else if (node.visibility === 'external' || node.visibility === 'public') {
+                const context = externalOrPublicFunctionContext(node);
+                const partialContent = await readPartial('external-or-public-function');
+                const partial = Handlebars.compile(partialContent);
+                mockContent += partial(context);
+              } else if(node.visibility === 'internal' && node.virtual) {
+                const context = internalFunctionContext(node);
+                const partialContent = await readPartial('internal-function');
+                const partial = Handlebars.compile(partialContent);
+                mockContent += partial(context);
+              }
             }
           }
+
+          const scope = contract.vScope;
+          const contractCode: string = contractTemplate({
+            content: mockContent,
+            importsContent: importsContent,
+            contractName: contractName,
+            contractAbsolutePath: scope.absolutePath,
+            exportedSymbols: Array.from(scope.exportedSymbols.keys()),
+          })
+          // TODO: check if there are other symbols we should account for, or if there is a better way to handle this
+          // TODO: Check if there is a better way to handle the HTML encoded characters, for instance with `compile` options
+          .replace(/&#x27;/g, "'")
+          .replace(/&#x3D;/g, '=')
+          .replace(/&gt;/g, '>')
+          .replace(/&lt;/g, '<')
+          .replace(/;;/g, ';');
+
+          writeFileSync(`${mocksDirectory}/Mock${contractName}.sol`, contractCode);
         }
-
-        const scope = contract.vScope;
-        const contractCode: string = contractTemplate({
-          content: mockContent,
-          contractName: contractName,
-          contractAbsolutePath: scope.absolutePath,
-          exportedSymbols: Array.from(scope.exportedSymbols.keys())
-        })
-        // TODO: check if there are other symbols we should account for, or if there is a better way to handle this
-        // TODO: Check if there is a better way to handle the HTML encoded characters, for instance with `compile` options
-        .replace(/&#x27;/g, "'")
-        .replace(/&#x3D;/g, '=')
-        .replace(/&gt;/g, '>')
-        .replace(/&lt;/g, '<')
-        .replace(/;;/g, ';');
-
-        writeFileSync(`${mocksDirectory}/Mock${contractName}.sol`, contractCode);
       }
       
       // Generate SmockHelper contract
@@ -240,5 +251,21 @@ export function constructorContext(node: FunctionDefinition): ConstructorContext
   return {
     parameters: parameters.join(', '),
     parameterNames: parameterNames.join(', ')
+  }
+}
+
+export function importContext(node: ImportDirective): ImportContext {
+  // Get the absolute path and the symbol aliases, the symbol aliases are the named imports
+  const { symbolAliases, absolutePath } = node;
+
+  // If there are no named imports then we import the whole file
+  if (!symbolAliases.length) return { absolutePath}
+
+  // Get the names of the named imports
+  const namedImports = symbolAliases.map((symbolAlias) => symbolAlias.foreign instanceof Identifier ? symbolAlias.foreign.name : symbolAlias.foreign);
+
+  return {
+    namedImports,
+    absolutePath
   }
 }

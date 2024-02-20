@@ -198,3 +198,8 @@ export interface InternalFunctionContext {
   outputTypes: string[];
   isView: boolean;
 }
+
+export interface ImportContext {
+  absolutePath: string;
+  namedImports?: (string | number)[];
+}
