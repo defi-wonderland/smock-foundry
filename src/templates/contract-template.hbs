@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: {{#if license}}{{license}}{{else}}UNLICENSED{{/if}}
 pragma solidity ^0.8.0;
 
-import {Test} from 'forge-std/Test.sol';
-import { {{~exportedSymbols~}} } from '{{contractImport}}';
+import { Test } from 'forge-std/Test.sol';
+import { {{~exportedSymbols~}} } from '{{contractAbsolutePath}}';
 {{#each import}}
 {{this}};
 {{/each}}
 
 contract Mock{{contractName}} is {{contractName}}, Test {
-  {{mockContent}}
+  {{content}}
 {{!-- {{#if constructor}}
   {{constructor}}
 {{/if}}

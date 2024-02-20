@@ -1,55 +1,46 @@
-import { getExternalMockFunctions, getInternalMockFunctions, getConstructor, getImports, getStateVariables, Ast } from './index';
+import { getExternalMockFunctions, getInternalMockFunctions, getImports, getStateVariables, Ast } from './index';
 import {
-  getSubDirNameFromPath,
   registerHandlebarsTemplates,
-  getContractNamesAndFolders,
   compileSolidityFilesFoundry,
   registerSmockHelperTemplate,
   getSolidityFilesAbsolutePaths,
-  readPartial
+  readPartial,
+  sanitizeParameterType
 } from './utils';
 import Handlebars from 'handlebars';
-import { writeFileSync, existsSync, readdirSync } from 'fs';
+import { writeFileSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
-import { resolve } from 'path';
-import { StateVariablesOptions, ContractDefinitionNode } from './types';
-import { ASTKind, ASTReader, SourceUnit, compileSol, FunctionDefinition, VariableDeclaration } from 'solc-typed-ast';
+import { ASTKind, ASTReader, compileSol, SourceUnit, ContractDefinition, FunctionDefinition, VariableDeclaration } from 'solc-typed-ast';
 
 /**
  * Generates the mock contracts
- * @param contractsDir The directory where the contracts are located
- * @param compiledArtifactsDir The directory where the compiled artifacts are located
- * @param generatedContractsDir The directory where the mock contracts will be generated
+ * @param mocksDirectory The directory where the mock contracts will be generated
  */
-export const generateMockContracts = async (
-  contractsDir: string[],
-  compiledArtifactsDir: string,
-  generatedContractsDir: string,
-  ignoreDir: string[],
-) => {
-  const templateContent: string = registerHandlebarsTemplates();
-  const template = Handlebars.compile(templateContent);
+export async function generateMockContracts(mocksDirectory: string) {
+  const contractTemplateContent: string = registerHandlebarsTemplates();
+  const contractTemplate = Handlebars.compile(contractTemplateContent);
+  // Create the directory if it doesn't exist
   try {
-    // Create the directory if it doesn't exist
-    try {
-      await ensureDir(generatedContractsDir);
-    } catch (error) {
-      console.error('Error while creating the mock directory: ', error);
-    }
+    await ensureDir(mocksDirectory);
+  } catch (error) {
+    console.error('Error while creating the mock directory: ', error);
+  }
 
-    // Empty the directory, if it exists
-    try {
-      await emptyDir(generatedContractsDir);
-    } catch (error) {
-      console.error('Error while trying to empty the mock directory: ', error);
-    }
+  // Empty the directory, if it exists
+  try {
+    await emptyDir(mocksDirectory);
+  } catch (error) {
+    console.error('Error while trying to empty the mock directory: ', error);
+  }
 
+  try {
     console.log('Parsing contracts...');
 
     try {
-      const includedPaths = ['solidity/contracts/utils/ContractE.sol'];
+      const contractName = 'ContractA';
+      const includedPaths = [`solidity/contracts/utils/${contractName}.sol`];
       const solidityFiles: string[] = await getSolidityFilesAbsolutePaths(includedPaths);
-      const rootPath = './solidity/contracts';
+      const rootPath = './';
       const remappings = [];
 
       const compiledFiles = await compileSol(solidityFiles, 'auto', {
@@ -69,7 +60,12 @@ export const generateMockContracts = async (
             const partial = Handlebars.compile(partialContent);
             mockContent += partial({});
           } else if (node instanceof FunctionDefinition) {
-            if (node.visibility === 'external') {
+            if(node.kind === 'constructor') {
+              const constructorContent = constructorContext(node);
+              const partialContent = await readPartial('constructor');
+              const partial = Handlebars.compile(partialContent);
+              mockContent += partial({...constructorContent, contractName: contractName});
+            } else if (node.visibility === 'external') {
               const partialContent = await readPartial('external-function');
               const partial = Handlebars.compile(partialContent);
               mockContent += partial({});
@@ -80,26 +76,67 @@ export const generateMockContracts = async (
             }
           }
         }
+
+        const scope = contract.vScope;
+        const contractCode: string = contractTemplate({
+          content: mockContent,
+          contractName: contractName,
+          contractAbsolutePath: scope.absolutePath,
+          exportedSymbols: Array.from(scope.exportedSymbols.keys())
+        });
+
+        writeFileSync(`${mocksDirectory}/Mock${contractName}.sol`, contractCode);
       }
-
-      // TODO: Compile the contract template
-      // writeFileSync(`${contractFolder}/Mock${contractName}.sol`, cleanedCode);
-      console.log(mockContent);
-
+      
       // Generate SmockHelper contract
       const smockHelperTemplateContent: string = registerSmockHelperTemplate();
       const smockHelperTemplate = Handlebars.compile(smockHelperTemplateContent);
       const smockHelperCode: string = smockHelperTemplate({});
-      writeFileSync(`${generatedContractsDir}/SmockHelper.sol`, smockHelperCode);
+      writeFileSync(`${mocksDirectory}/SmockHelper.sol`, smockHelperCode);
 
       console.log('Mock contracts generated successfully');
 
-      // Compile the mock contracts
-      await compileSolidityFilesFoundry(generatedContractsDir);
-    } catch(e) {
-      console.error(e);
+      // TODO: Compile the mock contracts
+      await compileSolidityFilesFoundry(mocksDirectory);
+    } catch(error) {
+      console.error(error);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
-};
+}
+
+export function constructorContext(node: FunctionDefinition): { parameters: string, parametersNames: string } {
+  if(node.kind !== 'constructor') throw new Error('The node is not a constructor');
+
+  // Get the parameters of the constructor, if there are no parameters then we use an empty array
+  const parameters: VariableDeclaration[] = node.vParameters.vParameters ? node.vParameters.vParameters : [];
+
+  // Save the parameters in an array with their types and storage location
+  const constructorParameters: string[] = [];
+  // Save the parameters names in another array
+  const parametersNames: string[] = [];
+
+  parameters.forEach((parameter, index) => {
+    // Remove the 'contract ' string from the type name
+    const typeName: string = sanitizeParameterType(parameter.typeString);
+    const paramName: string = parameter.name === '' ? `_param${index}` : parameter.name;
+
+    // If the storage location is memory or calldata then we keep it
+    const storageLocation =
+      parameter.storageLocation === 'memory' || parameter.storageLocation === 'calldata' ? `${parameter.storageLocation} ` : '';
+
+    // Create the string that will be used in the constructor signature
+    const parameterString = `${typeName} ${storageLocation}${paramName}`;
+
+    // Save the strings in the arrays
+    constructorParameters.push(parameterString);
+    parametersNames.push(paramName);
+    index++;
+  });
+
+  return {
+    parameters: constructorParameters.join(', '),
+    parametersNames: parametersNames.join(', ')
+  }
+}
