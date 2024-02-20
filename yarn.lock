@@ -2685,7 +2685,7 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
-solc-typed-ast@^18.1.2:
+solc-typed-ast@18.1.2:
   version "18.1.2"
   resolved "https://registry.yarnpkg.com/solc-typed-ast/-/solc-typed-ast-18.1.2.tgz#bc958fe3aead765cf6c2e06ce3d53c61fd06e70c"
   integrity sha512-57IKzvXHcyjqdjHEdX7NQuWkPALlH8V4eJ6UUehWrzgHDVzKVOCFplwgLDRnOZ8kDMO8+Ms8sQhfrivFK+v5FA==
