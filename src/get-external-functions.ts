@@ -1,5 +1,5 @@
 import { ContractDefinitionNode, FunctionDefinitionNode, VariableDeclarationNode, ExternalFunctionOptions } from './types';
-import { typeFix } from './utils';
+import { sanitizeParameterType } from './utils';
 
 /**
  * Returns the information of the external function for the mock contract
@@ -34,7 +34,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     let parameterIndex = 0;
     parameters.forEach((parameter: VariableDeclarationNode) => {
       // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = typeFix(parameter.typeDescriptions.typeString);
+      const typeName: string = sanitizeParameterType(parameter.typeDescriptions.typeString);
       const paramName: string = parameter.name == '' ? `_param${parameterIndex}` : parameter.name;
 
       // If the storage location is memory or calldata then we keep it
@@ -64,7 +64,7 @@ export const getExternalMockFunctions = (contractNode: ContractDefinitionNode): 
     parameterIndex = 0;
     returnParameters.forEach((parameter: VariableDeclarationNode) => {
       // We remove the 'contract ' string from the type name if it exists
-      const typeName: string = typeFix(parameter.typeDescriptions.typeString);
+      const typeName: string = sanitizeParameterType(parameter.typeDescriptions.typeString);
       const paramName: string = parameter.name == '' ? `_returnParam${parameterIndex}` : parameter.name;
       
       // If the storage location is memory or calldata then we keep it

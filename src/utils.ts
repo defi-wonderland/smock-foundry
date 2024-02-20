@@ -45,7 +45,7 @@ export const lowercaseFirstLetter = (str: string): string => {
  * @param type The string of the type to fix
  * @returns The string with the type fixed
  */
-export const typeFix = (type: string): string => {
+export const sanitizeParameterType = (type: string): string => {
   const regExp = new RegExp(`^(${userDefinedTypes.join('|')}) `);
   return type.replace(regExp, '');
 };
@@ -130,7 +130,7 @@ export const getContractNamesAndFolders = (contractsDir: string[], ignoreDir: st
  * Compiles the solidity files in the given directory calling forge build command
  * @param mockContractsDir The directory of the generated contracts
  */
-export const compileSolidityFilesFoundry = async (mockContractsDir: string) => {
+export async function compileSolidityFilesFoundry(mockContractsDir: string) {
   console.log('Compiling contracts...');
   try {
     const { stdout, stderr } = await promisify(exec)(`forge build -C ${mockContractsDir}`);
@@ -139,14 +139,14 @@ export const compileSolidityFilesFoundry = async (mockContractsDir: string) => {
   } catch (e) {
     throw new Error(`Error while compiling contracts: ${e}`);
   }
-};
+}
 
 export async function getSolidityFilesAbsolutePaths(files: string[]): Promise<string[]> {
   return files.filter((file) => file.endsWith('.sol')).map((file) => path.resolve(file));
 }
 
 export async function readPartial(partialName: string): Promise<string> {
-  const partialPath = resolve(__dirname, 'src', 'templates', 'partials', `${partialName}.hbs`);
+  const partialPath = resolve(__dirname, 'templates', 'partials', `${partialName}.hbs`);
   const partialContent = readFileSync(partialPath, 'utf8');
   return partialContent;
 }

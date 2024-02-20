@@ -6,7 +6,7 @@ import {
   MappingStateVariableOptions,
   StateVariablesOptions,
 } from './types';
-import { typeFix, explicitTypeStorageLocation } from './utils';
+import { sanitizeParameterType, explicitTypeStorageLocation } from './utils';
 
 /**
  * Returns all the mock functions information for state variables
@@ -65,10 +65,10 @@ function getArrayFunction(arrayNode: VariableDeclarationNode): ArrayStateVariabl
   const arrayName: string = arrayNode.name;
 
   // Array type
-  const arrayType: string = typeFix(explicitTypeStorageLocation(arrayNode.typeDescriptions.typeString));
+  const arrayType: string = sanitizeParameterType(explicitTypeStorageLocation(arrayNode.typeDescriptions.typeString));
 
   // Base type
-  const baseType: string = typeFix(explicitTypeStorageLocation(arrayNode.typeName.baseType.typeDescriptions.typeString));
+  const baseType: string = sanitizeParameterType(explicitTypeStorageLocation(arrayNode.typeName.baseType.typeDescriptions.typeString));
 
   // Struct flag
   const isStruct: boolean = arrayNode.typeDescriptions.typeString.startsWith('struct ');
@@ -112,19 +112,19 @@ function getMappingFunction(mappingNode: VariableDeclarationNode): MappingStateV
   const keyTypes: string[] = [];
   
   do {
-    const keyType: string = typeFix(explicitTypeStorageLocation(mappingTypeNameNode.keyType.typeDescriptions.typeString));
+    const keyType: string = sanitizeParameterType(explicitTypeStorageLocation(mappingTypeNameNode.keyType.typeDescriptions.typeString));
     keyTypes.push(keyType);
     mappingTypeNameNode = mappingTypeNameNode.valueType;
   } while (mappingTypeNameNode.typeDescriptions.typeString.startsWith('mapping'));
 
   // Value type
-  const valueType: string = typeFix(explicitTypeStorageLocation(mappingTypeNameNode.typeDescriptions.typeString));
+  const valueType: string = sanitizeParameterType(explicitTypeStorageLocation(mappingTypeNameNode.typeDescriptions.typeString));
 
   // Array flag
   const isArray: boolean = valueType.includes('[]');
 
   // Base type
-  const baseType: string = isArray ? typeFix(explicitTypeStorageLocation(mappingTypeNameNode.baseType.typeDescriptions.typeString)) : valueType;
+  const baseType: string = isArray ? sanitizeParameterType(explicitTypeStorageLocation(mappingTypeNameNode.baseType.typeDescriptions.typeString)) : valueType;
 
   // Struct array flag
   const isStructArray: boolean = isArray && mappingTypeNameNode.typeDescriptions.typeString.startsWith('struct ');
@@ -164,7 +164,7 @@ function getBasicStateVariableFunction(variableNode: VariableDeclarationNode): B
   const variableName: string = variableNode.name;
 
   // remove spec type leading string
-  const variableType: string = typeFix(explicitTypeStorageLocation(variableNode.typeDescriptions.typeString));
+  const variableType: string = sanitizeParameterType(explicitTypeStorageLocation(variableNode.typeDescriptions.typeString));
 
   // If the variable is internal we don't create mockCall for it
   const isInternal: boolean = variableNode.visibility == 'internal';
