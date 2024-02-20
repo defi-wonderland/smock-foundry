@@ -1,15 +1,16 @@
 import Handlebars from 'handlebars';
 import { writeFileSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
-import { ASTKind, ASTReader, compileSol, SourceUnit, FunctionDefinition, VariableDeclaration, Identifier, ImportDirective } from 'solc-typed-ast';
+import { ASTKind, ASTReader, compileSol, FunctionDefinition, VariableDeclaration, Identifier, ImportDirective } from 'solc-typed-ast';
 import {
   registerHandlebarsTemplates,
   registerSmockHelperTemplate,
   getSolidityFilesAbsolutePaths,
   readPartial,
-  sanitizeParameterType
+  sanitizeParameterType,
+  explicitTypeStorageLocation
 } from './utils';
-import { ExternalFunctionContext, ConstructorContext, InternalFunctionContext, ImportContext } from './types';
+import { ExternalFunctionContext, ConstructorContext, InternalFunctionContext, ImportContext, MappingVariableContext, ArrayVariableContext, StateVariableContext } from './types';
 
 /**
  * Generates the mock contracts
@@ -59,20 +60,43 @@ export async function generateMockContracts(mocksDirectory: string) {
           const partial = Handlebars.compile(partialContent);
           importsContent += partial(context);
         }
-        
+
         let mockContent = '';
         for(const contract of sourceUnit.vContracts) {
           for(const node of contract.children) {
             if (node instanceof VariableDeclaration) {
-              // const partialContent = await readPartial('state-variable');
-              // const partial = Handlebars.compile(partialContent);
-              // mockContent += partial({});
+              // If the state variable is constant then we don't need to mock it
+              if (node.constant || node.mutability === 'immutable') continue;
+              // If the state variable is private we don't mock it
+              if (node.visibility === 'private') continue;
+
+              // Get the type of the state variable
+              const stateVariableType: string = node.typeString;
+              let context;
+              let partialContent;
+              let partial;
+
+              if (stateVariableType.startsWith('mapping')) {
+                context = mappingVariableContext(node);
+                partialContent = await readPartial('mapping-state-variable');
+                partial = Handlebars.compile(partialContent);
+              } else if (stateVariableType.includes('[]')) {
+                context = arrayVariableContext(node);
+                partialContent = await readPartial('array-state-variable');
+                partial = Handlebars.compile(partialContent);
+              } else {
+                context = stateVariableContext(node);
+                partialContent = await readPartial('state-variable');
+                partial = Handlebars.compile(partialContent);
+              }
+
+              mockContent += partial(context);
             } else if (node instanceof FunctionDefinition) {
               if(node.isConstructor) {
                 const context = constructorContext(node);
                 const partialContent = await readPartial('constructor');
                 const partial = Handlebars.compile(partialContent);
-                mockContent += partial({...context, contractName: contractName});
+                mockContent += partial({...context, contractName: contract.name});
               } else if (node.visibility === 'external' || node.visibility === 'public') {
                 const context = externalOrPublicFunctionContext(node);
                 const partialContent = await readPartial('external-or-public-function');
@@ -91,7 +115,7 @@ export async function generateMockContracts(mocksDirectory: string) {
           const contractCode: string = contractTemplate({
             content: mockContent,
             importsContent: importsContent,
-            contractName: contractName,
+            contractName: contract.name,
             contractAbsolutePath: scope.absolutePath,
             exportedSymbols: Array.from(scope.exportedSymbols.keys()),
           })
@@ -101,9 +125,10 @@ export async function generateMockContracts(mocksDirectory: string) {
           .replace(/&#x3D;/g, '=')
           .replace(/&gt;/g, '>')
           .replace(/&lt;/g, '<')
+          .replace(/&lt;/g, '<')
           .replace(/;;/g, ';');
 
-          writeFileSync(`${mocksDirectory}/Mock${contractName}.sol`, contractCode);
+          writeFileSync(`${mocksDirectory}/Mock${contract.name}.sol`, contractCode);
         }
       }
       
@@ -171,7 +196,7 @@ export function internalFunctionContext(node: FunctionDefinition): InternalFunct
   const { functionReturnParameters, returnParameterTypes, returnParameterNames } = extractReturnParameters(node.vReturnParameters.vParameters);
   const signature = parameterTypes ? `${node.name}(${parameterTypes.join(',')})` : `${node.name}()`;
 
-  // We create the string that will be used in the mock function signature
+  // Create the string that will be used in the mock function signature
   const inputs: string = functionParameters.length ? functionParameters.join(', ') : '';
   const outputs: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
 
@@ -214,7 +239,7 @@ export function externalOrPublicFunctionContext(node: FunctionDefinition): Exter
   const { functionReturnParameters, returnParameterNames } = extractReturnParameters(node.vReturnParameters.vParameters);
   const signature = parameterTypes ? `${node.name}(${parameterTypes.join(',')})` : `${node.name}()`;
 
-  // We create the string that will be used in the mock function signature
+  // Create the string that will be used in the mock function signature
   const inputs: string = functionParameters.length ? functionParameters.join(', ') : '';
   const outputs: string = functionReturnParameters.length ? functionReturnParameters.join(', ') : '';
 
@@ -268,4 +293,110 @@ export function importContext(node: ImportDirective): ImportContext {
     namedImports,
     absolutePath
   }
+}
+
+export function mappingVariableContext(node: VariableDeclaration): MappingVariableContext {
+  // Name of the mapping
+  const mappingName: string = node.name;
+
+  // Type name
+  let mappingTypeNameNode = node.vType;
+
+  // Key types
+  const keyTypes: string[] = [];
+
+  do {
+    const keyType: string = sanitizeParameterType(explicitTypeStorageLocation(mappingTypeNameNode['vKeyType'].typeString));
+    keyTypes.push(keyType);
+    mappingTypeNameNode = mappingTypeNameNode['vValueType'];
+  } while (mappingTypeNameNode.typeString.startsWith('mapping'));
+
+  // Value type
+  const valueType: string = sanitizeParameterType(explicitTypeStorageLocation(mappingTypeNameNode.typeString));
+
+  // Array flag
+  const isArray: boolean = valueType.includes('[]');
+
+  // Base type
+  const baseType: string = isArray ? sanitizeParameterType(explicitTypeStorageLocation(mappingTypeNameNode['vBaseType'].typeString)) : valueType;
+
+  // Struct array flag
+  const isStructArray: boolean = isArray && mappingTypeNameNode.typeString.startsWith('struct ');
+
+  // If the mapping is internal we don't create mockCall for it
+  const isInternal: boolean = node.visibility === 'internal';
+
+  return {
+    setFunction: {
+      functionName: mappingName,
+      keyTypes: keyTypes,
+      valueType: valueType,
+    },
+    mockFunction: {
+      functionName: mappingName,
+      keyTypes: keyTypes,
+      valueType: valueType,
+      baseType: baseType,
+    },
+    isInternal: isInternal,
+    isArray: isArray,
+    isStructArray: isStructArray,
+  };
+}
+
+export function arrayVariableContext(node: VariableDeclaration): ArrayVariableContext {
+  // Name of the array
+  const arrayName: string = node.name;
+
+  // Array type
+  const arrayType: string = sanitizeParameterType(explicitTypeStorageLocation(node.typeString));
+
+  // Base type
+  const baseType: string = sanitizeParameterType(explicitTypeStorageLocation(node.vType.typeString));
+
+  // Struct flag
+  const isStructArray: boolean = node.typeString.startsWith('struct ');
+
+  // If the array is internal we don't create mockCall for it
+  const isInternal: boolean = node.visibility === 'internal';
+
+  return {
+    setFunction: {
+      functionName: arrayName,
+      arrayType: arrayType,
+      paramName: arrayName,
+    },
+    mockFunction: {
+      functionName: arrayName,
+      arrayType: arrayType,
+      baseType: baseType,
+    },
+    isInternal: isInternal,
+    isStructArray: isStructArray,
+  };
+}
+
+export function stateVariableContext(node: VariableDeclaration): StateVariableContext {
+  // Name of the variable
+  const variableName: string = node.name;
+
+  // Remove spec type leading string
+  const variableType: string = sanitizeParameterType(explicitTypeStorageLocation(node.typeString));
+
+  // If the variable is internal we don't create mockCall for it
+  const isInternal: boolean = node.visibility === 'internal';
+
+  // Save the state variable information
+  return {
+    setFunction: {
+      functionName: variableName,
+      paramType: variableType,
+      paramName: variableName,
+    },
+    mockFunction: {
+      functionName: variableName,
+      paramType: variableType,
+    },
+    isInternal: isInternal,
+  };
 }
