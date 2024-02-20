@@ -1,4 +1,3 @@
-// Write unit tests for the getExternalFunctions function here like the other tests.
 import { getStateVariables } from '../../src/get-variables-functions';
 import { ContractDefinitionNode, VariableDeclarationNode, StateVariablesOptions } from '../../src/types';
 import { expect } from 'chai';
