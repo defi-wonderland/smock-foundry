@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
 import Handlebars from 'handlebars';
 import { promisify } from 'util';
+import path from 'path';
 
 /**
  * Given a path returns the name of the file with the extension replaced with .json
@@ -68,36 +69,28 @@ export const explicitTypeStorageLocation = (type: string): string => {
  * @returns The content of the template
  */
 export const registerHandlebarsTemplates = (): string => {
-  // Template paths
-  const templatePath = resolve(__dirname, 'templates', 'mockContractTemplate.hbs');
-  const externalFuncsTemplatePath = resolve(__dirname, 'templates', 'mockExternalFunctionTemplate.hbs');
-  const internalFuncsTemplatePath = resolve(__dirname, 'templates', 'mockInternalFunctionTemplate.hbs');
-  const basicStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockBasicStateVariableTemplate.hbs');
-  const arrayStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockArrayStateVariableTemplate.hbs');
-  const mappingStateVariablesTemplatePath = resolve(__dirname, 'templates', 'mockMappingStateVariableTemplate.hbs');
+  [
+    'state-variable',
+    'array-state-variable',
+    'mapping-state-variable',
+    'external-function',
+    'internal-function',
+  ].forEach((partialName: string) => {
+    const partialPath = resolve(__dirname, 'templates', 'partials', `${partialName}.hbs`);
+    const partialContent = readFileSync(partialPath, 'utf8');
+    Handlebars.registerPartial(partialName, partialContent);
+  });
 
-  // Read the templates
+  // TODO: Do we need to register templates? This one is never registered
+  const templatePath = resolve(__dirname, 'templates', 'contract-template.hbs');
   const templateContent = readFileSync(templatePath, 'utf8');
-  const externalFuncsTemplateContent = readFileSync(externalFuncsTemplatePath, 'utf8');
-  const internalFuncsTemplateContent = readFileSync(internalFuncsTemplatePath, 'utf8');
-  const basicStateVariablesTemplateContent = readFileSync(basicStateVariablesTemplatePath, 'utf8');
-  const arrayStateVariablesTemplateContent = readFileSync(arrayStateVariablesTemplatePath, 'utf8');
-  const mappingStateVariablesTemplateContent = readFileSync(mappingStateVariablesTemplatePath, 'utf8');
-
-  // Register the partial templates
-  Handlebars.registerPartial('mockStateVariable', basicStateVariablesTemplateContent);
-  Handlebars.registerPartial('mockExternalFunction', externalFuncsTemplateContent);
-  Handlebars.registerPartial('mockInternalFunction', internalFuncsTemplateContent);
-  Handlebars.registerPartial('mockArrayStateVariable', arrayStateVariablesTemplateContent);
-  Handlebars.registerPartial('mockMappingStateVariable', mappingStateVariablesTemplateContent);
-
   return templateContent;
 };
 
 export const registerSmockHelperTemplate = (): string => {
-  const smockHelperTemplatePath = resolve(__dirname, 'templates', 'smockHelperTemplate.hbs');
+  const smockHelperTemplatePath = resolve(__dirname, 'templates', 'helper-template.hbs');
   const smockHelperTemplateContent = readFileSync(smockHelperTemplatePath, 'utf8');
-  Handlebars.registerPartial('smockHelperTemplate', smockHelperTemplateContent);
+  Handlebars.registerPartial('helper-template', smockHelperTemplateContent);
   return smockHelperTemplateContent;
 };
 
@@ -147,3 +140,13 @@ export const compileSolidityFilesFoundry = async (mockContractsDir: string) => {
     throw new Error(`Error while compiling contracts: ${e}`);
   }
 };
+
+export async function getSolidityFilesAbsolutePaths(files: string[]): Promise<string[]> {
+  return files.filter((file) => file.endsWith('.sol')).map((file) => path.resolve(file));
+}
+
+export async function readPartial(partialName: string): Promise<string> {
+  const partialPath = resolve(__dirname, 'src', 'templates', 'partials', `${partialName}.hbs`);
+  const partialContent = readFileSync(partialPath, 'utf8');
+  return partialContent;
+}

@@ -10,3 +10,6 @@
 	path = lib/isolmate
 	url = https://github.com/defi-wonderland/isolmate
 	branch = main
+[submodule "lib/openzeppelin-contracts"]
+	path = lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts

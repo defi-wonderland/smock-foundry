@@ -5,12 +5,15 @@ import {
   getContractNamesAndFolders,
   compileSolidityFilesFoundry,
   registerSmockHelperTemplate,
+  getSolidityFilesAbsolutePaths,
+  readPartial
 } from './utils';
 import Handlebars from 'handlebars';
 import { writeFileSync, existsSync, readdirSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
 import { resolve } from 'path';
 import { StateVariablesOptions, ContractDefinitionNode } from './types';
+import { ASTKind, ASTReader, SourceUnit, compileSol, FunctionDefinition, VariableDeclaration } from 'solc-typed-ast';
 
 /**
  * Generates the mock contracts
@@ -40,114 +43,62 @@ export const generateMockContracts = async (
     } catch (error) {
       console.error('Error while trying to empty the mock directory: ', error);
     }
+
     console.log('Parsing contracts...');
 
-    // Get all contracts names and paths
-    const [contractFileNames, contractFolders] = getContractNamesAndFolders(contractsDir, ignoreDir);
+    try {
+      const includedPaths = ['solidity/contracts/utils/ContractE.sol'];
+      const solidityFiles: string[] = await getSolidityFilesAbsolutePaths(includedPaths);
+      const rootPath = './solidity/contracts';
+      const remappings = [];
 
-    // Loop for each contract path
-    contractFileNames.forEach(async (contractFileName: string, ind: number) => {
-      // Get the sub dir name
-      const subDirName: string = getSubDirNameFromPath(contractFileName);
+      const compiledFiles = await compileSol(solidityFiles, 'auto', {
+        basePath: rootPath,
+        remapping: remappings,
+        includePath: [rootPath],
+      });
 
-      // Get contract name
-      // If the contract and the file have different names, it will be modified.
-      let contractName: string = subDirName.replace('.json', '');
+      const sourceUnits = new ASTReader().read(compiledFiles.data, ASTKind.Any, compiledFiles.files).filter((sourceUnit) => includedPaths.includes(sourceUnit.absolutePath));
 
-      // Get the compiled path
-      // If the contract and the file have different names, it will be modified.
-      let compiledArtifactsPath = resolve(compiledArtifactsDir, contractFileName, subDirName);
-
-      // Check if contract and file have different names
-      if (!existsSync(compiledArtifactsPath)) {
-        const directoryPath = resolve(compiledArtifactsDir, contractFileName);
-
-        // If the directory path does not exist, the contract is not compiled.
-        if (!existsSync(directoryPath)) return;
-
-        // Read inside the directory path
-        const subDirContractName = readdirSync(directoryPath);
-
-        // Get the real path of the json file
-        // If this !path means that the file is not compiled
-        compiledArtifactsPath = resolve(compiledArtifactsDir, contractFileName, subDirContractName[0]);
-        if (!compiledArtifactsPath) return;
-
-        contractName = subDirContractName[0].replace('.json', '');
-      }
-      // Get the ast
-      const ast: Ast = require(compiledArtifactsPath).ast;
-      // Check if the abi and ast exist
-      if (!ast) return;
-
-      // Get the license from the ast
-      const license: string = ast.license;
-
-      // Get the absolute path
-      const contractImport: string = ast.absolutePath;
-      if (!contractImport) return;
-
-      // Get all exported entities
-      const exportedSymbols = Object.keys(ast.exportedSymbols);
-
-      // Get the contract node and check if it's a library
-      // Also check if is another contract inside the file and avoid it
-      const contractNode = ast.nodes.find(
-        (node) => node.nodeType === 'ContractDefinition' && node.canonicalName === contractName,
-      ) as ContractDefinitionNode;
-
-      // Skip unneeded contracts
-      if (!contractNode || contractNode.contractKind === 'library') return;
-
-      const functions: StateVariablesOptions = getStateVariables(contractNode);
-
-      // All data which will be used for creating the template
-      const data = {
-        contractName: contractName,
-        license: license,
-        contractImport: contractImport,
-        exportedSymbols: exportedSymbols.join(', '),
-        import: getImports(ast),
-        constructor: getConstructor(contractNode),
-        mockExternalFunctions: getExternalMockFunctions(contractNode),
-        mockInternalFunctions: getInternalMockFunctions(contractNode),
-        mockStateVariables: functions.basicStateVariables,
-        mockArrayStateVariables: functions.arrayStateVariables,
-        mockMappingStateVariables: functions.mappingStateVariables,
-      };
-
-      console.log(`Generating mock contract for ${contractName}...`);
-      // Fill the handlebars template with the data
-      const code: string = template(data);
-
-      // some symbols seem to appear as unicode hex chars so replace them
-      // TODO: check if there are other symbols we should account for, or if there is a better way to handle this
-      const cleanedCode: string = code
-        .replace(/&#x27;/g, "'")
-        .replace(/&#x3D;/g, '=')
-        .replace(/;;/g, ';');
-
-      // Write the contract
-      const contractFolder = `${generatedContractsDir}/${contractFolders[ind]}`;
-      // Create the directory if it doesn't exist
-      try {
-        await ensureDir(contractFolder);
-      } catch (error) {
-        console.error('Error while creating the mock directory: ', error);
+      const contracts = sourceUnits.flatMap(s => s.vContracts);
+      let mockContent = '';
+      for(const contract of contracts) {
+        for(const node of contract.children) {
+          if (node instanceof VariableDeclaration) {
+            const partialContent = await readPartial('state-variable');
+            const partial = Handlebars.compile(partialContent);
+            mockContent += partial({});
+          } else if (node instanceof FunctionDefinition) {
+            if (node.visibility === 'external') {
+              const partialContent = await readPartial('external-function');
+              const partial = Handlebars.compile(partialContent);
+              mockContent += partial({});
+            } else {
+              const partialContent = await readPartial('internal-function');
+              const partial = Handlebars.compile(partialContent);
+              mockContent += partial({});
+            }
+          }
+        }
       }
 
-      writeFileSync(`${contractFolder}/Mock${contractName}.sol`, cleanedCode);
-    });
+      // TODO: Compile the contract template
+      // writeFileSync(`${contractFolder}/Mock${contractName}.sol`, cleanedCode);
+      console.log(mockContent);
 
-    // Generate SmockHelper contract
-    const smockHelperTemplateContent: string = registerSmockHelperTemplate();
-    const smockHelperTemplate = Handlebars.compile(smockHelperTemplateContent);
-    const smockHelperCode: string = smockHelperTemplate({});
-    writeFileSync(`${generatedContractsDir}/SmockHelper.sol`, smockHelperCode);
+      // Generate SmockHelper contract
+      const smockHelperTemplateContent: string = registerSmockHelperTemplate();
+      const smockHelperTemplate = Handlebars.compile(smockHelperTemplateContent);
+      const smockHelperCode: string = smockHelperTemplate({});
+      writeFileSync(`${generatedContractsDir}/SmockHelper.sol`, smockHelperCode);
 
-    console.log('Mock contracts generated successfully');
-    // Compile the mock contracts
-    await compileSolidityFilesFoundry(generatedContractsDir);
+      console.log('Mock contracts generated successfully');
+
+      // Compile the mock contracts
+      await compileSolidityFilesFoundry(generatedContractsDir);
+    } catch(e) {
+      console.error(e);
+    }
   } catch (error) {
     console.log(error);
   }
