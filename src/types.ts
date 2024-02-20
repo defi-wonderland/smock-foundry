@@ -183,3 +183,18 @@ export interface ExternalFunctionContext {
   stateMutability: string;
   implemented: boolean;
 }
+
+export interface InternalFunctionContext {
+  // TODO: Extend ExternalFunctionContext and remove visibility and stateMutability
+  functionName: string;
+  signature: string;
+  parameters: string;
+  inputs: string;
+  outputs: string;
+  inputNames: string[];
+  outputNames: string[];
+  implemented: boolean;
+  inputTypes: string[];
+  outputTypes: string[];
+  isView: boolean;
+}
