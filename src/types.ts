@@ -6,6 +6,7 @@ export const explicitTypes = ['string', 'bytes', 'mapping', 'struct'];
 export interface ConstructorContext {
   parameters: string;
   parameterNames: string;
+  contractName: string;
 }
 
 export interface ExternalFunctionContext {

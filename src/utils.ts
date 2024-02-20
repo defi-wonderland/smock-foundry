@@ -1,3 +1,4 @@
+import { VariableDeclaration } from 'solc-typed-ast';
 import { userDefinedTypes, explicitTypes } from './types';
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
@@ -68,4 +69,40 @@ export async function readPartial(partialName: string): Promise<string> {
   const partialPath = resolve(__dirname, 'templates', 'partials', `${partialName}.hbs`);
   const partialContent = readFileSync(partialPath, 'utf8');
   return partialContent;
+}
+
+export function extractParameters(parameters: VariableDeclaration[]): { functionParameters: string[], parameterTypes: string[], parameterNames: string[] } {
+  const functionParameters = parameters.map((parameter, index) => {
+    const typeName: string = sanitizeParameterType(parameter.typeString);
+    const paramName: string = parameter.name || `_param${index}`;
+    const storageLocation = ['memory', 'calldata'].includes(parameter.storageLocation) ? `${parameter.storageLocation} ` : '';
+    return `${typeName} ${storageLocation}${paramName}`;
+  });
+
+  const parameterTypes = parameters.map(parameter => sanitizeParameterType(parameter.typeString));
+  const parameterNames = parameters.map((parameter, index) => parameter.name || `_param${index}`);
+
+  return {
+    functionParameters,
+    parameterTypes,
+    parameterNames
+  }
+}
+
+export function extractReturnParameters(returnParameters: VariableDeclaration[]): { functionReturnParameters: string[], returnParameterTypes: string[], returnParameterNames: string[] } {
+  const functionReturnParameters = returnParameters.map((parameter: VariableDeclaration, index: number) => {
+    const typeName: string = sanitizeParameterType(parameter.typeString);
+    const paramName: string = parameter.name === '' ? `_returnParam${index}` : parameter.name;
+    const storageLocation = ['memory', 'calldata'].includes(parameter.storageLocation) ? `${parameter.storageLocation} ` : '';
+    return `${typeName} ${storageLocation}${paramName}`;
+  });
+
+  const returnParameterTypes = returnParameters.map(parameter => sanitizeParameterType(parameter.typeString));
+  const returnParameterNames = returnParameters.map((parameter, index) => parameter.name === '' ? `_returnParam${index}` : parameter.name);
+
+  return {
+    functionReturnParameters,
+    returnParameterTypes,
+    returnParameterNames
+  }
 }

@@ -7,31 +7,4 @@ import { {{~exportedSymbols~}} } from '{{contractAbsolutePath}}';
 
 contract Mock{{contractName}} is {{contractName}}, Test {
   {{content}}
-{{!-- {{#if constructor}}
-  {{constructor}}
-{{/if}}
-{{#if mockStateVariables}}{{nl}}
-  // Mocked State Variables
-  {{#each mockStateVariables}}{{nl}}
-  {{> mockStateVariable}}
-  {{/each}}
-  {{#each mockArrayStateVariables}}{{nl}}
-  {{> mockArrayStateVariable}}
-  {{/each}}
-  {{#each mockMappingStateVariables}}{{nl}}
-  {{> mockMappingStateVariable}}
-  {{/each}}
-{{/if}}
-{{#if mockExternalFunctions}}{{nl}}
-  // Mocked External Functions
-  {{#each mockExternalFunctions}}{{nl}}
-  {{> mockExternalFunction}}
-  {{/each}}
-{{/if}}
-{{#if mockInternalFunctions}}{{nl}}
-  // Mocked Internal Functions
-  {{#each mockInternalFunctions}}{{nl}}
-  {{> mockInternalFunction}}
-  {{/each}}
-{{/if}} --}}
 }
