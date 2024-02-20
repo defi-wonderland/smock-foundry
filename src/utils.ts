@@ -1,10 +1,29 @@
-import { VariableDeclaration } from 'solc-typed-ast';
+import Handlebars from 'handlebars';
+import { VariableDeclaration, FunctionDefinition, ImportDirective, ASTNode } from 'solc-typed-ast';
 import { userDefinedTypes, explicitTypes } from './types';
 import { resolve } from 'path';
-import { readFileSync } from 'fs';
 import { exec } from 'child_process';
+import { readFileSync } from 'fs';
 import { promisify } from 'util';
-import path from 'path';
+import {
+  importContext,
+  mappingVariableContext,
+  arrayVariableContext,
+  stateVariableContext,
+  constructorContext,
+  externalOrPublicFunctionContext,
+  internalFunctionContext
+} from './context';
+
+export const CONTEXT_RETRIEVERS = {
+  'mapping-state-variable': mappingVariableContext,
+  'array-state-variable': arrayVariableContext,
+  'state-variable': stateVariableContext,
+  'constructor': constructorContext,
+  'external-or-public-function': externalOrPublicFunctionContext,
+  'internal-function': internalFunctionContext,
+  'import': importContext
+}
 
 /**
  * Fixes user-defined types
@@ -62,7 +81,7 @@ export async function compileSolidityFilesFoundry(mockContractsDir: string) {
 }
 
 export async function getSolidityFilesAbsolutePaths(files: string[]): Promise<string[]> {
-  return files.filter((file) => file.endsWith('.sol')).map((file) => path.resolve(file));
+  return files.filter((file) => file.endsWith('.sol')).map((file) => resolve(file));
 }
 
 export async function readPartial(partialName: string): Promise<string> {
@@ -105,4 +124,38 @@ export function extractReturnParameters(returnParameters: VariableDeclaration[])
     returnParameterTypes,
     returnParameterNames
   }
+}
+
+export async function renderNodeMock(node: ASTNode): Promise<string> {
+  const partial = partialName(node);
+  if (partial === undefined) return '';
+  const context = CONTEXT_RETRIEVERS[partial](node);
+  // TODO: Handle a possible invalid partial name
+  const partialContent = await readPartial(partial);
+  const template = Handlebars.compile(partialContent);
+  return template(context);
+}
+
+export function partialName(node: ASTNode): string {
+  if (node instanceof VariableDeclaration) {
+    if (node.typeString.startsWith('mapping')) {
+      return 'mapping-state-variable';
+    } else if (node.typeString.includes('[]')) {
+      return 'array-state-variable';
+    } else {
+      return 'state-variable';
+    }
+  } else if (node instanceof FunctionDefinition) {
+    if (node.isConstructor) {
+      return 'constructor';
+    } else if (node.visibility === 'external' || node.visibility === 'public') {
+      return 'external-or-public-function';
+    } else if (node.visibility === 'internal' && node.virtual) {
+      return 'internal-function';
+    }
+  } else if (node instanceof ImportDirective) {
+    return 'import';
+  }
+
+  // TODO: Handle unknown nodes
 }

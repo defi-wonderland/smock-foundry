@@ -5,7 +5,7 @@ import {
   extractParameters,
   extractReturnParameters
 } from './utils';
-import { FunctionDefinition, VariableDeclaration, Identifier, ImportDirective } from 'solc-typed-ast';
+import { ContractDefinition, FunctionDefinition, VariableDeclaration, Identifier, ImportDirective } from 'solc-typed-ast';
 
 export function internalFunctionContext(node: FunctionDefinition): InternalFunctionContext {
   // Check if the function is internal
@@ -97,7 +97,7 @@ export function constructorContext(node: FunctionDefinition): ConstructorContext
   return {
     parameters: parameters.join(', '),
     parameterNames: parameterNames.join(', '),
-    contractName: node.name
+    contractName: (node.vScope as ContractDefinition).name
   }
 }
 

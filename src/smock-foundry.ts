@@ -1,22 +1,13 @@
 import Handlebars from 'handlebars';
 import { writeFileSync } from 'fs';
 import { ensureDir, emptyDir } from 'fs-extra';
-import { ASTKind, ASTReader, compileSol, FunctionDefinition, VariableDeclaration, Identifier, ImportDirective } from 'solc-typed-ast';
+import { ASTKind, ASTReader, compileSol, VariableDeclaration } from 'solc-typed-ast';
 import {
   registerHandlebarsTemplates,
   registerSmockHelperTemplate,
   getSolidityFilesAbsolutePaths,
-  readPartial,
+  renderNodeMock
 } from './utils';
-import {
-  importContext,
-  mappingVariableContext,
-  arrayVariableContext,
-  stateVariableContext,
-  constructorContext,
-  externalOrPublicFunctionContext,
-  internalFunctionContext
-} from './context';
 
 /**
  * Generates the mock contracts
@@ -55,16 +46,15 @@ export async function generateMockContracts(mocksDirectory: string) {
         includePath: [rootPath],
       });
 
-      const sourceUnits = new ASTReader().read(compiledFiles.data, ASTKind.Any, compiledFiles.files).filter((sourceUnit) => includedPaths.includes(sourceUnit.absolutePath));
+      const sourceUnits = new ASTReader()
+        .read(compiledFiles.data, ASTKind.Any, compiledFiles.files)
+        .filter((sourceUnit) => includedPaths.includes(sourceUnit.absolutePath));
 
       for(const sourceUnit of sourceUnits) {
         let importsContent = '';
         // First process the imports, they will be on top of each mock contract
         for(const importDirective of sourceUnit.vImportDirectives) {
-          const context = importContext(importDirective);
-          const partialContent = await readPartial('import');
-          const partial = Handlebars.compile(partialContent);
-          importsContent += partial(context);
+          importsContent += await renderNodeMock(importDirective);
         }
 
         let mockContent = '';
@@ -75,47 +65,12 @@ export async function generateMockContracts(mocksDirectory: string) {
               if (node.constant || node.mutability === 'immutable') continue;
               // If the state variable is private we don't mock it
               if (node.visibility === 'private') continue;
-
-              // Get the type of the state variable
-              const stateVariableType: string = node.typeString;
-              let context;
-              let partialContent;
-              let partial;
-
-              if (stateVariableType.startsWith('mapping')) {
-                context = mappingVariableContext(node);
-                partialContent = await readPartial('mapping-state-variable');
-                partial = Handlebars.compile(partialContent);
-              } else if (stateVariableType.includes('[]')) {
-                context = arrayVariableContext(node);
-                partialContent = await readPartial('array-state-variable');
-                partial = Handlebars.compile(partialContent);
-              } else {
-                context = stateVariableContext(node);
-                partialContent = await readPartial('state-variable');
-                partial = Handlebars.compile(partialContent);
-              }
-
-              mockContent += partial(context);
-            } else if (node instanceof FunctionDefinition) {
-              if(node.isConstructor) {
-                const context = constructorContext(node);
-                const partialContent = await readPartial('constructor');
-                const partial = Handlebars.compile(partialContent);
-                mockContent += partial(context);
-              } else if (node.visibility === 'external' || node.visibility === 'public') {
-                const context = externalOrPublicFunctionContext(node);
-                const partialContent = await readPartial('external-or-public-function');
-                const partial = Handlebars.compile(partialContent);
-                mockContent += partial(context);
-              } else if(node.visibility === 'internal' && node.virtual) {
-                const context = internalFunctionContext(node);
-                const partialContent = await readPartial('internal-function');
-                const partial = Handlebars.compile(partialContent);
-                mockContent += partial(context);
-              }
             }
+
+            mockContent += await renderNodeMock(node);
           }
+
+          if (mockContent === '') continue;
 
           const scope = contract.vScope;
           const contractCode: string = contractTemplate({
