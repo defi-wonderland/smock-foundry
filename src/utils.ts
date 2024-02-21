@@ -1,9 +1,12 @@
 import Handlebars from 'handlebars';
-import { VariableDeclaration, FunctionDefinition, ImportDirective, ASTNode } from 'solc-typed-ast';
-import { userDefinedTypes, explicitTypes } from './types';
-import { resolve } from 'path';
+import path from 'path';
+import { glob } from 'fast-glob';
 import { exec } from 'child_process';
-import { readFileSync } from 'fs';
+import { VariableDeclaration, FunctionDefinition, ImportDirective, ASTNode, ASTKind, ASTReader, SourceUnit, compileSol } from 'solc-typed-ast';
+import { userDefinedTypes, explicitTypes } from './types';
+import { readFileSync } from 'fs'; // TODO: Replace with fs/promises
+import { ensureDir, emptyDir } from 'fs-extra';
+import fs from 'fs/promises';
 import { promisify } from 'util';
 import {
   importContext,
@@ -53,16 +56,16 @@ export const explicitTypeStorageLocation = (type: string): string => {
  * Registers the nested templates
  * @returns The content of the template
  */
-export const registerHandlebarsTemplates = (): string => {
-  const templatePath = resolve(__dirname, 'templates', 'contract-template.hbs');
+export const getContractTemplate = (): HandlebarsTemplateDelegate<any> => {
+  const templatePath = path.resolve(__dirname, 'templates', 'contract-template.hbs');
   const templateContent = readFileSync(templatePath, 'utf8');
-  return templateContent;
+  return Handlebars.compile(templateContent);
 };
 
-export const registerSmockHelperTemplate = (): string => {
-  const smockHelperTemplatePath = resolve(__dirname, 'templates', 'helper-template.hbs');
-  const smockHelperTemplateContent = readFileSync(smockHelperTemplatePath, 'utf8');
-  return smockHelperTemplateContent;
+export const getSmockHelperTemplate = (): HandlebarsTemplateDelegate<any> => {
+  const templatePath = path.resolve(__dirname, 'templates', 'helper-template.hbs');
+  const templateContent = readFileSync(templatePath, 'utf8');
+  return Handlebars.compile(templateContent);
 };
 
 /**
@@ -80,12 +83,17 @@ export async function compileSolidityFilesFoundry(mockContractsDir: string) {
   }
 }
 
-export async function getSolidityFilesAbsolutePaths(files: string[]): Promise<string[]> {
-  return files.filter((file) => file.endsWith('.sol')).map((file) => resolve(file));
+export async function getSolidityFilesAbsolutePaths(cwd: string, directories: string[]): Promise<string[]> {
+  // Map each directory to a glob promise, searching for .sol files
+  const promises = directories.map(directory => glob(`${directory}/**/*.sol`, { cwd, ignore: [] }));
+  const filesArrays = await Promise.all(promises);
+  const files = filesArrays.flat();
+
+  return files;
 }
 
 export async function readPartial(partialName: string): Promise<string> {
-  const partialPath = resolve(__dirname, 'templates', 'partials', `${partialName}.hbs`);
+  const partialPath = path.resolve(__dirname, 'templates', 'partials', `${partialName}.hbs`);
   const partialContent = readFileSync(partialPath, 'utf8');
   return partialContent;
 }
@@ -158,4 +166,90 @@ export function partialName(node: ASTNode): string {
   }
 
   // TODO: Handle unknown nodes
+}
+
+export async function getRemappings(rootPath: string): Promise<string[]> {
+  // First try the remappings.txt file
+  try {
+    return await exports.getRemappingsFromFile(path.join(rootPath, 'remappings.txt'));
+  } catch (e) {
+    // If the remappings file does not exist, try foundry.toml
+    try {
+      return await exports.getRemappingsFromConfig(path.join(rootPath, 'foundry.toml'));
+    } catch {
+      return [];
+    }
+  }
+}
+
+export async function getRemappingsFromFile(remappingsPath: string): Promise<string[]> {
+  const remappingsContent = await fs.readFile(remappingsPath, 'utf8');
+
+  return remappingsContent
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length)
+    .map((line) => sanitizeRemapping(line));
+}
+
+export async function getRemappingsFromConfig(foundryConfigPath: string): Promise<string[]> {
+  const foundryConfigContent = await fs.readFile(foundryConfigPath, 'utf8');
+  const regex = /remappings[\s|\n]*=[\s\n]*\[(?<remappings>[^\]]+)]/;
+  const matches = foundryConfigContent.match(regex);
+  if (matches) {
+    return matches
+      .groups!.remappings.split(',')
+      .map((line) => line.trim())
+      .map((line) => line.replace(/["']/g, ''))
+      .filter((line) => line.length)
+      .map((line) => sanitizeRemapping(line));
+  } else {
+    return [];
+  }
+}
+
+export function sanitizeRemapping(line: string): string {
+  // Make sure the key and the value both either have or don't have a trailing slash
+  const [key, value] = line.split('=');
+  const slashNeeded = key.endsWith('/');
+
+  if (slashNeeded) {
+    return value.endsWith('/') ? line : `${line}/`;
+  } else {
+    return value.endsWith('/') ? line.slice(0, -1) : line;
+  }
+}
+
+export async function emptySmockDirectory(mocksDirectory: string) {
+    // Create the directory if it doesn't exist
+    try {
+      await ensureDir(mocksDirectory);
+    } catch (error) {
+      console.error('Error while creating the mock directory: ', error);
+    }
+  
+    // Empty the directory, if it exists
+    try {
+      await emptyDir(mocksDirectory);
+    } catch (error) {
+      console.error('Error while trying to empty the mock directory: ', error);
+    }
+}
+
+export async function getSourceUnits(rootPath: string, contractsDirectories: string[], ignoreDirectories: string[]): Promise<SourceUnit[]> {
+  const solidityFiles: string[] = await getSolidityFilesAbsolutePaths(rootPath, contractsDirectories);
+  const remappings: string[] = await getRemappings(rootPath);
+
+  const compiledFiles = await compileSol(solidityFiles, 'auto', {
+    basePath: rootPath,
+    remapping: remappings,
+    includePath: [rootPath],
+  });
+
+  const sourceUnits = new ASTReader()
+    .read(compiledFiles.data, ASTKind.Any, compiledFiles.files)
+    // Remove Solidity files from the ignored directories
+    .filter(sourceUnit => !ignoreDirectories.some(directory => sourceUnit.absolutePath.includes(directory)));
+
+  return sourceUnits;
 }
