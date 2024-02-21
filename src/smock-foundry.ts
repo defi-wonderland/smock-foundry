@@ -1,12 +1,12 @@
 import { writeFileSync } from 'fs';
-import { FunctionDefinition, VariableDeclaration } from 'solc-typed-ast';
 import {
   getContractTemplate,
   getSmockHelperTemplate,
   renderNodeMock,
   emptySmockDirectory,
   getSourceUnits,
-  mockableNode
+  mockableNode,
+  compileSolidityFilesFoundry
 } from './utils';
 import path from 'path';
 import { ensureDir } from 'fs-extra';
@@ -88,8 +88,7 @@ export async function generateMockContracts(rootPath: string, contractsDirectori
 
       console.log('Mock contracts generated successfully');
 
-      // TODO: Compile the mock contracts
-      // await compileSolidityFilesFoundry(mocksDirectory);
+      await compileSolidityFilesFoundry(mocksDirectory);
     } catch(error) {
       console.error(error);
     }

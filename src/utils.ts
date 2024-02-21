@@ -264,4 +264,6 @@ export function mockableNode(node: ASTNode): boolean {
     // Only process variables and functions
     return false;
   }
+
+  return true;
 }
