@@ -29,6 +29,7 @@
     "package.json": "sort-package-json"
   },
   "dependencies": {
+    "fast-glob": "3.3.2",
     "handlebars": "4.7.7",
     "solc-typed-ast": "18.1.2",
     "yargs": "17.7.2"
