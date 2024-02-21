@@ -174,7 +174,7 @@ export function arrayVariableContext(node: VariableDeclaration): ArrayVariableCo
   const arrayType: string = sanitizeParameterType(explicitTypeStorageLocation(node.typeString));
 
   // Base type
-  const baseType: string = sanitizeParameterType(explicitTypeStorageLocation(node.vType.typeString));
+  const baseType: string = sanitizeParameterType(explicitTypeStorageLocation(node.vType['vBaseType'].typeString));
 
   // Struct flag
   const isStructArray: boolean = node.typeString.startsWith('struct ');
