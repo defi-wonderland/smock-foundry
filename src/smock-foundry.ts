@@ -1,12 +1,12 @@
-import Handlebars from 'handlebars';
 import { writeFileSync } from 'fs';
-import { VariableDeclaration } from 'solc-typed-ast';
+import { FunctionDefinition, VariableDeclaration } from 'solc-typed-ast';
 import {
   getContractTemplate,
   getSmockHelperTemplate,
   renderNodeMock,
   emptySmockDirectory,
-  getSourceUnits
+  getSourceUnits,
+  mockableNode
 } from './utils';
 import path from 'path';
 import { ensureDir } from 'fs-extra';
@@ -34,19 +34,13 @@ export async function generateMockContracts(rootPath: string, contractsDirectori
           importsContent += await renderNodeMock(importDirective);
         }
 
-        let mockContent = '';
         for(const contract of sourceUnit.vContracts) {
+          let mockContent = '';
           // Libraries are not mocked
           if(contract.kind === 'library') continue;
 
           for(const node of contract.children) {
-            if (node instanceof VariableDeclaration) {
-              // If the state variable is constant then we don't need to mock it
-              if (node.constant || node.mutability === 'immutable') continue;
-              // If the state variable is private we don't mock it
-              if (node.visibility === 'private') continue;
-            }
-
+            if(!mockableNode(node)) continue;
             mockContent += await renderNodeMock(node);
           }
 

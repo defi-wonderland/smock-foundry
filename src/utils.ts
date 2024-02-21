@@ -253,3 +253,15 @@ export async function getSourceUnits(rootPath: string, contractsDirectories: str
 
   return sourceUnits;
 }
+
+export function mockableNode(node: ASTNode): boolean {
+  if (node instanceof VariableDeclaration) {
+    // If the state variable is constant then we don't need to mock it
+    if (node.constant || node.mutability === 'immutable') return false;
+    // If the state variable is private we don't mock it
+    if (node.visibility === 'private') return false;
+  } else if(!(node instanceof FunctionDefinition)) {
+    // Only process variables and functions
+    return false;
+  }
+}
