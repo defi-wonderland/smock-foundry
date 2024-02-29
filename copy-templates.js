@@ -6,6 +6,7 @@ const path = require('path');
  */
 const copyTemplates = () => {
   try {
+    // TODO: Make sure this copies all partials
     fs.cpSync('src/templates', 'dist/templates', { recursive: true, overwrite: true });
   } catch (err) {
     console.error(err);
