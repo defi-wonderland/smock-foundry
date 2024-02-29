@@ -254,7 +254,7 @@ export async function getSourceUnits(rootPath: string, contractsDirectories: str
   return sourceUnits;
 }
 
-export function mockableNode(node: ASTNode): boolean {
+export function smockableNode(node: ASTNode): boolean {
   if (node instanceof VariableDeclaration) {
     // If the state variable is constant then we don't need to mock it
     if (node.constant || node.mutability === 'immutable') return false;

@@ -5,7 +5,7 @@ import {
   renderNodeMock,
   emptySmockDirectory,
   getSourceUnits,
-  mockableNode,
+  smockableNode,
   compileSolidityFilesFoundry
 } from './utils';
 import path from 'path';
@@ -40,7 +40,7 @@ export async function generateMockContracts(rootPath: string, contractsDirectori
           if(contract.kind === 'library') continue;
 
           for(const node of contract.children) {
-            if(!mockableNode(node)) continue;
+            if(!smockableNode(node)) continue;
             mockContent += await renderNodeMock(node);
           }
 
