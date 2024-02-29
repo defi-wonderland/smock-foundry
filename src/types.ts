@@ -1,7 +1,6 @@
 export const userDefinedTypes = ['contract', 'enum', 'struct'];
 export const explicitTypes = ['string', 'bytes', 'mapping', 'struct'];
 
-
 // Contexts to pass to Handlebars templates
 export interface ConstructorContext {
   parameters: string;
@@ -22,16 +21,7 @@ export interface ExternalFunctionContext {
   implemented: boolean;
 }
 
-export interface InternalFunctionContext {
-  // TODO: Extend ExternalFunctionContext and remove visibility and stateMutability
-  functionName: string;
-  signature: string;
-  parameters: string;
-  inputs: string;
-  outputs: string;
-  inputNames: string[];
-  outputNames: string[];
-  implemented: boolean;
+export interface InternalFunctionContext extends Omit<ExternalFunctionContext, 'visibility' | 'stateMutability'> {
   inputTypes: string[];
   outputTypes: string[];
   isView: boolean;

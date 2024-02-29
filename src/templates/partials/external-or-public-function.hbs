@@ -1,5 +1,5 @@
 {{#unless implemented}}
-function {{functionName}}({{inputs}}) {{visibility}}{{stateMutability}}override {{#if outputs}}returns ({{outputs}}){{/if}} {}
+function {{functionName}}({{inputs}}) {{visibility}} {{stateMutability}} override {{#if outputs}}returns ({{outputs}}){{/if}} {}
 
 {{/unless}}
 function mock_call_{{functionName}}({{parameters}}) public {

@@ -119,7 +119,7 @@ export function extractParameters(parameters: VariableDeclaration[]): { function
 export function extractReturnParameters(returnParameters: VariableDeclaration[]): { functionReturnParameters: string[], returnParameterTypes: string[], returnParameterNames: string[] } {
   const functionReturnParameters = returnParameters.map((parameter: VariableDeclaration, index: number) => {
     const typeName: string = sanitizeParameterType(parameter.typeString);
-    const paramName: string = parameter.name === '' ? `_returnParam${index}` : parameter.name;
+    const paramName: string = parameter.name || `_returnParam${index}`;
     const storageLocation = ['memory', 'calldata'].includes(parameter.storageLocation) ? `${parameter.storageLocation} ` : '';
     return `${typeName} ${storageLocation}${paramName}`;
   });

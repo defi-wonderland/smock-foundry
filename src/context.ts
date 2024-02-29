@@ -51,10 +51,10 @@ export function internalFunctionContext(node: FunctionDefinition): InternalFunct
 
 export function externalOrPublicFunctionContext(node: FunctionDefinition): ExternalFunctionContext {
   // Check if the function is external or public
-  if (node.visibility != 'external' && node.visibility != 'public') throw new Error('The function is not external or public');
+  if (node.visibility != 'external' && node.visibility != 'public') throw new Error('The function is not external nor public');
 
   // Save state mutability
-  const stateMutability = node.stateMutability === 'nonpayable' ? ' ' : ` ${node.stateMutability} `;
+  const stateMutability = node.stateMutability === 'nonpayable' ? '' : `${node.stateMutability ?? ''}`;
 
   const { functionParameters, parameterTypes, parameterNames } = extractParameters(node.vParameters.vParameters);
   const { functionReturnParameters, returnParameterNames } = extractReturnParameters(node.vReturnParameters.vParameters);
