@@ -67,7 +67,7 @@ export async function generateMockContracts(rootPath: string, contractsDirectori
             exportedSymbols: Array.from(scope.exportedSymbols.keys()),
             license: sourceUnit.license
           })
-          // TODO: check if there are other symbols we should account for, or if there is a better way to handle this
+          // TODO: Check if there are other symbols we should account for
           // TODO: Check if there is a better way to handle the HTML encoded characters, for instance with `compile` options
           .replace(/&#x27;/g, "'")
           .replace(/&#x3D;/g, '=')

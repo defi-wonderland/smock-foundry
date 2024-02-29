@@ -33,40 +33,40 @@ export const CONTEXT_RETRIEVERS = {
  * @param type The string of the type to fix
  * @returns The string with the type fixed
  */
-export const sanitizeParameterType = (type: string): string => {
+export function sanitizeParameterType(type: string): string {
   const regExp = new RegExp(`^(${userDefinedTypes.join('|')}) `);
   return type.replace(regExp, '');
-};
+}
 
 /**
  * Explicits a type's storage location, if required
  * @param type The string of the type to explicit
  * @returns The string with the type explicit
  */
-export const explicitTypeStorageLocation = (type: string): string => {
+export function explicitTypeStorageLocation(type: string): string {
   const regExp = new RegExp(`^(${explicitTypes.join('|')})\\b`);
   if (regExp.test(type) || type.includes('[]')) {
     return `${type} memory`;
   } else {
     return type;
   }
-};
+}
 
 /**
  * Registers the nested templates
  * @returns The content of the template
  */
-export const getContractTemplate = (): HandlebarsTemplateDelegate<any> => {
+export function getContractTemplate(): HandlebarsTemplateDelegate<any> {
   const templatePath = path.resolve(__dirname, 'templates', 'contract-template.hbs');
   const templateContent = readFileSync(templatePath, 'utf8');
   return Handlebars.compile(templateContent);
-};
+}
 
-export const getSmockHelperTemplate = (): HandlebarsTemplateDelegate<any> => {
+export function getSmockHelperTemplate(): HandlebarsTemplateDelegate<any> {
   const templatePath = path.resolve(__dirname, 'templates', 'helper-template.hbs');
   const templateContent = readFileSync(templatePath, 'utf8');
   return Handlebars.compile(templateContent);
-};
+}
 
 /**
  * Compiles the solidity files in the given directory calling forge build command
