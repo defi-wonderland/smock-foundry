@@ -125,7 +125,7 @@ export function extractReturnParameters(returnParameters: VariableDeclaration[])
   });
 
   const returnParameterTypes = returnParameters.map(parameter => sanitizeParameterType(parameter.typeString));
-  const returnParameterNames = returnParameters.map((parameter, index) => parameter.name === '' ? `_returnParam${index}` : parameter.name);
+  const returnParameterNames = returnParameters.map((parameter, index) => parameter.name || `_returnParam${index}`);
 
   return {
     functionReturnParameters,
