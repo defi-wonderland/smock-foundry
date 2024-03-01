@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'isolmate/interfaces/tokens/IERC20.sol';
-import {MockContractTest, IContractTest} from 'test/smock/contracts/MockContractTest.sol';
+import {MockContractTest, IContractTest} from 'test/smock/MockContractTest.sol';
 import {console} from 'forge-std/console.sol';
 import {SmockHelper} from 'test/smock/SmockHelper.sol';
 

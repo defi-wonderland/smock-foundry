@@ -1,5 +1,5 @@
 function set_{{setFunction.functionName}}({{setFunction.arrayType}} _{{setFunction.paramName}}) public {
-  {{#if isStruct}}
+  {{#if isStructArray}}
   for (uint256 _i; _i < _{{setFunction.paramName}}.length; ++_i) {
     {{setFunction.functionName}}.push(_{{setFunction.paramName}}[_i]);
   }

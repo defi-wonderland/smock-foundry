@@ -1,164 +1,78 @@
-export interface TypeNameNode {
-  nodeType?: 'ElementaryTypeName' | 'ArrayTypeName' | 'Mapping' | 'UserDefinedTypeName';
-  typeDescriptions?: {
-    typeString: string;
-  };
-  baseType?: TypeNameNode;
-  keyType?: TypeNameNode;
-  valueType?: TypeNameNode;
-  name?: string;
-  keyName?: string;
-  valueName?: string;
-  stateMutability?: string;
+export const userDefinedTypes = ['contract', 'enum', 'struct'];
+export const explicitTypes = ['string', 'bytes', 'mapping', 'struct'];
+
+// Contexts to pass to Handlebars templates
+export interface ConstructorContext {
+  parameters: string;
+  parameterNames: string;
+  contractName: string;
 }
 
-export interface VariableDeclarationNode {
-  nodeType: 'VariableDeclaration';
-  typeDescriptions: {
-    typeString: string;
-  };
-  typeName?: TypeNameNode;
-  name?: string;
-  constant?: boolean;
-  mutability?: string;
-  visibility?: string;
-  stateVariable?: boolean;
-  storageLocation?: string;
-}
-
-export interface FunctionDefinitionNode {
-  nodeType: 'FunctionDefinition';
-  name: string;
-  kind: string;
-  parameters: {
-    parameters: VariableDeclarationNode[];
-  };
-  returnParameters: {
-    parameters: VariableDeclarationNode[];
-  };
+export interface ExternalFunctionContext {
+  functionName: string;
+  signature: string;
+  parameters: string;
+  inputs: string;
+  outputs: string;
+  inputNames: string[];
+  outputNames: string[];
   visibility: string;
   stateMutability: string;
-  virtual: boolean;
   implemented: boolean;
 }
 
-export interface ContractDefinitionNode {
-  nodeType: 'ContractDefinition';
-  canonicalName: string;
-  nodes: AstNode[];
-  abstract: boolean;
-  contractKind: string;
-  name: string;
+export interface InternalFunctionContext extends Omit<ExternalFunctionContext, 'visibility' | 'stateMutability'> {
+  inputTypes: string[];
+  outputTypes: string[];
+  isView: boolean;
 }
 
-export interface ImportDirectiveNode {
-  nodeType: 'ImportDirective';
+export interface ImportContext {
   absolutePath: string;
-  file: string;
-  symbolAliases: {
-    foreign: {
-      name: string;
-      nodeType: 'Identifier';
-    };
-  }[];
+  namedImports?: (string | number)[];
 }
 
-export type AstNode = ImportDirectiveNode | ContractDefinitionNode | FunctionDefinitionNode | VariableDeclarationNode;
-
-export interface Ast {
-  nodeType: 'SourceUnit';
-  id?: number;
-  src: string;
-  nodes: AstNode[];
-  license: string;
-  absolutePath: string;
-  exportedSymbols: { [key: string]: number[] };
-}
-
-export interface BasicStateVariableOptions {
+export interface MappingVariableContext {
   setFunction: {
-    functionName: string;
-    paramType: string;
-    paramName: string;
+    functionName: string,
+    keyTypes: string[],
+    valueType: string,
+  },
+  mockFunction: {
+    functionName: string,
+    keyTypes: string[],
+    valueType: string,
+    baseType: string,
+  },
+  isInternal: boolean,
+  isArray: boolean,
+  isStructArray: boolean,
+}
+
+export interface ArrayVariableContext {
+  setFunction: {
+    functionName: string,
+    arrayType: string,
+    paramName: string,
   };
   mockFunction: {
-    functionName: string;
-    paramType: string;
+    functionName: string,
+    arrayType: string,
+    baseType: string,
   };
   isInternal: boolean;
-}
-
-export interface ArrayStateVariableOptions {
-  setFunction: {
-    functionName: string;
-    arrayType: string;
-    paramName: string;
-  };
-  mockFunction: {
-    functionName: string;
-    arrayType: string;
-    baseType: string;
-  };
-  isInternal: boolean;
-  isStruct: boolean;
-}
-
-export interface MappingStateVariableOptions {
-  setFunction: {
-    functionName: string;
-    keyTypes: string[];
-    valueType: string;
-  };
-  mockFunction: {
-    functionName: string;
-    keyTypes: string[];
-    valueType: string;
-    baseType: string;
-  };
-  isInternal: boolean;
-  isArray: boolean;
   isStructArray: boolean;
 }
 
-export interface StateVariablesOptions {
-  basicStateVariables: BasicStateVariableOptions[];
-  arrayStateVariables: ArrayStateVariableOptions[];
-  mappingStateVariables: MappingStateVariableOptions[];
+export interface StateVariableContext {
+  isInternal: boolean;
+  setFunction: {
+    functionName: string,
+    paramType: string,
+    paramName: string,
+  };
+  mockFunction: {
+    functionName: string,
+    paramType: string,
+  };
 }
-
-export interface ExternalFunctionOptions {
-  functionName: string;
-  signature: string;
-  parameters: string;
-  inputs: string;
-  outputs: string;
-  inputNames: string[];
-  outputNames: string[];
-  visibility: string;
-  stateMutability: string;
-  implemented: boolean;
-}
-
-export interface InternalFunctionOptions {
-  functionName: string;
-  signature: string;
-  parameters: string;
-  inputs: string;
-  outputs: string;
-  inputTypes: string[];
-  outputTypes: string[];
-  inputNames: string[];
-  outputNames: string[];
-  isView: boolean;
-  implemented: boolean;
-}
-
-export interface OutputType {
-  name: string;
-  type: string;
-  baseType: string;
-  indexed?: boolean;
-}
-
-export const userDefinedTypes = ['contract', 'enum', 'struct'];
-export const explicitTypes = ['string', 'bytes', 'mapping', 'struct'];
